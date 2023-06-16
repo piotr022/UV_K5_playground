@@ -1,0 +1,3 @@
+[submodule "tools/fw_tools"]
+	path = tools/fw_tools
+	url = https://github.com/amnemonic/Quansheng_UV-K5_Firmware.git
