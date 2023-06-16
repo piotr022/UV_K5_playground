@@ -1,0 +1,11 @@
+C:/Users/plewa/dev/UV_K5_playground/build/CMakeFiles/edit_cache.dir
+C:/Users/plewa/dev/UV_K5_playground/build/CMakeFiles/rebuild_cache.dir
+C:/Users/plewa/dev/UV_K5_playground/build/libs/CMakeFiles/edit_cache.dir
+C:/Users/plewa/dev/UV_K5_playground/build/libs/CMakeFiles/rebuild_cache.dir
+C:/Users/plewa/dev/UV_K5_playground/build/libs/g030_drivers/CMakeFiles/edit_cache.dir
+C:/Users/plewa/dev/UV_K5_playground/build/libs/g030_drivers/CMakeFiles/rebuild_cache.dir
+C:/Users/plewa/dev/UV_K5_playground/build/src/CMakeFiles/edit_cache.dir
+C:/Users/plewa/dev/UV_K5_playground/build/src/CMakeFiles/rebuild_cache.dir
+C:/Users/plewa/dev/UV_K5_playground/build/src/decompiled/CMakeFiles/decompiled.dir
+C:/Users/plewa/dev/UV_K5_playground/build/src/decompiled/CMakeFiles/edit_cache.dir
+C:/Users/plewa/dev/UV_K5_playground/build/src/decompiled/CMakeFiles/rebuild_cache.dir

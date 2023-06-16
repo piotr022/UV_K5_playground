@@ -1,0 +1,14 @@
+# ninja log v5
+7	40	7086352708682141	src/decompiled/CMakeFiles/decompiled.dir/__/mcu_target_common/startup_stm32g030xx.s.obj	69539413432f1dea
+11	68	7086352708955078	src/decompiled/CMakeFiles/decompiled.dir/main.cpp.obj	3dbe244f920770f0
+3	85	7086352709137376	src/decompiled/CMakeFiles/decompiled.dir/__/mcu_target_common/system_stm32g0xx.c.obj	b14a57baf7047a01
+18	3043	7086355083872636	src/decompiled/CMakeFiles/decompiled.dir/decompiled.c.obj	ad3caac15c30836b
+2	64	7086357633959230	src/decompiled/CMakeFiles/decompiled.dir/main.cpp.obj	3dbe244f920770f0
+64	294	7086357634834969	src/decompiled/decompiled	e9a21bf19a949a43
+14	96	7086358570559536	src/decompiled/CMakeFiles/decompiled.dir/main.cpp.obj	3dbe244f920770f0
+3	82	7086395702587459	src/decompiled/CMakeFiles/decompiled.dir/main.cpp.obj	3dbe244f920770f0
+82	250	7086395703531546	src/decompiled/decompiled	e9a21bf19a949a43
+2	104	7086415888347136	src/decompiled/CMakeFiles/decompiled.dir/main.cpp.obj	3dbe244f920770f0
+104	269	7086415889238296	src/decompiled/decompiled	e9a21bf19a949a43
+2	74	7086417743481691	src/decompiled/CMakeFiles/decompiled.dir/main.cpp.obj	3dbe244f920770f0
+74	230	7086417744466151	src/decompiled/decompiled	e9a21bf19a949a43

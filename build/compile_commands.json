@@ -1,0 +1,26 @@
+[
+{
+  "directory": "C:/Users/plewa/dev/UV_K5_playground/build",
+  "command": "C:\\PROGRA~2\\GNUARM~1\\102021~1.10\\bin\\AR19DD~1.EXE -DDEBUG_ENABLED -DSTM32G0 -DSTM32G030xx -DSTM32 -IC:/Users/plewa/dev/UV_K5_playground/src/decompiled/. -IC:/Users/plewa/dev/UV_K5_playground/src/decompiled/Drivers/CMSIS/Device/ST/STM32G0xx/Include -IC:/Users/plewa/dev/UV_K5_playground/src/decompiled/Drivers/CMSIS/DSP/Include -IC:/Users/plewa/dev/UV_K5_playground/src/decompiled/Drivers/CMSIS/Include -IC:/Users/plewa/dev/UV_K5_playground/libs/g030_drivers/./include -IC:/Users/plewa/dev/UV_K5_playground/libs/g030_drivers/./CMSIS/Device/ST/STM32G0xx/Include -IC:/Users/plewa/dev/UV_K5_playground/libs/g030_drivers/./CMSIS/Include -IC:/Users/plewa/dev/UV_K5_playground/libs/g030_drivers/./STM32G0xx_HAL_Driver/Inc -g -std=c99 -mthumb -mcpu=cortex-m0plus -mfpu=auto -mfloat-abi=soft -fno-exceptions -msoft-float -fdata-sections -ffunction-sections -Wall -Wno-unknown-pragmas -Os --debug -DDEBUG -o src\\decompiled\\CMakeFiles\\decompiled.dir\\__\\mcu_target_common\\system_stm32g0xx.c.obj -c C:\\Users\\plewa\\dev\\UV_K5_playground\\src\\mcu_target_common\\system_stm32g0xx.c",
+  "file": "C:\\Users\\plewa\\dev\\UV_K5_playground\\src\\mcu_target_common\\system_stm32g0xx.c",
+  "output": "src\\decompiled\\CMakeFiles\\decompiled.dir\\__\\mcu_target_common\\system_stm32g0xx.c.obj"
+},
+{
+  "directory": "C:/Users/plewa/dev/UV_K5_playground/build",
+  "command": "C:\\PROGRA~2\\GNUARM~1\\102021~1.10\\bin\\AR19DD~1.EXE -DDEBUG_ENABLED -DSTM32G0 -DSTM32G030xx -DSTM32 -IC:/Users/plewa/dev/UV_K5_playground/src/decompiled/. -IC:/Users/plewa/dev/UV_K5_playground/src/decompiled/Drivers/CMSIS/Device/ST/STM32G0xx/Include -IC:/Users/plewa/dev/UV_K5_playground/src/decompiled/Drivers/CMSIS/DSP/Include -IC:/Users/plewa/dev/UV_K5_playground/src/decompiled/Drivers/CMSIS/Include -IC:/Users/plewa/dev/UV_K5_playground/libs/g030_drivers/./include -IC:/Users/plewa/dev/UV_K5_playground/libs/g030_drivers/./CMSIS/Device/ST/STM32G0xx/Include -IC:/Users/plewa/dev/UV_K5_playground/libs/g030_drivers/./CMSIS/Include -IC:/Users/plewa/dev/UV_K5_playground/libs/g030_drivers/./STM32G0xx_HAL_Driver/Inc -g -mthumb -mcpu=cortex-m0plus -mfpu=auto -mfloat-abi=soft -fno-exceptions -msoft-float -fdata-sections -ffunction-sections -Wall -Wno-unknown-pragmas -Os --debug -DDEBUG -o src\\decompiled\\CMakeFiles\\decompiled.dir\\__\\mcu_target_common\\startup_stm32g030xx.s.obj -c C:\\Users\\plewa\\dev\\UV_K5_playground\\src\\mcu_target_common\\startup_stm32g030xx.s",
+  "file": "C:\\Users\\plewa\\dev\\UV_K5_playground\\src\\mcu_target_common\\startup_stm32g030xx.s",
+  "output": "src\\decompiled\\CMakeFiles\\decompiled.dir\\__\\mcu_target_common\\startup_stm32g030xx.s.obj"
+},
+{
+  "directory": "C:/Users/plewa/dev/UV_K5_playground/build",
+  "command": "C:\\PROGRA~2\\GNUARM~1\\102021~1.10\\bin\\AR10B2~1.EXE -DDEBUG_ENABLED -DSTM32G0 -DSTM32G030xx -DSTM32 -IC:/Users/plewa/dev/UV_K5_playground/src/decompiled/. -IC:/Users/plewa/dev/UV_K5_playground/src/decompiled/Drivers/CMSIS/Device/ST/STM32G0xx/Include -IC:/Users/plewa/dev/UV_K5_playground/src/decompiled/Drivers/CMSIS/DSP/Include -IC:/Users/plewa/dev/UV_K5_playground/src/decompiled/Drivers/CMSIS/Include -IC:/Users/plewa/dev/UV_K5_playground/libs/g030_drivers/./include -IC:/Users/plewa/dev/UV_K5_playground/libs/g030_drivers/./CMSIS/Device/ST/STM32G0xx/Include -IC:/Users/plewa/dev/UV_K5_playground/libs/g030_drivers/./CMSIS/Include -IC:/Users/plewa/dev/UV_K5_playground/libs/g030_drivers/./STM32G0xx_HAL_Driver/Inc -g -std=gnu++17 -mthumb -mcpu=cortex-m0plus -mfpu=auto -mfloat-abi=soft -fno-exceptions -msoft-float -fdata-sections -ffunction-sections -Wall -Wno-register -Wno-unknown-pragmas -Os -fno-rtti --debug -DDEBUG -o src\\decompiled\\CMakeFiles\\decompiled.dir\\main.cpp.obj -c C:\\Users\\plewa\\dev\\UV_K5_playground\\src\\decompiled\\main.cpp",
+  "file": "C:\\Users\\plewa\\dev\\UV_K5_playground\\src\\decompiled\\main.cpp",
+  "output": "src\\decompiled\\CMakeFiles\\decompiled.dir\\main.cpp.obj"
+},
+{
+  "directory": "C:/Users/plewa/dev/UV_K5_playground/build",
+  "command": "C:\\PROGRA~2\\GNUARM~1\\102021~1.10\\bin\\AR19DD~1.EXE -DDEBUG_ENABLED -DSTM32G0 -DSTM32G030xx -DSTM32 -IC:/Users/plewa/dev/UV_K5_playground/src/decompiled/. -IC:/Users/plewa/dev/UV_K5_playground/src/decompiled/Drivers/CMSIS/Device/ST/STM32G0xx/Include -IC:/Users/plewa/dev/UV_K5_playground/src/decompiled/Drivers/CMSIS/DSP/Include -IC:/Users/plewa/dev/UV_K5_playground/src/decompiled/Drivers/CMSIS/Include -IC:/Users/plewa/dev/UV_K5_playground/libs/g030_drivers/./include -IC:/Users/plewa/dev/UV_K5_playground/libs/g030_drivers/./CMSIS/Device/ST/STM32G0xx/Include -IC:/Users/plewa/dev/UV_K5_playground/libs/g030_drivers/./CMSIS/Include -IC:/Users/plewa/dev/UV_K5_playground/libs/g030_drivers/./STM32G0xx_HAL_Driver/Inc -g -std=c99 -mthumb -mcpu=cortex-m0plus -mfpu=auto -mfloat-abi=soft -fno-exceptions -msoft-float -fdata-sections -ffunction-sections -Wall -Wno-unknown-pragmas -Os --debug -DDEBUG -o src\\decompiled\\CMakeFiles\\decompiled.dir\\decompiled.c.obj -c C:\\Users\\plewa\\dev\\UV_K5_playground\\src\\decompiled\\decompiled.c",
+  "file": "C:\\Users\\plewa\\dev\\UV_K5_playground\\src\\decompiled\\decompiled.c",
+  "output": "src\\decompiled\\CMakeFiles\\decompiled.dir\\decompiled.c.obj"
+}
+]
