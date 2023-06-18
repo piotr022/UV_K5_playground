@@ -9,3 +9,6 @@ C:/Users/plewa/dev/UV_K5_playground/build/src/CMakeFiles/rebuild_cache.dir
 C:/Users/plewa/dev/UV_K5_playground/build/src/decompiled/CMakeFiles/decompiled.dir
 C:/Users/plewa/dev/UV_K5_playground/build/src/decompiled/CMakeFiles/edit_cache.dir
 C:/Users/plewa/dev/UV_K5_playground/build/src/decompiled/CMakeFiles/rebuild_cache.dir
+C:/Users/plewa/dev/UV_K5_playground/build/src/ocl_loader/CMakeFiles/ocl_loader.dir
+C:/Users/plewa/dev/UV_K5_playground/build/src/ocl_loader/CMakeFiles/edit_cache.dir
+C:/Users/plewa/dev/UV_K5_playground/build/src/ocl_loader/CMakeFiles/rebuild_cache.dir

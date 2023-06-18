@@ -1,0 +1,20 @@
+{
+   "version": "2.0.0",
+   "tasks": [
+       {
+           "label": "OpenOCD",
+           "type": "shell",
+           "command": "openocd -f interface/stlink.cfg -f target/stm32g0x.cfg -c \"set CPUTAPID 0x0bb11477\"",
+           "isBackground": true,
+           "presentation": {
+               "reveal": "always",
+               "panel": "dedicated"
+           },
+           "group": {
+               "kind": "build",
+               "isDefault": true
+           },
+           "problemMatcher": []
+       }
+   ]
+}

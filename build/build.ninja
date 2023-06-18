@@ -240,9 +240,75 @@ build src/decompiled/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
 build src/decompiled/rebuild_cache: phony src/decompiled/CMakeFiles/rebuild_cache.util
 
 # =============================================================================
+# Write statements declared in CMakeLists.txt:
+# C:/Users/plewa/dev/UV_K5_playground/src/CMakeLists.txt
+# =============================================================================
+
+# =============================================================================
+# Object build statements for EXECUTABLE target ocl_loader
+
+
+#############################################
+# Order-only phony target for ocl_loader
+
+build cmake_object_order_depends_target_ocl_loader: phony || src/ocl_loader/CMakeFiles/ocl_loader.dir
+
+build src/ocl_loader/CMakeFiles/ocl_loader.dir/main.c.obj: C_COMPILER__ocl_loader_unscanned_Debug C$:/Users/plewa/dev/UV_K5_playground/src/ocl_loader/main.c || cmake_object_order_depends_target_ocl_loader
+  DEFINES = -DDEBUG_ENABLED -DSTM32G0 -DSTM32G030xx -DSTM32
+  DEP_FILE = src\ocl_loader\CMakeFiles\ocl_loader.dir\main.c.obj.d
+  FLAGS = -g -std=c99 -mthumb -mcpu=cortex-m0plus -mfpu=auto -mfloat-abi=soft -fno-exceptions -msoft-float -Wall -Wno-unknown-pragmas -Os --debug -DDEBUG -ffunction-sections -fdata-sections -gdwarf-3 -nostartfiles -fno-strict-aliasing
+  INCLUDES = -IC:/Users/plewa/dev/UV_K5_playground/src/ocl_loader/. -IC:/Users/plewa/dev/UV_K5_playground/src/ocl_loader/Drivers/CMSIS/Device/ST/STM32G0xx/Include -IC:/Users/plewa/dev/UV_K5_playground/src/ocl_loader/Drivers/CMSIS/DSP/Include -IC:/Users/plewa/dev/UV_K5_playground/src/ocl_loader/Drivers/CMSIS/Include -IC:/Users/plewa/dev/UV_K5_playground/libs/g030_drivers/./include -IC:/Users/plewa/dev/UV_K5_playground/libs/g030_drivers/./CMSIS/Device/ST/STM32G0xx/Include -IC:/Users/plewa/dev/UV_K5_playground/libs/g030_drivers/./CMSIS/Include -IC:/Users/plewa/dev/UV_K5_playground/libs/g030_drivers/./STM32G0xx_HAL_Driver/Inc
+  OBJECT_DIR = src\ocl_loader\CMakeFiles\ocl_loader.dir
+  OBJECT_FILE_DIR = src\ocl_loader\CMakeFiles\ocl_loader.dir
+
+
+# =============================================================================
+# Link build statements for EXECUTABLE target ocl_loader
+
+
+#############################################
+# Link the executable src\ocl_loader\ocl_loader
+
+build src/ocl_loader/ocl_loader: C_EXECUTABLE_LINKER__ocl_loader_Debug src/ocl_loader/CMakeFiles/ocl_loader.dir/main.c.obj
+  DEP_FILE = src\ocl_loader\CMakeFiles\ocl_loader.dir\link.d
+  FLAGS = -g
+  LINK_FLAGS = -T C:/Users/plewa/dev/UV_K5_playground/src/ocl_loader/ram.lds -mcpu=cortex-m0plus -mthumb -mfpu=auto -mfloat-abi=soft -specs=nosys.specs -specs=nano.specs -lc -lm -lnosys -Wl,-Map=uv-k5-custom-build.map,--cref -Wl,--gc-sections -Wl,--print-memory-usage -Wstack-usage=128 -Wno-register -Wl,--dependency-file,src\ocl_loader\CMakeFiles\ocl_loader.dir\link.d
+  OBJECT_DIR = src\ocl_loader\CMakeFiles\ocl_loader.dir
+  POST_BUILD = cmd.exe /C "cd /D C:\Users\plewa\dev\UV_K5_playground\build\src\ocl_loader && arm-none-eabi-size ocl_loader && cd /D C:\Users\plewa\dev\UV_K5_playground\build\src\ocl_loader && arm-none-eabi-objcopy -O ihex ocl_loader ocl_loader.hex && arm-none-eabi-objcopy -O binary ocl_loader ocl_loader.bin"
+  PRE_LINK = cd .
+  TARGET_FILE = src\ocl_loader\ocl_loader
+  TARGET_PDB = ocl_loader.dbg
+
+
+#############################################
+# Utility command for edit_cache
+
+build src/ocl_loader/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D C:\Users\plewa\dev\UV_K5_playground\build\src\ocl_loader && "C:\Program Files\CMake\bin\cmake-gui.exe" -SC:\Users\plewa\dev\UV_K5_playground -BC:\Users\plewa\dev\UV_K5_playground\build"
+  DESC = Running CMake cache editor...
+  pool = console
+  restat = 1
+
+build src/ocl_loader/edit_cache: phony src/ocl_loader/CMakeFiles/edit_cache.util
+
+
+#############################################
+# Utility command for rebuild_cache
+
+build src/ocl_loader/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D C:\Users\plewa\dev\UV_K5_playground\build\src\ocl_loader && "C:\Program Files\CMake\bin\cmake.exe" --regenerate-during-build -SC:\Users\plewa\dev\UV_K5_playground -BC:\Users\plewa\dev\UV_K5_playground\build"
+  DESC = Running CMake to regenerate build system...
+  pool = console
+  restat = 1
+
+build src/ocl_loader/rebuild_cache: phony src/ocl_loader/CMakeFiles/rebuild_cache.util
+
+# =============================================================================
 # Target aliases.
 
 build decompiled: phony src/decompiled/decompiled
+
+build ocl_loader: phony src/ocl_loader/ocl_loader
 
 # =============================================================================
 # Folder targets.
@@ -273,7 +339,7 @@ build libs/g030_drivers/all: phony
 #############################################
 # Folder: C:/Users/plewa/dev/UV_K5_playground/build/src
 
-build src/all: phony src/decompiled/all
+build src/all: phony src/decompiled/all src/ocl_loader/all
 
 # =============================================================================
 
@@ -283,20 +349,27 @@ build src/all: phony src/decompiled/all
 build src/decompiled/all: phony src/decompiled/decompiled
 
 # =============================================================================
+
+#############################################
+# Folder: C:/Users/plewa/dev/UV_K5_playground/build/src/ocl_loader
+
+build src/ocl_loader/all: phony src/ocl_loader/ocl_loader
+
+# =============================================================================
 # Built-in targets
 
 
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja: RERUN_CMAKE | C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeASMInformation.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeCInformation.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeCXXInformation.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeCommonLanguageInclude.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeGenericSystem.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeInitializeConfigs.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeLanguageInformation.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeSystemSpecificInformation.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeSystemSpecificInitialize.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/Compiler/CMakeCommonCompilerMacros.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/Compiler/GNU-ASM.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/Compiler/GNU-C.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/Compiler/GNU-CXX.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/Compiler/GNU.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/Platform/Generic.cmake C$:/Users/plewa/dev/UV_K5_playground/CMakeLists.txt C$:/Users/plewa/dev/UV_K5_playground/libs/CMakeLists.txt C$:/Users/plewa/dev/UV_K5_playground/libs/g030_drivers/CMakeLists.txt C$:/Users/plewa/dev/UV_K5_playground/src/CMakeLists.txt C$:/Users/plewa/dev/UV_K5_playground/src/decompiled/CMakeLists.txt C$:/Users/plewa/dev/UV_K5_playground/toolchain/arm-none-eabi-gcc.cmake CMakeCache.txt CMakeFiles/3.27.0-rc2/CMakeASMCompiler.cmake CMakeFiles/3.27.0-rc2/CMakeCCompiler.cmake CMakeFiles/3.27.0-rc2/CMakeCXXCompiler.cmake CMakeFiles/3.27.0-rc2/CMakeSystem.cmake
+build build.ninja: RERUN_CMAKE | C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeASMInformation.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeCInformation.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeCXXInformation.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeCommonLanguageInclude.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeGenericSystem.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeInitializeConfigs.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeLanguageInformation.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeSystemSpecificInformation.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeSystemSpecificInitialize.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/Compiler/CMakeCommonCompilerMacros.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/Compiler/GNU-ASM.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/Compiler/GNU-C.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/Compiler/GNU-CXX.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/Compiler/GNU.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/Platform/Generic.cmake C$:/Users/plewa/dev/UV_K5_playground/CMakeLists.txt C$:/Users/plewa/dev/UV_K5_playground/libs/CMakeLists.txt C$:/Users/plewa/dev/UV_K5_playground/libs/g030_drivers/CMakeLists.txt C$:/Users/plewa/dev/UV_K5_playground/src/CMakeLists.txt C$:/Users/plewa/dev/UV_K5_playground/src/decompiled/CMakeLists.txt C$:/Users/plewa/dev/UV_K5_playground/src/ocl_loader/CMakeLists.txt C$:/Users/plewa/dev/UV_K5_playground/toolchain/arm-none-eabi-gcc.cmake CMakeCache.txt CMakeFiles/3.27.0-rc2/CMakeASMCompiler.cmake CMakeFiles/3.27.0-rc2/CMakeCCompiler.cmake CMakeFiles/3.27.0-rc2/CMakeCXXCompiler.cmake CMakeFiles/3.27.0-rc2/CMakeSystem.cmake
   pool = console
 
 
 #############################################
 # A missing CMake input file is not an error.
 
-build C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeASMInformation.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeCInformation.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeCXXInformation.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeCommonLanguageInclude.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeGenericSystem.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeInitializeConfigs.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeLanguageInformation.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeSystemSpecificInformation.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeSystemSpecificInitialize.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/Compiler/CMakeCommonCompilerMacros.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/Compiler/GNU-ASM.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/Compiler/GNU-C.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/Compiler/GNU-CXX.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/Compiler/GNU.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/Platform/Generic.cmake C$:/Users/plewa/dev/UV_K5_playground/CMakeLists.txt C$:/Users/plewa/dev/UV_K5_playground/libs/CMakeLists.txt C$:/Users/plewa/dev/UV_K5_playground/libs/g030_drivers/CMakeLists.txt C$:/Users/plewa/dev/UV_K5_playground/src/CMakeLists.txt C$:/Users/plewa/dev/UV_K5_playground/src/decompiled/CMakeLists.txt C$:/Users/plewa/dev/UV_K5_playground/toolchain/arm-none-eabi-gcc.cmake CMakeCache.txt CMakeFiles/3.27.0-rc2/CMakeASMCompiler.cmake CMakeFiles/3.27.0-rc2/CMakeCCompiler.cmake CMakeFiles/3.27.0-rc2/CMakeCXXCompiler.cmake CMakeFiles/3.27.0-rc2/CMakeSystem.cmake: phony
+build C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeASMInformation.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeCInformation.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeCXXInformation.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeCommonLanguageInclude.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeGenericSystem.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeInitializeConfigs.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeLanguageInformation.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeSystemSpecificInformation.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/CMakeSystemSpecificInitialize.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/Compiler/CMakeCommonCompilerMacros.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/Compiler/GNU-ASM.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/Compiler/GNU-C.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/Compiler/GNU-CXX.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/Compiler/GNU.cmake C$:/Program$ Files/CMake/share/cmake-3.27/Modules/Platform/Generic.cmake C$:/Users/plewa/dev/UV_K5_playground/CMakeLists.txt C$:/Users/plewa/dev/UV_K5_playground/libs/CMakeLists.txt C$:/Users/plewa/dev/UV_K5_playground/libs/g030_drivers/CMakeLists.txt C$:/Users/plewa/dev/UV_K5_playground/src/CMakeLists.txt C$:/Users/plewa/dev/UV_K5_playground/src/decompiled/CMakeLists.txt C$:/Users/plewa/dev/UV_K5_playground/src/ocl_loader/CMakeLists.txt C$:/Users/plewa/dev/UV_K5_playground/toolchain/arm-none-eabi-gcc.cmake CMakeCache.txt CMakeFiles/3.27.0-rc2/CMakeASMCompiler.cmake CMakeFiles/3.27.0-rc2/CMakeCCompiler.cmake CMakeFiles/3.27.0-rc2/CMakeCXXCompiler.cmake CMakeFiles/3.27.0-rc2/CMakeSystem.cmake: phony
 
 
 #############################################

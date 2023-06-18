@@ -1,0 +1,28 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "svdFile": "./.vscode/stm32g030.svd",
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/src/decompiled/decompiled",
+            "name": "kwaczek DBG",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "configFiles": [
+                "interface/cmsis-dap.cfg",
+                "./.vscode/clone_stm32g0x.cfg" // "target/swm050.cfg", //
+            ],
+            "searchDir": [
+                ".",
+                "${workspaceRoot}",
+                "${workspaceRoot}/.vscode/",
+            ],
+            "runToEntryPoint": "main",
+            "showDevDebugOutput": "both",
+            // "postLaunchCommands": [
+            //     "monitor gdb_memory_map disable",
+            // ]
+        },
+    ]
+}

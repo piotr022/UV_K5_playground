@@ -49,7 +49,8 @@
 					"build" : "src",
 					"childIndexes" : 
 					[
-						4
+						4,
+						5
 					],
 					"jsonFile" : "directory-src-Debug-c94b7c2814d5a21df52c.json",
 					"minimumCMakeVersion" : 
@@ -74,6 +75,21 @@
 					[
 						0
 					]
+				},
+				{
+					"build" : "src/ocl_loader",
+					"jsonFile" : "directory-src.ocl_loader-Debug-9c533c3d418f8fe22477.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.15"
+					},
+					"parentIndex" : 3,
+					"projectIndex" : 0,
+					"source" : "src/ocl_loader",
+					"targetIndexes" : 
+					[
+						1
+					]
 				}
 			],
 			"name" : "Debug",
@@ -86,12 +102,14 @@
 						1,
 						2,
 						3,
-						4
+						4,
+						5
 					],
 					"name" : "uv-k5-custom-build",
 					"targetIndexes" : 
 					[
-						0
+						0,
+						1
 					]
 				}
 			],
@@ -102,6 +120,13 @@
 					"id" : "decompiled::@3d87ae4da4cac2952ac7",
 					"jsonFile" : "target-decompiled-Debug-4e33d0bf754ddd5d8509.json",
 					"name" : "decompiled",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "ocl_loader::@9d117fae84ed60aca5a4",
+					"jsonFile" : "target-ocl_loader-Debug-484e0d1a1dd8371185c3.json",
+					"name" : "ocl_loader",
 					"projectIndex" : 0
 				}
 			]

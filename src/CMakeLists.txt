@@ -1,1 +1,2 @@
 add_subdirectory(decompiled)
+add_subdirectory(ocl_loader)

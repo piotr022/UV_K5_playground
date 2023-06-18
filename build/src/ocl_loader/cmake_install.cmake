@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/plewa/dev/UV_K5_playground/src
+# Install script for directory: C:/Users/plewa/dev/UV_K5_playground/src/ocl_loader
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -35,15 +35,5 @@ endif()
 # Set default install directory permissions.
 if(NOT DEFINED CMAKE_OBJDUMP)
   set(CMAKE_OBJDUMP "C:/Program Files (x86)/GNU Arm Embedded Toolchain/10 2021.10/bin/arm-none-eabi-objdump.exe")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
-  include("C:/Users/plewa/dev/UV_K5_playground/build/src/decompiled/cmake_install.cmake")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
-  include("C:/Users/plewa/dev/UV_K5_playground/build/src/ocl_loader/cmake_install.cmake")
 endif()
 

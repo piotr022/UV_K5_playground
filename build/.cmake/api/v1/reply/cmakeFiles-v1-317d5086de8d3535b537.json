@@ -142,6 +142,9 @@
 		},
 		{
 			"path" : "src/decompiled/CMakeLists.txt"
+		},
+		{
+			"path" : "src/ocl_loader/CMakeLists.txt"
 		}
 	],
 	"kind" : "cmakeFiles",
