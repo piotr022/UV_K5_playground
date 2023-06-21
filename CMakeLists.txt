@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.15)
 
-set(OPTI_FLAG s)
+set(OPTI_FLAG g)
 set(CMAKE_BUILD_TYPE Debug)
 
-set(STM32_DEFINES "-DSTM32G0 -DSTM32G030xx -DSTM32")
+set(STM32_DEFINES "-DSTM32F0 -DSTM32F030x8 -DSTM32")
 
 set(TOOLCHAIN_PREFIX arm-none-eabi-)
 set(CMAKE_TOOLCHAIN_FILE toolchain/arm-none-eabi-gcc.cmake)

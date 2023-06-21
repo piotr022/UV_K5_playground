@@ -4,14 +4,18 @@
         {
             "svdFile": "./.vscode/stm32g030.svd",
             "cwd": "${workspaceRoot}",
-            "executable": "./build/src/decompiled/decompiled",
+            "executable": "./build/src/par_runner/par_runner",
             "name": "kwaczek DBG",
             "request": "launch",
             "type": "cortex-debug",
             "servertype": "openocd",
             "configFiles": [
                 "interface/cmsis-dap.cfg",
-                "./.vscode/clone_stm32g0x.cfg" // "target/swm050.cfg", //
+                "./openocd_scripts/dp32g030.cfg" // "target/swm050.cfg", //
+            ],
+            "openOCDLaunchCommands": [
+                "write_image ./build/src/par_runner/par_runner.bin 0",
+                "reset halt"
             ],
             "searchDir": [
                 ".",

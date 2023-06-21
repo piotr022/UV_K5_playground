@@ -1,12 +1,13 @@
-#include "stm32g030xx.h"
-extern "C" long entry_point();
-extern "C" void __asm_nop(int a, int b, int c, int d)
-{
-   __NOP();
-}
+
 int main()
 {
-   entry_point();
+   unsigned int u32Test = 0;
+   while(1)
+   {
+      u32Test++;
+   }
+
    return 0;
 }
 
+ 

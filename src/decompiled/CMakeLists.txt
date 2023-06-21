@@ -1,16 +1,14 @@
 set(NAME decompiled)
 set(MCU_TARGET_FILES_DIR ../mcu_target_common)
 
-
 add_executable(${NAME}  
-        ${MCU_TARGET_FILES_DIR}/system_stm32g0xx.c
-        ${MCU_TARGET_FILES_DIR}/startup_stm32g030xx.s   
+        ${MCU_TARGET_FILES_DIR}/system_stm32f0xx.c
+        ${MCU_TARGET_FILES_DIR}/stm32f030xc.s   
         main.cpp
-        decompiled.c
 )
 
 target_link_libraries(${NAME}
-   mcu_drivers
+        f030_drivers
 )
 
 target_include_directories(${NAME} PUBLIC
@@ -30,12 +28,11 @@ target_compile_options(${NAME} PRIVATE
 )
 
 target_link_options(${NAME} PRIVATE
-        #-print-multi-lib
-        -T ${CMAKE_CURRENT_SOURCE_DIR}/${MCU_TARGET_FILES_DIR}/STM32G030F6Px_FLASH.ld #${CMAKE_SOURCE_DIR}/
-        -mcpu=cortex-m0plus
+        -T ${CMAKE_CURRENT_SOURCE_DIR}/${MCU_TARGET_FILES_DIR}/memory.ld #${CMAKE_SOURCE_DIR}/
+        -mcpu=cortex-m0
         -mthumb
         -mfpu=auto
-        -mfloat-abi=soft #lets go fpu
+        -mfloat-abi=soft
         -specs=nosys.specs
         -specs=nano.specs
         -lc
