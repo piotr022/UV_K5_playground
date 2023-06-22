@@ -14,7 +14,7 @@ SECTIONS
 	{
 		_text = .;
 		*(.entry*)
-		*(.text*)
+		*(.text*)	
 		_etext = .;
 	} > PROGRAM
 

@@ -29,7 +29,7 @@ target_compile_options(${NAME} PRIVATE
 
 target_link_options(${NAME} PRIVATE
         #-print-multi-lib
-        -T ${CMAKE_CURRENT_SOURCE_DIR}/${MCU_TARGET_FILES_DIR}/memory.ld #${CMAKE_SOURCE_DIR}/
+        -T ${CMAKE_CURRENT_SOURCE_DIR}/memory.ld
         -mcpu=cortex-m0
         -mthumb
         -mfpu=auto
