@@ -1,6 +1,6 @@
 set(LIB_NAME orginal_fw)
 
-set(ORGINAL_FW_BIN output_00000_10000.bin)
+set(ORGINAL_FW_BIN orginal_fw.bin)
 
 set(ORGINAL_FW_VECTORS_BIN org_vectors.bin)
 set(ORGINAL_FW_VECTORS_OBJ org_vectors.o)

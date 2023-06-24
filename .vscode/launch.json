@@ -13,10 +13,10 @@
                 "interface/cmsis-dap.cfg",
                 "./openocd_scripts/dp32g030.cfg" // "target/swm050.cfg", //
             ],
-            "openOCDLaunchCommands": [
-                "write_image ./build/src/par_runner/par_runner.bin 0",
-                "reset halt"
-            ],
+            // "openOCDLaunchCommands": [
+            //     "write_image ./build/src/par_runner/par_runner.bin 0",
+            //     "reset halt"
+            // ],
             "searchDir": [
                 ".",
                 "${workspaceRoot}",
@@ -24,9 +24,7 @@
             ],
             "runToEntryPoint": "main",
             "showDevDebugOutput": "both",
-            // "postLaunchCommands": [
-            //     "monitor gdb_memory_map disable",
-            // ]
+            "preLaunchTask": "flash firmware"
         },
     ]
 }

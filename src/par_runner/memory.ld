@@ -27,6 +27,7 @@ SECTIONS
     .org_vectors :
     {
       . = ALIGN(4);
+      __org_vectors_start = .;
       *(.org_vectors)
     } > FLASH
 
