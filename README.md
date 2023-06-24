@@ -21,7 +21,7 @@ currently tested on windows, requred:
 * ninja
 * open-ocd
 
-All folders with executables of the above programs should be added to the PATH.
+All folders with executables of the above programs should be added to the PATH environment variable.
 
 for debugging:
 * vs code
