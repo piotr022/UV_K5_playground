@@ -1,14 +1,16 @@
 set(NAME par_runner)
 set(MCU_TARGET_FILES_DIR ../mcu_target_common)
 
+add_subdirectory(orginal_fw)
+
 add_executable(${NAME}  
-        ${MCU_TARGET_FILES_DIR}/system_stm32f0xx.c
-        ${MCU_TARGET_FILES_DIR}/stm32f030xc.s   
-        main.cpp
+${MCU_TARGET_FILES_DIR}/stm32f030xc.s   
+main.cpp
 )
 
 target_link_libraries(${NAME}
         f030_drivers
+        orginal_fw
 )
 
 target_include_directories(${NAME} PUBLIC
@@ -33,7 +35,7 @@ target_link_options(${NAME} PRIVATE
         -mcpu=cortex-m0
         -mthumb
         -mfpu=auto
-        -mfloat-abi=soft #lets go fpu
+        -mfloat-abi=soft
         -specs=nosys.specs
         -specs=nano.specs
         -lc

@@ -17,7 +17,19 @@ SECTIONS
      KEEP(*(.isr_vectors))
      . = ALIGN(4);
     } >FLASH
-    
+
+    .org_fw :
+    {
+      . = ALIGN(4);
+      KEEP(*(.org_fw))
+    } > FLASH
+
+    .org_vectors :
+    {
+      . = ALIGN(4);
+      *(.org_vectors)
+    } > FLASH
+
     .text :
     {
         *(.text)   
