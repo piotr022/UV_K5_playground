@@ -28,7 +28,7 @@ SECTIONS
     {
       . = ALIGN(4);
       __org_vectors_start = .;
-      *(.org_vectors)
+      KEEP(*(.org_vectors))
     } > FLASH
 
     .text :

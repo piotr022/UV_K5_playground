@@ -1,12 +1,14 @@
 #include "system/system.hpp"
 #include "hardware/hardware.hpp"
+#include "registers.hpp"
 
 Hardware::THardware Hw;
 
 int main()
 {
    Hw.Power.EnableDbg();
-  // System::JumpToOrginalFw();
+   __BKPT();
+   System::JumpToOrginalFw();
    while(1);
    return 0;
 }

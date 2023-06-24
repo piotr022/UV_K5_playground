@@ -32,3 +32,4 @@ struct TGpio
 
 #define GPIO_BASE 0x400B0000
 #define GPIO ((TGpio*)GPIO_BASE)
+#define __BKPT(value)                       __asm volatile ("bkpt "#value)
