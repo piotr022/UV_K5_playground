@@ -1,4 +1,7 @@
 # UV_K5_playground
+## flash masking and memory layout
+Chinese mcu DP32G030 has feature called flash masking, here is how it works:
+![original_memory layout](./docs/memory-map-original-fw.png)
 ## src/par_runner
 The idea is to run this firmware 'parallel' with the original Quencheng firmware. This can be achieved by relocating the original vector table to the end of the original firmware, and placing a new vector table at the beginning, with entities pointing to the par_runner functions that wrap the original firmware handlers.
 #### flash memory layout
