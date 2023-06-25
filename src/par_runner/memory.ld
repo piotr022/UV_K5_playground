@@ -11,12 +11,6 @@ _estack = 0x20001388;
 SECTIONS
 {
     . = 0x0;
-    .org_fw_part0 :
-    {
-      . = ALIGN(4);
-      KEEP(*(.org_fw_part0))
-    } > FLASH
-
     .isr_vectors : 
     {
      . = ALIGN(4);
@@ -24,10 +18,10 @@ SECTIONS
      . = ALIGN(4);
     } >FLASH
 
-    .org_fw_part1 :
+    .org_fw_rest :
     {
       . = ALIGN(4);
-      KEEP(*(.org_fw_part1))
+      KEEP(*(.org_fw_rest))
     } > FLASH
 
     .org_vectors :

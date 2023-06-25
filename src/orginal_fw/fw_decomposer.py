@@ -1,4 +1,5 @@
 import sys
+
 class FwDecompozer:
    def __init__(self, vector_table_size, vector_table_address, file):
       self.vector_table_size = vector_table_size * 4

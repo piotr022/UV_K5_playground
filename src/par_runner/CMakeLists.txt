@@ -1,8 +1,6 @@
 set(NAME par_runner)
 set(MCU_TARGET_FILES_DIR ../mcu_target_common)
 
-add_subdirectory(orginal_fw)
-
 add_executable(${NAME}  
         ${MCU_TARGET_FILES_DIR}/stm32f030xc.s   
         main.cpp
@@ -62,7 +60,14 @@ add_custom_command(TARGET ${NAME}
         COMMAND arm-none-eabi-objcopy -O binary ${NAME} ${NAME}.bin
 )
 
+get_target_property(BOOTLOADER_BIN_PATH orginal_fw BOOTLOADER_BIN_PATH)
+add_custom_command(TARGET ${NAME}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "generating full binary with bootloader to ${NAME}_with_bootloader.bin"
+        COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/fw_merger.py ${BOOTLOADER_BIN_PATH} ${NAME}.bin ${NAME}_with_bootloader.bin
+)
+
 add_custom_target(${NAME}_flash
-	COMMAND openocd -f interface/cmsis-dap.cfg -f ${PROJECT_SOURCE_DIR}/openocd_scripts/dp32g030.cfg -c "write_image ${PROJECT_SOURCE_DIR}/build/src/par_runner/par_runner.bin 0" -c "halt" -c "shutdown"
+	COMMAND openocd -f interface/cmsis-dap.cfg -f ${PROJECT_SOURCE_DIR}/openocd_scripts/dp32g030.cfg -c "write_image ${PROJECT_SOURCE_DIR}/build/src/par_runner/par_runner.bin 0x1000" -c "halt" -c "shutdown"
 	DEPENDS ${NAME}
 )

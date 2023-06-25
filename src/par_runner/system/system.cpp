@@ -16,7 +16,7 @@ __attribute__ ((interrupt)) static void CommonIrqWrapper()
    if (pOrgVectors->Vectors[VectorNr])
    {
    //   pOrgVectors->Vectors[VectorNr]();
-   }
+   } 
 }
 
 void System::JumpToOrginalFw()
@@ -26,7 +26,7 @@ void System::JumpToOrginalFw()
 
 TVectorTable __attribute__ ((section(".isr_vectors"))) VectorTable = 
 {
-   (VoidFxPointer)&_estack,
+   (VoidFxPointer)&_estack, 
    (VoidFxPointer)&Reset_Handler,
    &CommonIrqWrapper<2>,
    &CommonIrqWrapper<3>,
