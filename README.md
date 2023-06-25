@@ -1,16 +1,23 @@
 # UV_K5_playground
+## flash masking and memory layout
+Chinese mcu DP32G030 has feature called flash masking, here is how it works:
+![original_memory layout](./docs/memory-map-original-fw.png)
 ## src/par_runner
 The idea is to run this firmware 'parallel' with the original Quencheng firmware. This can be achieved by relocating the original vector table to the end of the original firmware, and placing a new vector table at the beginning, with entities pointing to the par_runner functions that wrap the original firmware handlers.
 #### flash memory layout
-When building the "par_runner" target, the resulting binary has sections in the following order (warning! deprecated):
+When building the "par_runner" target automaticly "bootloader" target will be build
 ![memory layout](./docs/memory-map.png)
-Currently, the par_runner target creates a binary with a layout as shown on the left side of the image. However, this approach is incorrect because I found that the 'flash masking' on these Chinese devices not only remaps the first few sectors (depending on the selection in flash registers), but it actually remaps the entire code section memory so that 0x0 points to 0x1000, as shown in the image above. So all the fixed address references in the par_runner section are incorrectly addressed, e.g., vector table entries. They are absolute from the beginning of the binary, but in the case of memory remapping, they should be offseted by -0x1000 (the size of the flash masking region). A solution is provided below.
-
-#### TODO:
-Unfortunately, I managed to brick my radio again :D. Here are some notes for later:
-Instead of building a single target, it is necessary to build two separate targets. The first target will be the stock bootloader, located at addresses 0x0 to 0x1000. The second target will be the main firmware, which will start from address 0x0 but will be flashed at address 0x1000. Additionally, this second target can be encoded as an 'encrypted' binary to work with the original Quasheng flasher tool.
+building par_runner target will result in following outputs:
+* par_runner.bin / .hex - right part of image, can be used to generate encrypted firmware compatible with orginal Quescheng update tool
+* bootloader.bin - stripped bootloader from orginal firmware
+* par_runner_with_bootloader.bin - complete firmware image
 
 To change the original firmware that will be wrapped and placed into the original firmware section, replace `./original_fw/original_fw.bin` or set the variable 
+#### TODO:
+Unfortunately, I managed to brick my radio again :D. Here are some notes for later:
+~~Instead of building a single target, it is necessary to build two separate targets. The first target will be the stock bootloader, located at addresses 0x0 to 0x1000. The second target will be the main firmware, which will start from address 0x0 but will be flashed at address 0x1000. Additionally, this second target can be encoded as an 'encrypted' binary to work with the original Quasheng flasher tool.~~ 
+done
+
 ```CMakeLists.txt set(ORGINAL_FW_BIN orginal_fw.bin)```
 in ./orginal_fw/CMakeLists.txt
 and rebuild par_runner
