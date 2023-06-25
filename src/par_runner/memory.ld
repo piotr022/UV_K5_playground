@@ -10,7 +10,7 @@ _estack = 0x20001388;
 
 SECTIONS
 {
-    .  = 0x0;        
+    . = 0x0;
     .org_fw_part0 :
     {
       . = ALIGN(4);

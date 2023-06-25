@@ -2,11 +2,13 @@
 ## src/par_runner
 The idea is to run this firmware 'parallel' with the original Quencheng firmware. This can be achieved by relocating the original vector table to the end of the original firmware, and placing a new vector table at the beginning, with entities pointing to the par_runner functions that wrap the original firmware handlers.
 #### flash memory layout
-making "par_runner" target will result binary with sectons in the following order:
-1. par_runner vector table 
-2. orginal firmware 
-3. relocated orginal fw vector table
-4. .text and other flash sections of par_runner
+When building the "par_runner" target, the resulting binary has sections in the following order (warning! deprecated):
+![memory layout](./docs/memory-map.png)
+Currently, the par_runner target creates a binary with a layout as shown on the left side of the image. However, this approach is incorrect because I found that the 'flash masking' on these Chinese devices not only remaps the first few sectors (depending on the selection in flash registers), but it actually remaps the entire code section memory so that 0x0 points to 0x1000, as shown in the image above.
+
+#### TODO:
+Unfortunately, I managed to brick my radio :D. Here are some notes for later:
+Instead of building a single target, it is necessary to build two separate targets. The first target will be the stock bootloader, located at addresses 0x0 to 0x1000. The second target will be the main firmware, which will start from address 0x0 but will be flashed at address 0x1000. Additionally, this second target can be encoded as an 'encrypted' binary to work with the original Quasheng flasher tool.
 
 To change the original firmware that will be wrapped and placed into the original firmware section, replace `./original_fw/original_fw.bin` or set the variable 
 ```CMakeLists.txt set(ORGINAL_FW_BIN orginal_fw.bin)```
