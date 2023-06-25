@@ -4,10 +4,10 @@ The idea is to run this firmware 'parallel' with the original Quencheng firmware
 #### flash memory layout
 When building the "par_runner" target, the resulting binary has sections in the following order (warning! deprecated):
 ![memory layout](./docs/memory-map.png)
-Currently, the par_runner target creates a binary with a layout as shown on the left side of the image. However, this approach is incorrect because I found that the 'flash masking' on these Chinese devices not only remaps the first few sectors (depending on the selection in flash registers), but it actually remaps the entire code section memory so that 0x0 points to 0x1000, as shown in the image above.
+Currently, the par_runner target creates a binary with a layout as shown on the left side of the image. However, this approach is incorrect because I found that the 'flash masking' on these Chinese devices not only remaps the first few sectors (depending on the selection in flash registers), but it actually remaps the entire code section memory so that 0x0 points to 0x1000, as shown in the image above. So all the fixed address references in the par_runner section are incorrectly addressed, e.g., vector table entries. They are absolute from the beginning of the binary, but in the case of memory remapping, they should be offseted by -0x1000 (the size of the flash masking region). A solution is provided below.
 
 #### TODO:
-Unfortunately, I managed to brick my radio :D. Here are some notes for later:
+Unfortunately, I managed to brick my radio again :D. Here are some notes for later:
 Instead of building a single target, it is necessary to build two separate targets. The first target will be the stock bootloader, located at addresses 0x0 to 0x1000. The second target will be the main firmware, which will start from address 0x0 but will be flashed at address 0x1000. Additionally, this second target can be encoded as an 'encrypted' binary to work with the original Quasheng flasher tool.
 
 To change the original firmware that will be wrapped and placed into the original firmware section, replace `./original_fw/original_fw.bin` or set the variable 
