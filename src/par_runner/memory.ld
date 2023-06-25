@@ -6,11 +6,17 @@ MEMORY
     FLASH (rx)  : ORIGIN = 0x00000000, LENGTH = 64K
 }
 
-_estack = 0x20001000;
+_estack = 0x20001388;
 
 SECTIONS
 {
     .  = 0x0;        
+    .org_fw_part0 :
+    {
+      . = ALIGN(4);
+      KEEP(*(.org_fw_part0))
+    } > FLASH
+
     .isr_vectors : 
     {
      . = ALIGN(4);
@@ -18,10 +24,10 @@ SECTIONS
      . = ALIGN(4);
     } >FLASH
 
-    .org_fw :
+    .org_fw_part1 :
     {
       . = ALIGN(4);
-      KEEP(*(.org_fw))
+      KEEP(*(.org_fw_part1))
     } > FLASH
 
     .org_vectors :

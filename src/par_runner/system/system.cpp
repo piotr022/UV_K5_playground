@@ -5,12 +5,12 @@ extern "C" void Reset_Handler();
 extern "C" unsigned int _estack;
 
 extern "C" const unsigned int __org_vectors_start;
-static const auto* pOrgVectors = (const TVectorTable*)&__org_vectors_start;
+volatile static const auto* pOrgVectors = (const TVectorTable*)&__org_vectors_start;
 
 extern void MultiIrq_Handler(unsigned int);
 
 template <int VectorNr>
-static void CommonIrqWrapper()
+__attribute__ ((interrupt)) static void CommonIrqWrapper()
 {
    MultiIrq_Handler(VectorNr);
    if (pOrgVectors->Vectors[VectorNr])
@@ -27,7 +27,7 @@ void System::JumpToOrginalFw()
 TVectorTable __attribute__ ((section(".isr_vectors"))) VectorTable = 
 {
    (VoidFxPointer)&_estack,
-   &Reset_Handler,
+   (VoidFxPointer)0xD5,//&Reset_Handler,
    &CommonIrqWrapper<2>,
    &CommonIrqWrapper<3>,
    &CommonIrqWrapper<4>,

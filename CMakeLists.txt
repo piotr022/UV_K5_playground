@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-set(OPTI_FLAG g)
+set(OPTI_FLAG s)
 set(CMAKE_BUILD_TYPE Debug)
 
 set(STM32_DEFINES "-DSTM32F0 -DSTM32F030x8 -DSTM32")

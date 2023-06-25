@@ -6,14 +6,14 @@ Hardware::THardware Hw;
 
 int main()
 {
-   Hw.Power.EnableDbg();
-   __BKPT();
-   System::JumpToOrginalFw();
    while(1);
+   Hw.Power.EnableDbg();
+   System::JumpToOrginalFw();
    return 0;
-}
+} 
 
-void MultiIrq_Handler(unsigned int u32IrqSource)
+__attribute__ ((interrupt)) void MultiIrq_Handler(unsigned int u32IrqSource)
 {
+   while(1);
    Hw.Power.EnableDbg();
 }
