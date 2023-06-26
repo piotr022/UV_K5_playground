@@ -12,9 +12,7 @@ int main()
    return 0;
 } 
 
-__attribute__ ((interrupt)) void MultiIrq_Handler(unsigned int u32IrqSource)
+void MultiIrq_Handler(unsigned int u32IrqSource)
 {
-   Hw.Power.EnableDbg();
-   __BKPT();
-   while(1);
+   GPIOC->DATA ^= 1 << 3;
 }

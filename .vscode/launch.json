@@ -13,10 +13,6 @@
                 "interface/cmsis-dap.cfg",
                 "./openocd_scripts/dp32g030.cfg" // "target/swm050.cfg", //
             ],
-            // "openOCDLaunchCommands": [
-            //     "write_image ./build/src/par_runner/par_runner.bin 0",
-            //     "reset halt"
-            // ],
             "searchDir": [
                 ".",
                 "${workspaceRoot}",
@@ -25,6 +21,28 @@
             "runToEntryPoint": "main",
             "showDevDebugOutput": "both",
             "preLaunchTask": "flash firmware"
+        },
+        {
+            "svdFile": "./.vscode/stm32g030.svd",
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/src/par_runner/par_runner",
+            "name": "attach kwaczek",
+            "request": "attach",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "configFiles": [
+                "interface/cmsis-dap.cfg",
+                "./openocd_scripts/dp32g030.cfg" // "target/swm050.cfg", //
+            ],
+            "openOCDLaunchCommands": [
+                "reset halt",
+            ],
+            "searchDir": [
+                ".",
+                "${workspaceRoot}",
+                "${workspaceRoot}/.vscode/",
+            ],
+            "showDevDebugOutput": "both",
         },
     ]
 }

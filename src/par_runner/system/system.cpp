@@ -15,7 +15,7 @@ __attribute__ ((interrupt)) static void CommonIrqWrapper()
    MultiIrq_Handler(VectorNr);
    if (pOrgVectors->Vectors[VectorNr])
    {
-   //   pOrgVectors->Vectors[VectorNr]();
+      pOrgVectors->Vectors[VectorNr]();
    } 
 }
 

@@ -17,7 +17,7 @@ struct TFlash
 #define FLASH_BASE 0x4006F000
 #define FLASH ((TFlash*)FLASH_BASAE)
 
-struct TGpio
+struct TPort
 {
    unsigned int PORTA_SEL0;
    unsigned int PORTA_SEL1;
@@ -28,8 +28,29 @@ struct TGpio
    unsigned int PORTA_IE;
    unsigned int PORTB_IE;
    unsigned int PORTC_IE;
+   unsigned int PORTA_PU;
+   unsigned int PORTB_PU;
+   unsigned int PORTC_PU;
+   unsigned int PORTA_PD;
+   unsigned int PORTB_PD;
+   unsigned int PORTC_PD;
+   unsigned int PORTA_OD;
+   unsigned int PORTB_OD;
+   unsigned int PORTC_OD;
+   unsigned int PORTA_WKE;
+   unsigned int PORTB_WKE;
+   unsigned int PORTC_WKE;
+   unsigned int PORT_CFG;
+};
+
+struct TGpio
+{
+   unsigned int DATA;
 };
 
 #define GPIO_BASE 0x400B0000
-#define GPIO ((TGpio*)GPIO_BASE)
+#define GPIO ((TPort*)GPIO_BASE)
 #define __BKPT(value)                       __asm volatile ("bkpt "#value)
+
+#define GPIOC_BASE 0x40061000
+#define GPIOC ((TGpio*)GPIOC_BASE)
