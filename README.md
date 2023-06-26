@@ -3,7 +3,8 @@
 Chinese mcu DP32G030 has feature called flash masking, here is how it works:
 ![original_memory layout](./docs/memory-map-original-fw.png)
 ## src/par_runner
-The idea is to run this firmware 'parallel' with the original Quencheng firmware. This can be achieved by relocating the original vector table to the end of the original firmware, and placing a new vector table at the beginning, with entities pointing to the par_runner functions that wrap the original firmware handlers.
+The idea is to run this firmware 'parallel' with the original Quencheng firmware. This can be achieved by relocating the original vector table to the end of the original firmware, and placing a new vector table at the beginning, with entities pointing to the par_runner functions that wrap the original firmware handlers.  
+Every interrupt is first processed by the par_runner handlers, which can perform tasks like responding to a button press(todo), before invoking the original firmware handler
 #### flash memory layout
 When building the "par_runner" target automaticly "bootloader" target will be build
 ![memory layout](./docs/memory-map.png)
