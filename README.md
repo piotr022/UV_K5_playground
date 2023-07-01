@@ -5,7 +5,7 @@ mod for printing rx signal level (RSSI) in numerical format, also includes small
 ### uploading to radio
 * download mod [uv_k5_01_26_rssi_printer_encoded.bin](https://github.com/piotr022/UV_K5_playground/releases/tag/rssi_printer_01)
 * upload it through original firmware update tool:  
-[quancheng website]http://en.qsfj.com/support/downloads/3002
+[Quancheng website](http://en.qsfj.com/support/downloads/3002)
 ## flash masking and memory layout
 Chinese mcu DP32G030 has feature called flash masking, here is how it works:
 ![original_memory layout](./docs/memory-map-original-fw.png)
@@ -58,4 +58,7 @@ Enter the 'Run & Debug' tab, select 'kwaczek DBG', and press run.
 ## Links
 currently firmare that is wrapped by par_runner comes from Tunas1337 mod 
 k5_26_encrypted_18to1300MHz.bin [UV-K5-Modded-Firmwares](https://github.com/Tunas1337/UV-K5-Modded-Firmwares)
+crypting/encrypting/modding py tools [amnemonic repo](https://github.com/amnemonic/Quansheng_UV-K5_Firmware)
 
+## Warning
+I'm not responsible for radios bricked by this 'trojan' xD

@@ -8,27 +8,40 @@ class CRssiPrinter
    static constexpr auto ChartStartX = 4*7 + 4;
    static void Handle(const System::TOrgFunctions& Fw, const System::TOrgData& FwData)
    {
-      static bool bIsCleared = false;
+      static bool bIsCleared = true;
       static unsigned char u8ChartPosition = 0;
+      static unsigned char u8SqlDelayCnt = 0xFF;
+      static unsigned char U8ScreenHistory[128 - ChartStartX] = {0};
       TUV_K5Display DisplayBuff(FwData.pDisplayBuffer);
       const TUV_K5SmallNumbers FontSmallNr(FwData.pSmallDigs);
       CDisplay Display(DisplayBuff);
 
-      auto* pMenuCheckData = (unsigned char*)DisplayBuff.GetCoursorData(DisplayBuff.GetCoursorPosition(3, ChartStartX));
-      bool bIsSqlOpen = (Fw.BK4819Read(0x0C) & 0b10);
-      if(!bIsSqlOpen || *pMenuCheckData == 0xFF)
+      auto* pMenuCheckData = (unsigned char*)DisplayBuff.GetCoursorData(DisplayBuff.GetCoursorPosition(2, 6*8 + 1));
+      if(Fw.BK4819Read(0x0C) & 0b10)
+      {
+         u8SqlDelayCnt = 0;
+      }
+
+      if(u8SqlDelayCnt > 20 || *pMenuCheckData == 0xFF)
       {
          if(!bIsCleared)
          {
             bIsCleared = true;
-            u8ChartPosition = ChartStartX;
             auto* pDData = (unsigned char*)DisplayBuff.GetCoursorData(DisplayBuff.GetCoursorPosition(3, 0));
             memset(pDData, 0, DisplayBuff.SizeX);
-            Fw.FlushFramebufferToScreen();
+            memset(U8ScreenHistory, 0, sizeof(U8ScreenHistory));
+            u8ChartPosition = 0;
+            if(*pMenuCheckData != 0xFF)
+            {
+               Fw.FlushFramebufferToScreen();
+            }
          }
 
          return;
       }
+
+      u8SqlDelayCnt++;
+      bIsCleared = false;
       
       Display.SetCoursor(3, 0);
       Display.SetFont(&FontSmallNr);
@@ -62,15 +75,19 @@ class CRssiPrinter
 
       unsigned char u8Sub = (u8Rssi * 7) >> 7;
       unsigned char u8PrintShift = (u8Sub > 7 ? 7 : u8Sub);
-      auto* pDData = (unsigned char*)DisplayBuff.GetCoursorData(DisplayBuff.GetCoursorPosition(3, 0) + u8ChartPosition);
-      *pDData = (1 << u8PrintShift) & 0xFF;
+      U8ScreenHistory[u8ChartPosition - ChartStartX] = (1 << u8PrintShift) & 0xFF;
+
       if(u8ChartPosition + 4 < DisplayBuff.SizeX)
       {
          for(unsigned char i = 0; i < 4; i++)
          {
-            *(++pDData) = 0;
+            U8ScreenHistory[u8ChartPosition - ChartStartX + i + 1] = 0;
          }
       }
+
+      auto* pDData = (unsigned char*)DisplayBuff.GetCoursorData(DisplayBuff.GetCoursorPosition(3, 0) + ChartStartX);
+      memcpy(pDData, U8ScreenHistory, sizeof(U8ScreenHistory));
+
       u8ChartPosition++;
       Fw.FlushFramebufferToScreen();
    }
