@@ -21,11 +21,6 @@ building par_runner target will result in following outputs:
 * par_runner_with_bootloader.bin - complete firmware image
 
 To change the original firmware that will be wrapped and placed into the original firmware section, replace `./original_fw/original_fw.bin` or set the variable 
-#### TODO:
-Unfortunately, I managed to brick my radio again :D. Here are some notes for later:
-~~Instead of building a single target, it is necessary to build two separate targets. The first target will be the stock bootloader, located at addresses 0x0 to 0x1000. The second target will be the main firmware, which will start from address 0x0 but will be flashed at address 0x1000. Additionally, this second target can be encoded as an 'encrypted' binary to work with the original Quasheng flasher tool.~~ 
-done
-
 ```CMakeLists.txt set(ORGINAL_FW_BIN orginal_fw.bin)```
 in ./orginal_fw/CMakeLists.txt
 and rebuild par_runner
@@ -59,3 +54,8 @@ outputs ./build/src/par_runner/par_runner.bin / hex / elf
 Select the par_runner build target in the bottom bar and press build.
 ###### uploading
 Enter the 'Run & Debug' tab, select 'kwaczek DBG', and press run.
+
+## Links
+currently firmare that is wrapped by par_runner comes from Tunas1337 mod 
+k5_26_encrypted_18to1300MHz.bin [UV-K5-Modded-Firmwares](https://github.com/Tunas1337/UV-K5-Modded-Firmwares)
+
