@@ -1,8 +1,15 @@
 # UV_K5_playground
+## src/rssi_printer
+![rssi printer](./docs/rssi_printer.png)
+mod for printing rx signal level (RSSI) in numerical format, also includes small signal level chart.
+### uploading to radio
+* download mod [uv_k5_01_26_rssi_printer_encoded.bin](https://github.com/piotr022/UV_K5_playground/releases/tag/rssi_printer_01)
+* upload it through original firmware update tool:  
+[quancheng website]http://en.qsfj.com/support/downloads/3002
 ## flash masking and memory layout
 Chinese mcu DP32G030 has feature called flash masking, here is how it works:
 ![original_memory layout](./docs/memory-map-original-fw.png)
-## src/par_runner
+## libs/system (par_runner)
 The idea is to run this firmware 'parallel' with the original Quencheng firmware. This can be achieved by relocating the original vector table to the end of the original firmware, and placing a new vector table at the beginning, with entities pointing to the par_runner functions that wrap the original firmware handlers.  
 Every interrupt is first processed by the par_runner handlers, which can perform tasks like responding to a button press(todo), before invoking the original firmware handler
 #### flash memory layout
