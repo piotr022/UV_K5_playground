@@ -1,6 +1,6 @@
 # UV_K5_playground
 ## src/rssi_printer
-![rssi printer](./docs/rssi_printer.png)
+![rssi printer](./docs/rssi_printer.png)  
 mod for printing rx signal level (RSSI) in numerical format, also includes small signal level chart.
 ### uploading to radio
 * download mod [uv_k5_01_26_rssi_printer_encoded.bin](https://github.com/piotr022/UV_K5_playground/releases/tag/rssi_printer_01)
