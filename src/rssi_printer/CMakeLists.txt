@@ -1,10 +1,9 @@
-set(NAME par_runner)
+set(NAME rssi_printer)
 set(MCU_TARGET_FILES_DIR ../mcu_target_common)
 
 add_executable(${NAME}  
         ${MCU_TARGET_FILES_DIR}/stm32f030xc.s   
         main.cpp
-        system/system.cpp
         hardware/hardware.cpp
         dp32g030.s
 )
@@ -12,6 +11,8 @@ add_executable(${NAME}
 target_link_libraries(${NAME}
         f030_drivers
         orginal_fw
+        uv_k5_system
+        lcd
 )
 
 target_include_directories(${NAME} PUBLIC
@@ -68,6 +69,11 @@ add_custom_command(TARGET ${NAME}
 )
 
 add_custom_target(${NAME}_flash
-	COMMAND openocd -f interface/cmsis-dap.cfg -f ${PROJECT_SOURCE_DIR}/openocd_scripts/dp32g030.cfg -c "write_image ${PROJECT_SOURCE_DIR}/build/src/par_runner/par_runner.bin 0x1000" -c "halt" -c "shutdown"
+	COMMAND openocd -f interface/cmsis-dap.cfg -f ${PROJECT_SOURCE_DIR}/openocd_scripts/dp32g030.cfg -c "write_image ${PROJECT_SOURCE_DIR}/build/src/rssi_printer/rssi_printer.bin 0x1000" -c "halt" -c "shutdown"
+	DEPENDS ${NAME}
+)
+
+add_custom_target(${NAME}_encoded
+	COMMAND python ${PROJECT_SOURCE_DIR}/tools/fw_tools/python-utils/fw_pack.py ${CMAKE_CURRENT_BINARY_DIR}/${NAME}.bin ${CMAKE_CURRENT_SOURCE_DIR}/../orginal_fw/k5_26_encrypted_18to1300MHz.ver.bin ${CMAKE_CURRENT_BINARY_DIR}/${NAME}_encoded.bin
 	DEPENDS ${NAME}
 )

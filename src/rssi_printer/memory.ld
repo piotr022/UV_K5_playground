@@ -2,7 +2,7 @@ ENTRY(Reset_Handler)
 
 MEMORY
 {
-    RAM (rwx) : ORIGIN = 0x20000000, LENGTH = 4K
+    RAM (rwx) : ORIGIN = 0x2000138B, LENGTH = 4K
     FLASH (rx)  : ORIGIN = 0x00000000, LENGTH = 60K
 }
 

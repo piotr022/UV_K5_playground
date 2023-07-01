@@ -4,7 +4,7 @@
         {
             "label": "flash firmware",
             "type": "shell",
-            "command": "openocd -f interface/cmsis-dap.cfg -f ./openocd_scripts/dp32g030.cfg -c 'reset halt' -c 'write_image ./build/src/par_runner/par_runner_with_bootloader.bin 0' -c 'shutdown'",
+            "command": "openocd -f interface/cmsis-dap.cfg -f ./openocd_scripts/dp32g030.cfg -c 'reset halt' -c 'write_image ./build/src/rssi_printer/rssi_printer_with_bootloader.bin 0' -c 'shutdown'",
             "presentation": {
                 "reveal": "always",
                 "panel": "shared"

@@ -1,3 +1,4 @@
+#pragma once
 namespace System
 {
    using VoidFxPointer = void(*)(void);
@@ -16,7 +17,15 @@ namespace System
          unsigned int u32StartPixel,
          unsigned int u32StopPixel,
          unsigned int u32LineNumber,
-         unsigned int u32Centered);
+         unsigned int u32PxPerChar,
+         unsigned int u32Centered,
+         unsigned int u32MenuLen,
+         unsigned int u32AsciiIdx,
+         unsigned int u32Unknown0,
+         unsigned int u32Unknown1,
+         unsigned int u32Unknown2,
+         unsigned int u32Unknown3
+         );
 
       void(*FillScreenMemory)(unsigned int u32Param1);
       void(*DelayMs)(unsigned int u32Ms);
@@ -24,6 +33,13 @@ namespace System
       int(*WriteSerialData)(unsigned char* p8Data, unsigned char u8Len);
       void(*BK4819Write)(unsigned int u32Address, unsigned int u32Data);
       unsigned int(*BK4819Read)(unsigned int u32Address);
+      void(*FlushFramebufferToScreen)(void);
+   };
+
+   struct TOrgData
+   {
+      unsigned char* pDisplayBuffer;
+      unsigned char* pSmallDigs;
    };
 
    inline const TOrgFunctions OrgFunc_01_26 =
@@ -35,5 +51,13 @@ namespace System
       .WriteSerialData = (int(*)(unsigned char*, unsigned char))(0xBE44 + 1),
       .BK4819Write = (decltype(TOrgFunctions::BK4819Write) (0xAF00 + 1)),
       .BK4819Read = (decltype(TOrgFunctions::BK4819Read) (0xA960 + 1)),
+      .FlushFramebufferToScreen = (decltype(TOrgFunctions::FlushFramebufferToScreen) (0xB638 + 1))
+   };
+
+   inline const TOrgData OrgData_01_26 =
+   {
+      .pDisplayBuffer = (decltype(TOrgData::pDisplayBuffer)) 0x20000704,
+      .pSmallDigs = (decltype(TOrgData::pSmallDigs)) 0xD620,
+      
    };
 }

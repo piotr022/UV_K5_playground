@@ -43,7 +43,7 @@ void TFlashLight::BlinkSync(unsigned char u8BlinksCnt)
    for(unsigned char i = 0; i < u8BlinksCnt*2; i++)
    {
       Toggle();
-      System.Delay(100000);
+      System.Delay(200000);
    }
 
    Off();

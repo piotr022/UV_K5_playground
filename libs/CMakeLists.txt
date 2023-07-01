@@ -1,2 +1,4 @@
 add_subdirectory(g030_drivers)
 add_subdirectory(f030_drivers)
+add_subdirectory(k5_uv_system)
+add_subdirectory(lcd)

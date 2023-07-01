@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 
 set(OPTI_FLAG s)
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE MinSizeRelease)
 
 set(STM32_DEFINES "-DSTM32F0 -DSTM32F030x8 -DSTM32")
 
@@ -21,7 +21,7 @@ set(CMAKE_CXX_EXTENSIONS ON)
 
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
-set(COMPILER_OPTIONS -mthumb -mcpu=cortex-m0plus -mfpu=auto -mfloat-abi=soft -fno-exceptions 
+set(COMPILER_OPTIONS -mthumb -mcpu=cortex-m0 -mfpu=auto -mfloat-abi=soft -fno-exceptions 
 -msoft-float -fdata-sections -ffunction-sections -Wall $<$<COMPILE_LANGUAGE:CXX>:-Wno-register> -Wno-unknown-pragmas 
 -O${OPTI_FLAG} $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>
 $<$<CONFIG:Debug>:--debug -DDEBUG>
