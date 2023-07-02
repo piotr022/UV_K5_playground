@@ -1,15 +1,18 @@
 # UV_K5_playground
-## src/rssi_printer
+## src/rssi_printer ![auto release build](https://github.com/piotr022/UV_K5_playground/actions/workflows/c-cpp.yml/badge.svg)
 ![rssi printer](./docs/rssi_printer.png)  
 mod for printing rx signal level (RSSI) in numerical format, also includes small signal level chart.
 ### uploading to radio
 * download mod [uv_k5_01_26_rssi_printer_encoded.bin](https://github.com/piotr022/UV_K5_playground/releases/latest)
 * upload it through original firmware update tool:  
-[Quancheng website](http://en.qsfj.com/support/downloads/3002)
+[Quancheng website](http://en.qsfj.com/support/downloads/3002)  
+
+Please, consider paying tribute to the two fallen Quashengs that were bricked during the development process. Their sacrifice played a crucial role in shaping this project. To show your appreciation and support for our ongoing work, you can make a [donation](https://paypal.me/sq9p).
+
 ## flash masking and memory layout
 Chinese mcu DP32G030 has feature called flash masking, here is how it works:
 ![original_memory layout](./docs/memory-map-original-fw.png)
-## libs/system (par_runner)
+## libs/k5_uv_system (par_runner)
 The idea is to run this firmware 'parallel' with the original Quencheng firmware. This can be achieved by relocating the original vector table to the end of the original firmware, and placing a new vector table at the beginning, with entities pointing to the par_runner functions that wrap the original firmware handlers.  
 Every interrupt is first processed by the par_runner handlers, which can perform tasks like responding to a button press(todo), before invoking the original firmware handler
 #### flash memory layout
@@ -55,10 +58,10 @@ Select the par_runner build target in the bottom bar and press build.
 ###### uploading
 Enter the 'Run & Debug' tab, select 'kwaczek DBG', and press run.
 
-## Links
-currently firmare that is wrapped by par_runner comes from Tunas1337 mod 
-k5_26_encrypted_18to1300MHz.bin [UV-K5-Modded-Firmwares](https://github.com/Tunas1337/UV-K5-Modded-Firmwares)
-crypting/encrypting/modding py tools [amnemonic repo](https://github.com/amnemonic/Quansheng_UV-K5_Firmware)
+## useful links
+* currently firmare that is wrapped by par_runner comes from Tunas1337 mod 
+k5_26_encrypted_18to1300MHz.bin [UV-K5-Modded-Firmwares](https://github.com/Tunas1337/UV-K5-Modded-Firmwares)  
+* crypting/encrypting/modding py tools [amnemonic repo](https://github.com/amnemonic/Quansheng_UV-K5_Firmware)  
 
 ## Warning
-I'm not responsible for radios bricked by this 'trojan' xD
+I'm not responsible for radios bricked by this trojan xD

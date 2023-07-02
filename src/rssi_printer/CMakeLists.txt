@@ -2,14 +2,12 @@ set(NAME rssi_printer)
 set(MCU_TARGET_FILES_DIR ../mcu_target_common)
 
 add_executable(${NAME}  
-        ${MCU_TARGET_FILES_DIR}/stm32f030xc.s   
         main.cpp
         hardware/hardware.cpp
         dp32g030.s
 )
 
 target_link_libraries(${NAME}
-        f030_drivers
         orginal_fw
         uv_k5_system
         lcd
