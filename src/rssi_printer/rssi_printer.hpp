@@ -75,7 +75,9 @@ class CRssiPrinter
 
       unsigned char u8Sub = (u8Rssi * 7) >> 7;
       unsigned char u8PrintShift = (u8Sub > 7 ? 7 : u8Sub);
-      U8ScreenHistory[u8ChartPosition - ChartStartX] = (1 << u8PrintShift) & 0xFF;
+      // Turn the proper pixel on, and the ones below it on as well
+      // The code to turn just the correct pixel on is: U8ScreenHistory[u8ChartPosition - ChartStartX] = (1 << u8PrintShift) & 0xFF;
+      U8ScreenHistory[u8ChartPosition - ChartStartX] = ~(0xFF >> (7 - u8PrintShift));
 
       if(u8ChartPosition + 4 < DisplayBuff.SizeX)
       {
