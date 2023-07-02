@@ -18,7 +18,7 @@ jobs:
     - name: arm-none-eabi-gcc
       uses: fiam/arm-none-eabi-gcc@v1.0.2
       with:
-        release: '10.3-2021.10'
+        release: '9-2020-q2'
         
     - name: Setup Python
       uses: actions/setup-python@v3.1.4
