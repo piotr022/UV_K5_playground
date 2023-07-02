@@ -16,6 +16,11 @@ class CRssiPrinter
       const TUV_K5SmallNumbers FontSmallNr(FwData.pSmallDigs);
       CDisplay Display(DisplayBuff);
 
+      if(!(GPIOC->DATA & 0b11))
+      {
+         return;
+      }
+
       auto* pMenuCheckData = (unsigned char*)DisplayBuff.GetCoursorData(DisplayBuff.GetCoursorPosition(2, 6*8 + 1));
       if(Fw.BK4819Read(0x0C) & 0b10)
       {
