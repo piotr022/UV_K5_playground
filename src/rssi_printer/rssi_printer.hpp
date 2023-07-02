@@ -16,7 +16,7 @@ class CRssiPrinter
       const TUV_K5SmallNumbers FontSmallNr(FwData.pSmallDigs);
       CDisplay Display(DisplayBuff);
 
-      if(!(GPIOC->DATA & 0b11))
+      if(!(GPIOC->DATA & 0b1))
       {
          return;
       }
