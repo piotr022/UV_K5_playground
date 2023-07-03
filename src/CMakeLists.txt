@@ -1,2 +1,4 @@
 add_subdirectory(orginal_fw)
 add_subdirectory(rssi_printer)
+add_subdirectory(rssi_sbar)
+add_subdirectory(spectrum)

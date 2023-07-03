@@ -75,7 +75,7 @@ class CDisplay
       return 0;
    }
 
-   void Print(const char* C8String)
+   void Print(const char* C8String) const
    {
       for(unsigned char i = 0; i < strlen(C8String); i++)
       {

@@ -9,7 +9,18 @@ namespace System
       VoidFxPointer Vectors[CortexM0VectorsCnt];
    };
 
+   template <class T, auto... Args>
+   struct TStaticWrapper
+   {
+      static T& GetInstance()
+      {
+         static T StaticObj(Args...);
+         return StaticObj;
+      }
+   };
+
    void JumpToOrginalFw();
+   void CopyDataSection();
 
    struct TOrgFunctions
    {
