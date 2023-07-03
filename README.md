@@ -9,6 +9,11 @@ mod for printing rx signal level (RSSI) in numerical format, also includes small
 
 Please, consider paying tribute to the two fallen Quashengs that were bricked during the development process. Their sacrifice played a crucial role in shaping this project. To show your appreciation and support for our ongoing work, you can make a [donation](https://paypal.me/sq9p).
 
+## src/pong ![auto release build](https://github.com/piotr022/UV_K5_playground/actions/workflows/c-cpp.yml/badge.svg)
+![rssi printer](./docs/pong_game.gif)
+this is usless, buggy and funny xD  
+* download mod [uv_k5_01_26_pong_game_encoded.bin](https://github.com/piotr022/UV_K5_playground/releases/latest)
+
 ## flash masking and memory layout
 Chinese mcu DP32G030 has feature called flash masking, here is how it works:
 ![original_memory layout](./docs/memory-map-original-fw.png)

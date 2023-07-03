@@ -26,7 +26,7 @@ void MultiIrq_Handler(unsigned int u32IrqSource)
    }
    
    static unsigned int u32StupidCounter = 1;
-   if((!(u32StupidCounter++ % 5) && u32StupidCounter > 200))
+   if((!(u32StupidCounter++ % 2) && u32StupidCounter > 200))
    {
       Pong.Handle();
    }
