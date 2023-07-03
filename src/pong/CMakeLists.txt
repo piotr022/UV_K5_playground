@@ -1,4 +1,4 @@
-set(NAME spectrum)
+set(NAME pong)
 set(MCU_TARGET_FILES_DIR ../mcu_target_common)
 
 add_executable(${NAME}  

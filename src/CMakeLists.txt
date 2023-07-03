@@ -1,4 +1,5 @@
 add_subdirectory(orginal_fw)
 add_subdirectory(rssi_printer)
 add_subdirectory(rssi_sbar)
-add_subdirectory(spectrum)
+add_subdirectory(most_useless_mod)
+add_subdirectory(pong)

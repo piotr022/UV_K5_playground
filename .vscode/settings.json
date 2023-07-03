@@ -1,0 +1,14 @@
+{
+   "files.associations": {
+      "cwchar": "cpp",
+      "string": "cpp",
+      "exception": "cpp",
+      "iosfwd": "cpp",
+      "istream": "cpp",
+      "new": "cpp",
+      "ostream": "cpp",
+      "stdexcept": "cpp",
+      "streambuf": "cpp",
+      "type_traits": "cpp"
+   }
+}

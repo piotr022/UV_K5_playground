@@ -19,7 +19,7 @@ void MultiIrq_Handler(unsigned int u32IrqSource)
 {
    static unsigned int u32StupidCounter = 1;
    //GPIOA->DATA & GPIO_PIN_3  
-   if((!(u32StupidCounter++ % 15) && u32StupidCounter > 200)) // exit key
+   if((!(u32StupidCounter++ % 1) && u32StupidCounter > 200)) // exit key
    {
       CRssiPrinter::Handle(Fw, FwData);
    }

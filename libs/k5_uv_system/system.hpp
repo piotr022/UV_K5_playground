@@ -45,6 +45,7 @@ namespace System
       void(*BK4819Write)(unsigned int u32Address, unsigned int u32Data);
       unsigned int(*BK4819Read)(unsigned int u32Address);
       void(*FlushFramebufferToScreen)(void);
+      unsigned int(*PollKeyboard)(void);
    };
 
    struct TOrgData
@@ -62,12 +63,13 @@ namespace System
       .WriteSerialData = (int(*)(unsigned char*, unsigned char))(0xBE44 + 1),
       .BK4819Write = (decltype(TOrgFunctions::BK4819Write) (0xAF00 + 1)),
       .BK4819Read = (decltype(TOrgFunctions::BK4819Read) (0xA960 + 1)),
-      .FlushFramebufferToScreen = (decltype(TOrgFunctions::FlushFramebufferToScreen) (0xB638 + 1))
+      .FlushFramebufferToScreen = (decltype(TOrgFunctions::FlushFramebufferToScreen) (0xB638 + 1)),
+      .PollKeyboard = (decltype(TOrgFunctions::PollKeyboard) (0xb0b8 + 1))
    };
 
    inline const TOrgData OrgData_01_26 =
    {
-      .pDisplayBuffer = (decltype(TOrgData::pDisplayBuffer)) 0x20000704,
+      .pDisplayBuffer = (decltype(TOrgData::pDisplayBuffer)) 0x20000704-128,
       .pSmallDigs = (decltype(TOrgData::pSmallDigs)) 0xD620,
       
    };
