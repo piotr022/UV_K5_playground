@@ -21,7 +21,7 @@ class CRssiPrinter
          return;
       }
 
-      auto* pMenuCheckData = (unsigned char*)DisplayBuff.GetCoursorData(DisplayBuff.GetCoursorPosition(3, 6*8 + 1));
+      auto* pMenuCheckData = (unsigned char*)DisplayBuff.GetCoursorData(DisplayBuff.GetCoursorPosition(2, 6*8 + 1));
       if(Fw.BK4819Read(0x0C) & 0b10)
       {
          u8SqlDelayCnt = 0;
@@ -32,7 +32,7 @@ class CRssiPrinter
          if(!bIsCleared)
          {
             bIsCleared = true;
-            auto* pDData = (unsigned char*)DisplayBuff.GetCoursorData(DisplayBuff.GetCoursorPosition(4, 0));
+            auto* pDData = (unsigned char*)DisplayBuff.GetCoursorData(DisplayBuff.GetCoursorPosition(3, 0));
             memset(pDData, 0, DisplayBuff.SizeX);
             memset(U8ScreenHistory, 0, sizeof(U8ScreenHistory));
             u8ChartPosition = 0;
@@ -48,7 +48,7 @@ class CRssiPrinter
       u8SqlDelayCnt++;
       bIsCleared = false;
       
-      Display.SetCoursor(4, 0);
+      Display.SetCoursor(3, 0);
       Display.SetFont(&FontSmallNr);
 
       char C8RssiString[] = "g000";
@@ -92,7 +92,7 @@ class CRssiPrinter
          }
       }
 
-      auto* pDData = (unsigned char*)DisplayBuff.GetCoursorData(DisplayBuff.GetCoursorPosition(4, 0) + ChartStartX);
+      auto* pDData = (unsigned char*)DisplayBuff.GetCoursorData(DisplayBuff.GetCoursorPosition(3, 0) + ChartStartX);
       memcpy(pDData, U8ScreenHistory, sizeof(U8ScreenHistory));
 
       u8ChartPosition++;

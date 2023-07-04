@@ -1,7 +1,7 @@
 #pragma once
 #include "lcd.hpp"
 
-struct TUV_K5Display : public IBitmap<128, 64, 8>
+struct TUV_K5Display : public IBitmap<128, 56, 8>
 {
    constexpr TUV_K5Display(const unsigned char* p8ScreenData) : IBitmap(p8ScreenData){};
    bool GetPixel(unsigned char u8X, unsigned char u8Y) const override
@@ -13,7 +13,13 @@ struct TUV_K5Display : public IBitmap<128, 64, 8>
    {
       unsigned char u8Line = u8Y / LineHeight;
       unsigned char* pStart = (unsigned char*)pBuffStart;
-      *(pStart + GetCoursorPosition(u8Line, u8X)) |= 0b1 << (u8Y % LineHeight);
+      auto Position = GetCoursorPosition(u8Line, u8X);
+      if(Position > (SizeY / LineHeight) * SizeX)
+      {
+         return;
+      }
+      
+      *(pStart + Position) |= 0b1 << (u8Y % LineHeight);
    }
 
    void* GetCoursorData(unsigned short u16CoursorPosition) const override

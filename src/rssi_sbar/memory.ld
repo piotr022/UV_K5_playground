@@ -33,25 +33,28 @@ SECTIONS
 
     .text :
     {
+        . = ALIGN(4);
         *(.text)   
         *(.text*) 
         *(.rodata)
-        *(.rodata*)   
+        *(.rodata*)
+        KEEP (*(.init))
+        KEEP (*(.fini))
         . = ALIGN(4);
     } >FLASH
 
     .preinit_array     :
     {
-      PROVIDE_HIDDEN (__preinit_array_start = .);
+      __preinit_array_start = .;
       KEEP (*(.preinit_array*))
-      PROVIDE_HIDDEN (__preinit_array_end = .);
+      __preinit_array_end = .;
     } >FLASH
     .init_array :
     {
-      PROVIDE_HIDDEN (__init_array_start = .);
+      __init_array_start = .;
       KEEP (*(SORT(.init_array.*)))
       KEEP (*(.init_array*))
-      PROVIDE_HIDDEN (__init_array_end = .);
+      __init_array_end = .;
     } >FLASH
     .fini_array :
     {

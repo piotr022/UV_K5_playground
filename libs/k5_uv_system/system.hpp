@@ -69,8 +69,10 @@ namespace System
 
    inline const TOrgData OrgData_01_26 =
    {
-      .pDisplayBuffer = (decltype(TOrgData::pDisplayBuffer)) 0x20000704-128,
+      .pDisplayBuffer = (decltype(TOrgData::pDisplayBuffer)) 0x20000704,
       .pSmallDigs = (decltype(TOrgData::pSmallDigs)) 0xD620,
       
    };
 }
+
+extern "C" void __libc_init_array();

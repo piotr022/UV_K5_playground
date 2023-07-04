@@ -15,24 +15,23 @@ public:
    void Handle()
    {
       DisplayBuff.ClearAll();
-      // char C8RssiString[] = "g000";
+      char C8RssiString[] = "000";
 
       unsigned int u32Key = Fw.PollKeyboard();
 
-      // C8RssiString[1] = '0' + (u32Key / 100) % 10;
-      // C8RssiString[2] = '0' + (u32Key / 10) % 10;
-      // C8RssiString[3] = '0' + u32Key % 10;
+      C8RssiString[0] = '0' + (u32Key / 100);
+      C8RssiString[1] = '0' + (u32Key / 10) % 10;
+      C8RssiString[2] = '0' + u32Key % 10;
 
       Game.handle(u32Key);
       auto const BallPosition = Game.getBallPosition();
       auto const PlatformPosition = Game.getPlatformPosition();
       
-
-      Display.DrawCircle(BallPosition.x, BallPosition.y, 4, true);
-      Display.DrawRectangle(PlatformPosition.x, PlatformPosition.y, 6, 20, 20);
-      Display.SetCoursor(3, 0);
-      // Display.SetFont(&FontSmallNr);
-      // Display.Print(C8RssiString);
+      Display.DrawRectangle(BallPosition.x, BallPosition.y, 7, 7, true);
+      Display.DrawRectangle(PlatformPosition.x, PlatformPosition.y, 6, 20, true);
+      Display.SetCoursor(0, 0);
+      Display.SetFont(&FontSmallNr);
+      Display.Print(C8RssiString);
       Fw.FlushFramebufferToScreen();
    }
 

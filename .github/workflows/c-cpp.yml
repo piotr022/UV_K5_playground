@@ -36,7 +36,11 @@ jobs:
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_PROJECT_rssi_printer_encoded:BOOL=ON
 
     - name: Build
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target rssi_printer_encoded
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target rssi_printer_encoded rssi_sbar_encoded pong_encoded most_useless_mod_encoded
+
+    - name: Get the date
+      id: date
+      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
 
     - name: Create Release
       id: create_release
@@ -44,12 +48,12 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
       with:
-        tag_name: ${{ format('release-{0}', github.run_id) }}
-        release_name: Release ${{ format('release-{0}', github.run_id) }}
+        tag_name: ${{ format('release-{0}', github.run_number) }}
+        release_name: ${{ format('Release #{0} for Project, {1}', github.run_number, steps.date.outputs.date) }}
         draft: false
         prerelease: false
 
-    - name: Upload Release Asset
+    - name: Upload Release Asset rssi_printer_encoded
       uses: actions/upload-release-asset@v1.0.2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -57,4 +61,34 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }} 
         asset_path: ${{github.workspace}}/build/src/rssi_printer/rssi_printer_encoded.bin
         asset_name: uv_k5_01_26_rssi_printer_encoded.bin
+        asset_content_type: application/octet-stream
+
+    - name: Upload Release Asset rssi_sbar_encoded
+      uses: actions/upload-release-asset@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} 
+        asset_path: ${{github.workspace}}/build/src/rssi_sbar/rssi_sbar_encoded.bin
+        asset_name: uv_k5_01_26_rssi_sbar_encoded.bin
+        asset_content_type: application/octet-stream
+
+    - name: Upload Release Asset pong_encoded
+      uses: actions/upload-release-asset@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} 
+        asset_path: ${{github.workspace}}/build/src/pong/pong_encoded.bin
+        asset_name: uv_k5_01_26_pong_encoded.bin
+        asset_content_type: application/octet-stream
+
+    - name: Upload Release Asset most_useless_mod_encoded
+      uses: actions/upload-release-asset@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} 
+        asset_path: ${{github.workspace}}/build/src/most_useless_mod/most_useless_mod_encoded.bin
+        asset_name: uv_k5_01_26_most_useless_mod_encoded.bin
         asset_content_type: application/octet-stream
