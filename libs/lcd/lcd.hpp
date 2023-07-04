@@ -184,6 +184,38 @@ public:
       }
    }
 
+   unsigned char PrintFixedDigtsNumer(int s32Number, unsigned char u8Digts)
+   {
+      char U8NumBuff[32];
+      memset(U8NumBuff, 0, sizeof(U8NumBuff));
+
+      auto pString = U8NumBuff;
+      if(s32Number < 0)
+      {
+         *pString++ = '-';
+         u8Digts--;
+      }
+
+      unsigned char u8DigtsCnt = u8Digts;
+      while(u8DigtsCnt--)
+      {
+         char c8Char;
+         if(u8DigtsCnt == 0)
+         {
+            c8Char = '0' + (s32Number % 10);
+         }
+         else
+         {
+            c8Char = '0' + ((s32Number / ((u8DigtsCnt)*10)) % 10);
+         }
+
+         *pString++ = c8Char;
+      }
+
+      Print(U8NumBuff);
+      return u8Digts * pCurrentFont->GetSizeX('0');
+   }
+
 private:
    const BitmapType &Bitmap;
    mutable const IFont *pCurrentFont;

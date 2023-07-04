@@ -38,6 +38,30 @@ jobs:
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target rssi_printer_encoded rssi_sbar_encoded pong_encoded most_useless_mod_encoded
 
+    - name: Upload rssi_printer_encoded as artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: rssi_printer_encoded
+        path: ${{github.workspace}}/build/src/rssi_printer/rssi_printer_encoded.bin
+
+    - name: Upload rssi_sbar_encoded as artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: rssi_sbar_encoded
+        path: ${{github.workspace}}/build/src/rssi_sbar/rssi_sbar_encoded.bin
+
+    - name: Upload pong_encoded as artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: pong_encoded
+        path: ${{github.workspace}}/build/src/pong/pong_encoded.bin
+
+    - name: Upload most_useless_mod_encoded as artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: most_useless_mod_encoded
+        path: ${{github.workspace}}/build/src/most_useless_mod/most_useless_mod_encoded.bin
+
     - name: Get the date
       id: date
       run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
