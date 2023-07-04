@@ -7,7 +7,7 @@ class CRssiPrinter
    public:
    static constexpr auto ChartStartX = 32;
    static constexpr auto BlockSizeX = 4;
-   static constexpr auto BlockSizeY = 8;
+   static constexpr auto BlockSizeY = 7;
    static constexpr auto BlockSpace = 1;
    static constexpr auto BlocksCnt = (128 - ChartStartX) / (BlockSizeX + BlockSpace);
    static void Handle(const System::TOrgFunctions& Fw, const System::TOrgData& FwData)
