@@ -55,14 +55,14 @@ jobs:
       with:
         name: pong_encoded
         path: ${{github.workspace}}/build/src/pong/pong_encoded.bin
-
+        
     - name: Upload most_useless_mod_encoded as artifact
       uses: actions/upload-artifact@v2
       with:
         name: most_useless_mod_encoded
         path: ${{github.workspace}}/build/src/most_useless_mod/most_useless_mod_encoded.bin
 
-      - name: Upload spectrum_encoded as artifact
+    - name: Upload spectrum_encoded as artifact
       uses: actions/upload-artifact@v2
       with:
         name: spectrum_encoded
