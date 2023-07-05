@@ -111,6 +111,7 @@ public:
          C8RssiString[0] = '-';
       }
 
+      u8Rssi += 10;
       unsigned char u8RssiCpy = u8Rssi;
       unsigned char hundreds = 0;
       while (u8RssiCpy >= 100)
