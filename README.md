@@ -1,4 +1,15 @@
 # UV_K5_playground
+## src/spectrum ![auto release build](https://github.com/piotr022/UV_K5_playground/actions/workflows/c-cpp.yml/badge.svg)
+![rssi printer](./docs/spectrum.png)  
+It's still in beta. It prints a spectrum graph that covers +/- 1 MHz from the center frequency. Overall, it prints 2 MHz of the band.
+
+* download mod [uv_k5_01_26_spectrum_2MHz_encoded.bin](https://github.com/piotr022/UV_K5_playground/releases/latest)
+* to enable spectum view press flash light button
+* (optional) turn down the volume
+* to disable, power off radio xD  
+
+Please, consider paying tribute to the two fallen Quashengs that were bricked during the development process. Their sacrifice played a crucial role in shaping this project. To show your appreciation and support for our ongoing work, you can make a [donation](https://paypal.me/sq9p).
+
 ## src/rssi_printer ![auto release build](https://github.com/piotr022/UV_K5_playground/actions/workflows/c-cpp.yml/badge.svg)
 ![rssi printer](./docs/rssi_printer.png)  
 mod for printing rx signal level (RSSI) in numerical format, also includes small signal level chart.
@@ -7,11 +18,9 @@ mod for printing rx signal level (RSSI) in numerical format, also includes small
 * upload it through original firmware update tool:  
 [Quancheng website](http://en.qsfj.com/support/downloads/3002)  
 
-Please, consider paying tribute to the two fallen Quashengs that were bricked during the development process. Their sacrifice played a crucial role in shaping this project. To show your appreciation and support for our ongoing work, you can make a [donation](https://paypal.me/sq9p).
-
 ## src/pong ![auto release build](https://github.com/piotr022/UV_K5_playground/actions/workflows/c-cpp.yml/badge.svg)
-![rssi printer](./docs/pong_game.gif)
-this is usless, buggy and funny xD  
+![rssi printer](./docs/pong_game.gif)  
+this is useless 
 * download mod [uv_k5_01_26_pong_game_encoded.bin](https://github.com/piotr022/UV_K5_playground/releases/latest)
 
 ## flash masking and memory layout

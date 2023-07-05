@@ -65,6 +65,17 @@ public:
       }
    }
 
+   void DrawHLine(int sy, int ey, int nx, bool bCropped = false)
+   {
+      for (int i = sy; i <= ey; i++)
+      {
+         if (i < Bitmap.SizeY && nx < Bitmap.SizeX && (!bCropped || i % 2))
+         {
+            Bitmap.SetPixel(nx, i);
+         }
+      }
+   }
+
    void DrawCircle(unsigned char cx, unsigned char cy, unsigned int r, bool bFilled = false)
    {
       int x = 0;
@@ -189,27 +200,19 @@ public:
       char U8NumBuff[32];
       memset(U8NumBuff, 0, sizeof(U8NumBuff));
 
-      auto pString = U8NumBuff;
-      if(s32Number < 0)
+      char *pString = U8NumBuff + u8Digts;
+      *pString = '\0';                    
+
+      if (s32Number < 0)
       {
-         *pString++ = '-';
-         u8Digts--;
+         U8NumBuff[0] = '-';
+         s32Number = -s32Number; 
       }
 
-      unsigned char u8DigtsCnt = u8Digts;
-      while(u8DigtsCnt--)
+      while (u8Digts--)
       {
-         char c8Char;
-         if(u8DigtsCnt == 0)
-         {
-            c8Char = '0' + (s32Number % 10);
-         }
-         else
-         {
-            c8Char = '0' + ((s32Number / ((u8DigtsCnt)*10)) % 10);
-         }
-
-         *pString++ = c8Char;
+         *--pString = '0' + (s32Number % 10); 
+         s32Number /= 10;                     
       }
 
       Print(U8NumBuff);
