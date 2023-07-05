@@ -55,10 +55,10 @@ struct TGpio
 
 
 #define GPIOA_BASE 0x40060000
-#define GPIOA ((TGpio*)GPIOC_BASE)
+#define GPIOA ((TGpio*)GPIOA_BASE)
 
 #define GPIOB_BASE 0x40060800
-#define GPIOB ((TGpio*)GPIOC_BASE)
+#define GPIOB ((TGpio*)GPIOB_BASE)
 
 #define GPIOC_BASE 0x40061000
 #define GPIOC ((TGpio*)GPIOC_BASE)

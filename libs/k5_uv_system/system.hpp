@@ -52,6 +52,7 @@ namespace System
    {
       unsigned char* pDisplayBuffer;
       unsigned char* pSmallDigs;
+      unsigned char* pSmallLeters;
    };
 
    inline const TOrgFunctions OrgFunc_01_26 =
@@ -71,7 +72,7 @@ namespace System
    {
       .pDisplayBuffer = (decltype(TOrgData::pDisplayBuffer)) 0x20000704,
       .pSmallDigs = (decltype(TOrgData::pSmallDigs)) 0xD620,
-      
+      .pSmallLeters = (decltype(TOrgData::pSmallLeters)) 0xD348,
    };
 }
 
