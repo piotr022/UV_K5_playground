@@ -201,22 +201,69 @@ public:
       memset(U8NumBuff, 0, sizeof(U8NumBuff));
 
       char *pString = U8NumBuff + u8Digts;
-      *pString = '\0';                    
+      *pString = '\0';
 
       if (s32Number < 0)
       {
          U8NumBuff[0] = '-';
-         s32Number = -s32Number; 
+         s32Number = -s32Number;
       }
 
       while (u8Digts--)
       {
-         *--pString = '0' + (s32Number % 10); 
-         s32Number /= 10;                     
+         *--pString = '0' + (s32Number % 10);
+         s32Number /= 10;
       }
 
       Print(U8NumBuff);
       return u8Digts * pCurrentFont->GetSizeX('0');
+   }
+
+   static constexpr int powersOfTen[9] = {
+       1,        // 10^0
+       10,       // 10^1
+       100,      // 10^2
+       1000,     // 10^3
+       10000,    // 10^4
+       100000,   // 10^5
+       1000000,  // 10^6
+       10000000, // 10^7
+       100000000 // 10^8
+   };
+   void PrintFixedDigitsNumber2(int s32Number)
+   {
+      char U8NumBuff[11] = {0}; // 9 digits, sign, and null terminator
+      int startIdx = 0;
+      bool isNegative = false;
+
+      if (s32Number < 0)
+      {
+         U8NumBuff[0] = '-';
+         s32Number = -s32Number;
+         isNegative = true;
+      }
+
+      for (int i = 8; i >= 2; --i) // assuming powersOfTen is an array of powers of 10
+      {
+         int digit = 0;
+         while (s32Number >= powersOfTen[i])
+         {
+            s32Number -= powersOfTen[i];
+            ++digit;
+         }
+         U8NumBuff[isNegative + (8 - i)] = '0' + digit;
+
+         // We found the first non-zero digit
+         if (digit != 0 && startIdx == (isNegative ? 1 : 0))
+            startIdx = isNegative + (8 - i);
+      }
+
+      // If the number was 0, we write a single 0.
+      if (startIdx == (isNegative ? 1 : 0))
+         U8NumBuff[isNegative] = '0';
+
+      // Print the string from the start index
+      Print(U8NumBuff + startIdx);
    }
 
 private:

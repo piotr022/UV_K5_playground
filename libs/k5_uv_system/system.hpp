@@ -4,6 +4,18 @@ namespace System
    using VoidFxPointer = void(*)(void);
    static constexpr auto CortexM0VectorsCnt = 16+32;
 
+   struct TCortexM0Stacking
+   {
+      unsigned int R0;
+      unsigned int R1;
+      unsigned int R2;
+      unsigned int R3;
+      unsigned int R12;
+      unsigned int LR;
+      unsigned int PC;
+      unsigned int xPSR;
+   };
+
    struct TVectorTable
    {
       VoidFxPointer Vectors[CortexM0VectorsCnt];

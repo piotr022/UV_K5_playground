@@ -6,15 +6,14 @@ sbar with calibrated S steps
 * flash with original quansheng update tool
 
 Please, consider paying tribute to the two fallen Quashengs that were bricked during the development process. Their sacrifice played a crucial role in shaping this project. To show your appreciation and support for our ongoing work, you can make a [donation](https://paypal.me/sq9p).
-
 ## src/spectrum ![auto release build](https://github.com/piotr022/UV_K5_playground/actions/workflows/c-cpp.yml/badge.svg)
 ![rssi printer](./docs/spectrum.png)  
-It's still in beta. It prints a spectrum graph that covers +/- 1 MHz from the center frequency. Overall, it prints 2 MHz of the band.
+Spectrum scanner. It prints a spectrum graph that covers +/- 1 MHz from the center frequency. Prints center frequency, and frequency with highest amplitude.
 
 * download mod [uv_k5_01_26_spectrum_2MHz_encoded.bin](https://github.com/piotr022/UV_K5_playground/releases/latest)
 * to enable spectum view press flash light button
-* (optional) turn down the volume
-* to disable, power off radio xD  
+* use *up* and *down* key to change center frequency
+* press PTT to disable spectrum view
 
 ## src/rssi_printer ![auto release build](https://github.com/piotr022/UV_K5_playground/actions/workflows/c-cpp.yml/badge.svg)
 ![rssi printer](./docs/rssi_printer.png)  

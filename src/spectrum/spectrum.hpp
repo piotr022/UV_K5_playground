@@ -28,18 +28,24 @@ public:
    static constexpr auto StepSizeFreq = 10'000;
    static constexpr unsigned char EnableKey = 13;
    static constexpr auto DrawingSize = TUV_K5Display::SizeX * 2;
-   static constexpr auto DrawingSizeY = 16;
-   static constexpr auto DrawingEndY = 32;
+   static constexpr auto DrawingSizeY = 16 + 4 * 8;
+   static constexpr auto DrawingEndY = 57;
    static constexpr auto LabelsCnt = 6;
+   static constexpr auto PressDuration = 30;
    CSpectrum()
        : DisplayBuff(FwData.pDisplayBuffer),
          FontSmallNr(FwData.pSmallDigs),
          Display(DisplayBuff),
-         bDisplayCleared(true){};
+         bDisplayCleared(true),
+         u8PressCnt(0),
+         bEnabled(0)
+   {
+      Display.SetFont(&FontSmallNr);
+   };
 
    void Handle()
    {
-      if ((GPIOA->DATA & ((1 << 0xA) | (1 << 0xB) | (1 << 0xC) | (1 << 0xD))) || !(GPIOC->DATA & 0b1))
+      if (!(GPIOC->DATA & 0b1))
       {
          return;
       }
@@ -66,22 +72,52 @@ public:
       }
 
       bDisplayCleared = false;
+      if (u8LastBtnPressed == 11) // up
+      {
+         u32OldFreq += 100_KHz;
+      }
+      else if (u8LastBtnPressed == 12) // down
+      {
+         u32OldFreq -= 100_KHz;
+      }
 
       ClearDrawings();
+
+      unsigned int u32Peak;
+      unsigned char u8MaxRssi = 0;
+      unsigned char u8PeakPos;
       for (unsigned char u8Pos = 0; u8Pos < DisplayBuff.SizeX; u8Pos++)
       {
          if (!(u8Pos % (DisplayBuff.SizeX / LabelsCnt)))
          {
-            Display.DrawHLine(16, 18, u8Pos);
+            Display.DrawHLine(10, 15, u8Pos);
          }
 
-         auto const FreqOffset = u8Pos * ScanRange / (DisplayBuff.SizeX - 1);
-         auto const Rssi = GetRssi(u32OldFreq - (ScanRange / 2) + FreqOffset);
-         signed char u8Sub = ((Rssi * 120) >> 7) - 12;
+         auto const FreqOffset = (u8Pos * ScanRange) >> 7;
+         auto const Rssi = GetRssi(u32OldFreq - (ScanRange >> 1) + FreqOffset);
+         signed char u8Sub = ((Rssi * 200) >> 7) - 20;
          u8Sub = (u8Sub > DrawingSizeY ? DrawingSizeY : u8Sub);
          u8Sub = (u8Sub < 0 ? 0 : u8Sub);
          Display.DrawHLine(DrawingEndY - u8Sub, DrawingEndY, u8Pos);
+
+         if (Rssi > u8MaxRssi)
+         {
+            u8MaxRssi = Rssi;
+            u8PeakPos = u8Pos;
+            u32Peak = u32OldFreq - (ScanRange >> 1) + FreqOffset;
+         }
       }
+
+      // Display.DrawRectangle(0,0, 7, 7, 0);
+      memcpy(FwData.pDisplayBuffer + 8 * 2 + 10 * 6, FwData.pSmallLeters + 18 + 5, 7);
+      Display.SetCoursor(0, 0);
+      Display.PrintFixedDigitsNumber2(u32OldFreq);
+
+      // Display.DrawRectangle(8*2 + 10*6,0, 7, 7, 0);
+      Display.SetCoursor(0, 8 * 2 + 10 * 7);
+      Display.PrintFixedDigitsNumber2(u32Peak);
+
+      memcpy(FwData.pDisplayBuffer + 128 * 2 + u8PeakPos - 3, FwData.pSmallLeters + 18 + 5, 7);
 
       Fw.FlushFramebufferToScreen();
    }
@@ -112,24 +148,43 @@ private:
 
    bool FreeToDraw()
    {
-      bool bLedKey = GPIOA->DATA & GPIO_PIN_3; // Fw.PollKeyboard(); keyboard polling causes many problems probably it disrupt main fw polling procedure
-      auto *pMenuCheckData = (unsigned char *)DisplayBuff.GetCoursorData(
-          DisplayBuff.GetCoursorPosition(1, 6 * 8 + 1));
-
-      unsigned char u8Keyboard = 0;
-      if (bLedKey)
+      bool bFlashlight = (GPIOC->DATA & GPIO_PIN_3);
+      if (bFlashlight)
       {
-         u8Keyboard = Fw.PollKeyboard();
+         bEnabled = true;
+         GPIOC->DATA &= ~GPIO_PIN_3;
       }
 
-      return bLedKey && *pMenuCheckData != 0xFF && u8Keyboard != EnableKey;
+      bool bPtt = !(GPIOC->DATA & GPIO_PIN_5);
+      if(bPtt)
+      {
+         bEnabled = false;
+      }
+
+      if(bEnabled)
+      {
+         u8LastBtnPressed = Fw.PollKeyboard();
+      }
+
+         // u8LastBtnPressed = Fw.PollKeyboard();
+         // if (u8LastBtnPressed == EnableKey)
+         // {
+         //    u8PressCnt++;
+         // }
+
+         // if (u8PressCnt > (bEnabled ? 3 : PressDuration))
+         // {
+         //    u8PressCnt = 0;
+         //    bEnabled = !bEnabled;
+         // }
+      
+
+      return bEnabled;
    }
 
    void ClearDrawings()
    {
-      auto *p8Drw = (unsigned char *)DisplayBuff.GetCoursorData(
-          DisplayBuff.GetCoursorPosition(2, 0));
-      memset(p8Drw, 0, DrawingSize);
+      memset(FwData.pDisplayBuffer, 0, (DisplayBuff.SizeX / 8) * DisplayBuff.SizeY);
    }
 
    TUV_K5Display DisplayBuff;
@@ -139,4 +194,7 @@ private:
 
    unsigned int u32OldFreq;
    unsigned short u16OldAfSettings;
+   unsigned char u8PressCnt;
+   bool bEnabled;
+   unsigned char u8LastBtnPressed;
 };

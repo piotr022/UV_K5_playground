@@ -19,6 +19,10 @@ int main()
 
 void MultiIrq_Handler(unsigned int u32IrqSource)
 {
+   unsigned int u32Dummy;
+   System::TCortexM0Stacking* pStackedRegs = 
+      (System::TCortexM0Stacking*)(((unsigned int*)&u32Dummy) + 1);
+
    static bool bFirstInit = false;
    if(!bFirstInit)
    {
@@ -27,8 +31,11 @@ void MultiIrq_Handler(unsigned int u32IrqSource)
       bFirstInit = true;
    }
 
+   bool bPreventWhileKeypadPolling = pStackedRegs->LR > (unsigned int)Fw.PollKeyboard && 
+      pStackedRegs->PC < (unsigned int)Fw.PollKeyboard + 0x100; // i made a mistake and compared PC and LR, but this works fine xD
+
    static unsigned int u32StupidCounter = 1;
-   if(u32StupidCounter++ > 200)
+   if(u32StupidCounter++ > 200 && !bPreventWhileKeypadPolling)
    {
       Spectrum.Handle();
    }
