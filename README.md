@@ -1,6 +1,6 @@
 # UV_K5_playground
 ## src/spectrum ![auto release build](https://github.com/piotr022/UV_K5_playground/actions/workflows/c-cpp.yml/badge.svg)
-![rssi printer](./docs/spectrum.png)  
+![rssi printer](./docs/spectrum2.png)  
 Spectrum scanner. It prints a spectrum graph that covers +/- 1 MHz from the center frequency. Prints center frequency, and frequency with highest amplitude.
 
 * download mod [uv_k5_01_26_spectrum_2MHz_encoded.bin](https://github.com/piotr022/UV_K5_playground/releases/latest)
