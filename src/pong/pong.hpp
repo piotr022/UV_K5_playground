@@ -10,14 +10,24 @@ public:
    static constexpr auto StepSize = 0xFFFF / TUV_K5Display::SizeX;
    static constexpr auto StepSizeFreq = 10'000;
    CSPong()
-       : DisplayBuff(FwData.pDisplayBuffer), FontSmallNr(FwData.pSmallDigs), Display(DisplayBuff), x(DisplayBuff.SizeX / 2), y(DisplayBuff.SizeY / 2){};
+       : DisplayBuff(FwData.pDisplayBuffer), FontSmallNr(FwData.pSmallDigs), Display(DisplayBuff), x(DisplayBuff.SizeX / 2), y(DisplayBuff.SizeY / 2)
+         ,bEnabled(true){};
 
    void Handle()
    {
+      if(!bEnabled)
+      {
+         return;
+      }
+
       DisplayBuff.ClearAll();
       char C8RssiString[] = "000";
 
       unsigned int u32Key = Fw.PollKeyboard();
+      if(u32Key == 13) // exit key
+      {
+         bEnabled = false;
+      }
 
       C8RssiString[0] = '0' + (u32Key / 100);
       C8RssiString[1] = '0' + (u32Key / 10) % 10;
@@ -32,6 +42,20 @@ public:
       Display.SetCoursor(0, 0);
       Display.SetFont(&FontSmallNr);
       Display.Print(C8RssiString);
+
+      static unsigned int u32Cnt = 0;
+      u32Cnt++;
+      if((u32Cnt >> 8) % 2)
+      {
+         unsigned int* p32Buff = (unsigned int*)FwData.pDisplayBuffer;
+         for(int i = 0; i < (DisplayBuff.SizeX * DisplayBuff.SizeY) / (8*4); i++)
+         {
+            *p32Buff = ~(*p32Buff);
+            p32Buff++;
+         }
+      }
+
+
       Fw.FlushFramebufferToScreen();
    }
 
@@ -42,4 +66,5 @@ private:
    PongGame Game;
 
    unsigned char x, y;
+   bool bEnabled;
 };
