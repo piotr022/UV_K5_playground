@@ -100,7 +100,7 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} 
         asset_path: ${{github.workspace}}/build/src/rssi_sbar/rssi_sbar_encoded.bin
-        asset_name: uv_k5_01_26_rssi_sbar_encoded.bin
+        asset_name: ${{ format('uv_k5_26_rssi_sbar_encoded_v{0}.bin', github.run_number) }}
         asset_content_type: application/octet-stream
 
     - name: Upload Release Asset pong_encoded
@@ -110,7 +110,7 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} 
         asset_path: ${{github.workspace}}/build/src/pong/pong_encoded.bin
-        asset_name: uv_k5_01_26_pong_encoded.bin
+        asset_name: ${{ format('uv_k5_26_pong_encoded_v{0}.bin', github.run_number) }}
         asset_content_type: application/octet-stream
 
     - name: Upload Release Asset most_useless_mod_encoded
@@ -120,7 +120,7 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} 
         asset_path: ${{github.workspace}}/build/src/most_useless_mod/most_useless_mod_encoded.bin
-        asset_name: uv_k5_01_26_most_useless_mod_encoded.bin
+        asset_name: ${{ format('uv_k5_26_most_useless_mod_encoded_v{0}.bin', github.run_number) }}
         asset_content_type: application/octet-stream
 
     - name: Upload Release Asset spectrum_encoded
@@ -130,5 +130,5 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} 
         asset_path: ${{github.workspace}}/build/src/spectrum/spectrum_encoded.bin
-        asset_name: uv_k5_01_26_spectrum_2MHz_encoded.bin
+        asset_name: ${{ format('uv_k5_26_spectrum_v{0}.bin', github.run_number) }}
         asset_content_type: application/octet-stream

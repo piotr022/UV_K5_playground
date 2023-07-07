@@ -58,6 +58,7 @@ namespace System
       unsigned int(*BK4819Read)(unsigned int u32Address);
       void(*FlushFramebufferToScreen)(void);
       unsigned int(*PollKeyboard)(void);
+      char* (*sprintf)(char *, const char *, ...);
    };
 
    struct TOrgData
@@ -65,6 +66,7 @@ namespace System
       unsigned char* pDisplayBuffer;
       unsigned char* pSmallDigs;
       unsigned char* pSmallLeters;
+      unsigned char *p8FlashLightStatus;
    };
 
    inline const TOrgFunctions OrgFunc_01_26 =
@@ -77,7 +79,8 @@ namespace System
       .BK4819Write = (decltype(TOrgFunctions::BK4819Write) (0xAF00 + 1)),
       .BK4819Read = (decltype(TOrgFunctions::BK4819Read) (0xA960 + 1)),
       .FlushFramebufferToScreen = (decltype(TOrgFunctions::FlushFramebufferToScreen) (0xB638 + 1)),
-      .PollKeyboard = (decltype(TOrgFunctions::PollKeyboard) (0xb0b8 + 1))
+      .PollKeyboard = (decltype(TOrgFunctions::PollKeyboard) (0xb0b8 + 1)),
+      .sprintf = (decltype(TOrgFunctions::sprintf) (0xc8ec + 1)),
    };
 
    inline const TOrgData OrgData_01_26 =
@@ -85,6 +88,7 @@ namespace System
       .pDisplayBuffer = (decltype(TOrgData::pDisplayBuffer)) 0x20000704,
       .pSmallDigs = (decltype(TOrgData::pSmallDigs)) 0xD620,
       .pSmallLeters = (decltype(TOrgData::pSmallLeters)) 0xD348,
+      .p8FlashLightStatus = (decltype(TOrgData::p8FlashLightStatus)) 0x200003b3,
    };
 }
 

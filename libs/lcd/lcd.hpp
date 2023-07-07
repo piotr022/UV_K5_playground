@@ -230,7 +230,7 @@ public:
        10000000, // 10^7
        100000000 // 10^8
    };
-   void PrintFixedDigitsNumber2(int s32Number)
+   void PrintFixedDigitsNumber2(int s32Number, unsigned char u8DigsToCut = 2)
    {
       char U8NumBuff[11] = {0}; // 9 digits, sign, and null terminator
       int startIdx = 0;
@@ -243,7 +243,7 @@ public:
          isNegative = true;
       }
 
-      for (int i = 8; i >= 2; --i) // assuming powersOfTen is an array of powers of 10
+      for (int i = 8; i >= u8DigsToCut; --i) // assuming powersOfTen is an array of powers of 10
       {
          int digit = 0;
          while (s32Number >= powersOfTen[i])

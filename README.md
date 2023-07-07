@@ -1,20 +1,23 @@
 # UV_K5_playground
+## src/spectrum ![auto release build](https://github.com/piotr022/UV_K5_playground/actions/workflows/c-cpp.yml/badge.svg)
+![rssi printer](./docs/spectrum2.png)  
+**new version**  
+Spectrum scanner. It prints a spectrum graph. Zoom in and zoom out as well as resolution could be controled via keyboard.
+
+* download mod [uv_k5_01_26_spectrum_2MHz_encoded.bin](https://github.com/piotr022/UV_K5_playground/releases/latest)
+* to enable spectum view press **flash light button**
+* hold **up** or **down** key to change center frequency
+* press **8** / **2** for zoom in / zoom out
+* press **1** / **7** to increase / decrease resolution (smaller resolution == faster update rate)
+* press **PTT** or **EXIT** to disable spectrum view  
+
+Please, consider paying tribute to the two fallen Quashengs that were bricked during the development process. Their sacrifice played a crucial role in shaping this project. To show your appreciation and support for our ongoing work, you can make a [donation](https://paypal.me/sq9p).
+
 ## src/rssi_sbar ![auto release build](https://github.com/piotr022/UV_K5_playground/actions/workflows/c-cpp.yml/badge.svg)
 ![rssi printer](./docs/rssi_sbar.png)  
 sbar with calibrated S steps
 * download mod [uv_k5_01_26_rssi_sbar_encoded.bin](https://github.com/piotr022/UV_K5_playground/releases/latest)
 * flash with original quansheng update tool  
-Please, consider paying tribute to the two fallen Quashengs that were bricked during the development process. Their sacrifice played a crucial role in shaping this project. To show your appreciation and support for our ongoing work, you can make a [donation](https://paypal.me/sq9p).
-
-## src/spectrum ![auto release build](https://github.com/piotr022/UV_K5_playground/actions/workflows/c-cpp.yml/badge.svg)
-![rssi printer](./docs/spectrum2.png)  
-*still bugy*  
-Spectrum scanner. It prints a spectrum graph that covers +/- 1 MHz from the center frequency. Prints center frequency, and frequency with highest amplitude.
-
-* download mod [uv_k5_01_26_spectrum_2MHz_encoded.bin](https://github.com/piotr022/UV_K5_playground/releases/latest)
-* to enable spectum view press flash light button
-* hold *up* or *down* key to change center frequency
-* press *PTT* to disable spectrum view
 
 ## src/rssi_printer ![auto release build](https://github.com/piotr022/UV_K5_playground/actions/workflows/c-cpp.yml/badge.svg)
 ![rssi printer](./docs/rssi_printer.png)  
