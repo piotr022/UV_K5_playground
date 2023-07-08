@@ -11,7 +11,7 @@ Spectrum scanner. It prints a spectrum graph. Zoom in well as resolution can be 
 * press **1** / **7** to increase / decrease resolution (smaller resolution == faster update rate)
 * press **PTT** or **EXIT** to disable spectrum view  
 
-Please, consider paying tribute to the two fallen Quashengs that were bricked during the development process. Their sacrifice played a crucial role in shaping this project. To show your appreciation and support for our ongoing work, you can make a [donation](https://paypal.me/sq9p).
+To show your appreciation and support for ongoing work, you can make a [donation](https://paypal.me/sq9p).
 
 ## src/rssi_sbar ![auto release build](https://github.com/piotr022/UV_K5_playground/actions/workflows/c-cpp.yml/badge.svg)
 ![rssi printer](./docs/rssi_sbar.png)  
