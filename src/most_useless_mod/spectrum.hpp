@@ -15,37 +15,22 @@ public:
 
    void Handle()
    {
-      DisplayBuff.ClearAll();
-      char C8RssiString[] = "g000";
-
-      unsigned int u32Key = Fw.PollKeyboard();
-
-      C8RssiString[1] = '0' + (u32Key / 100 )% 10;
-      C8RssiString[2] = '0' + (u32Key / 10) % 10;
-      C8RssiString[3] = '0' + u32Key % 10;
-
-      switch(u32Key)
+      if (!(GPIOC->DATA & 0b1))
       {
-         case 2:
-            y -= 3;
-            break;
-         case 8:
-            y += 3;
-            break;
-         case 4:
-            x -= 3;
-            break;
-         case 6:
-            x += 3;
-            break;
-         default:
-         break;
+         return;
       }
 
-      Display.DrawCircle(x, y, 5, true);
-      Display.SetCoursor(3, 0);
-      Display.SetFont(&FontSmallNr);
-      Display.Print(C8RssiString);
+      if (!(Fw.BK4819Read(0x0C) & 0b10))
+      {
+         return;
+      }
+
+      char kupa[20];
+
+      Fw.FormatString(kupa, "test %u", 100);
+       
+
+      Fw.PrintTextOnScreen(kupa, 0, 127, 0, 8, 0);   
       Fw.FlushFramebufferToScreen();
    }
 

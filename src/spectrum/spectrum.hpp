@@ -147,7 +147,6 @@ public:
       Display.PrintFixedDigitsNumber2(u32Peak);
 
       memcpy(FwData.pDisplayBuffer + 128 * 2 + u8PeakPos - 3, FwData.pSmallLeters + 18 + 5, 7);
-
       Fw.FlushFramebufferToScreen();
    }
 
@@ -227,4 +226,5 @@ private:
    unsigned char u8LastBtnPressed;
    unsigned char u8ResolutionDiv;
    bool bEnabled;
+   char C8Info[20];
 };

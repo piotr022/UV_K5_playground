@@ -41,13 +41,7 @@ namespace System
          unsigned int u32StopPixel,
          unsigned int u32LineNumber,
          unsigned int u32PxPerChar,
-         unsigned int u32Centered,
-         unsigned int u32MenuLen,
-         unsigned int u32AsciiIdx,
-         unsigned int u32Unknown0,
-         unsigned int u32Unknown1,
-         unsigned int u32Unknown2,
-         unsigned int u32Unknown3
+         unsigned int u32Centered
          );
 
       void(*FillScreenMemory)(unsigned int u32Param1);
@@ -59,6 +53,9 @@ namespace System
       void(*FlushFramebufferToScreen)(void);
       unsigned int(*PollKeyboard)(void);
       char* (*sprintf)(char *, const char *, ...);
+      void(*FillWithZero)(unsigned char* p8Data, unsigned int u32Size);
+      char* (*FormatString)(char *, const char *, ...);
+
    };
 
    struct TOrgData
@@ -81,6 +78,8 @@ namespace System
       .FlushFramebufferToScreen = (decltype(TOrgFunctions::FlushFramebufferToScreen) (0xB638 + 1)),
       .PollKeyboard = (decltype(TOrgFunctions::PollKeyboard) (0xb0b8 + 1)),
       .sprintf = (decltype(TOrgFunctions::sprintf) (0xc8ec + 1)),
+      .FillWithZero = (decltype(TOrgFunctions::FillWithZero) (0x1AA + 1)),
+      .FormatString = (decltype(TOrgFunctions::FormatString) (0xC6E8 + 1)),
    };
 
    inline const TOrgData OrgData_01_26 =

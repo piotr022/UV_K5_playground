@@ -1,8 +1,8 @@
 # UV_K5_playground
 ## src/spectrum ![auto release build](https://github.com/piotr022/UV_K5_playground/actions/workflows/c-cpp.yml/badge.svg)
-![rssi printer](./docs/spectrum2.png)  
-**new version**  
-Spectrum scanner. It prints a spectrum graph. Zoom in and zoom out as well as resolution could be controled via keyboard.
+![rssi printer](./docs/spectrum.gif)  
+**update**  
+Spectrum scanner. It prints a spectrum graph. Zoom in well as resolution can be controled via keyboard.
 
 * download mod [uv_k5_01_26_spectrum_2MHz_encoded.bin](https://github.com/piotr022/UV_K5_playground/releases/latest)
 * to enable spectum view press **flash light button**
