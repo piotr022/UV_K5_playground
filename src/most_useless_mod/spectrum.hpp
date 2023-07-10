@@ -1,17 +1,29 @@
 #pragma once
 #include "system.hpp"
 #include "uv_k5_display.hpp"
+#include "radio.hpp"
 
-#define REVERSE_UINT16(x) ((((x) & 0xFF00) >> 8) | (((x) & 0x00FF) << 8))
-
-template <const System::TOrgFunctions &Fw, const System::TOrgData &FwData>
-class CSpectrum
+template <const System::TOrgFunctions &Fw,
+    const System::TOrgData &FwData,
+    Radio::CBK4819<Fw>& RadioDriver>
+class CSpectrum : public Radio::IRadioUser
 {
 public:
    static constexpr auto StepSize = 0xFFFF / TUV_K5Display::SizeX;
    static constexpr auto StepSizeFreq = 10'000;
+
+   enum eState : unsigned char
+   {
+      Init,
+      Idle,
+      RxPending,
+      SendData,
+      RxDone,
+      Exit,
+   };
+
    CSpectrum()
-       : DisplayBuff(FwData.pDisplayBuffer), FontSmallNr(FwData.pSmallDigs), Display(DisplayBuff), x(DisplayBuff.SizeX/2), y(DisplayBuff.SizeY/2){};
+       : DisplayBuff(FwData.pDisplayBuffer), FontSmallNr(FwData.pSmallDigs), Display(DisplayBuff), State(eState::SendData), u8RxCnt(0){};
 
    void Handle()
    {
@@ -20,31 +32,48 @@ public:
          return;
       }
 
-      if (!(Fw.BK4819Read(0x0C) & 0b10))
+      switch(State)
       {
-         return;
+         case eState::Init:
+         {
+            RadioDriver.RecieveAsyncAirCopyMode(U8RxBuff, sizeof(U8RxBuff), this);
+            State = eState::RxPending;
+            break;
+         }
+
+         case eState::RxDone:
+         {
+            u8RxCnt++;
+            char kupa[20];
+            Fw.FormatString(kupa, "test %u", u8RxCnt);
+            Fw.PrintTextOnScreen(kupa, 0, 127, 0, 8, 0);
+            Fw.FlushFramebufferToScreen();
+            State = eState::Init;
+            break;
+         }
+
+         case eState::SendData:
+         {
+            RadioDriver.SendSyncAirCopyMode72((unsigned char*)this);
+            return;
+         }
+
+         default:
+            return;
       }
+   }
 
-      char kupa[20];
-
-      Fw.FormatString(kupa, "test %u", 100);
-       
-
-      Fw.PrintTextOnScreen(kupa, 0, 127, 0, 8, 0);   
-      Fw.FlushFramebufferToScreen();
+   void RxDoneHandler() override
+   {
+      State = eState::RxDone;
    }
 
 private:
-   void SetFrequency(unsigned int u32Freq)
-   {
-      u32Freq /= 10;
-      Fw.BK4819Write(0x39, REVERSE_UINT16((u32Freq >> 16) & 0xFFFF));
-      Fw.BK4819Write(0x38, REVERSE_UINT16(u32Freq & 0xFFFF));
-   }
-
    TUV_K5Display DisplayBuff;
    const TUV_K5SmallNumbers FontSmallNr;
    CDisplay<const TUV_K5Display> Display;
-   
-   unsigned char x, y;
+   eState State;
+   unsigned char U8RxBuff[72];
+   unsigned char u8RxCnt;
+
 };

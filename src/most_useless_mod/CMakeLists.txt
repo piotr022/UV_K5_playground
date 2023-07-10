@@ -11,6 +11,7 @@ target_link_libraries(${NAME}
         orginal_fw
         uv_k5_system
         lcd
+        radio
 )
 
 target_include_directories(${NAME} PUBLIC
