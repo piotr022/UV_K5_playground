@@ -39,6 +39,5 @@ extern "C" void MultiIrq_Handler(unsigned int u32IrqSource)
    {
       T9Texting.Handle();
    }
-
     System::JumpToOrginalVector(u32IrqSource);
 }

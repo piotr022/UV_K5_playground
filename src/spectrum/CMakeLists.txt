@@ -2,10 +2,10 @@ set(NAME spectrum)
 set(MCU_TARGET_FILES_DIR ../mcu_target_common)
 
 add_executable(${NAME}
-		main.cpp
-		hardware/hardware.cpp
-		dp32g030.s
-		)
+        main.cpp
+        hardware/hardware.cpp
+        dp32g030.s
+)
 
 target_link_libraries(${NAME}
         orginal_fw
@@ -33,6 +33,7 @@ target_compile_options(${NAME} PRIVATE
 target_link_options(${NAME} PRIVATE
         #-print-multi-lib
         -T ${CMAKE_CURRENT_SOURCE_DIR}/memory.ld
+        -flto
         -mcpu=cortex-m0
         -mthumb
         -mfpu=auto
@@ -68,7 +69,7 @@ add_custom_command(TARGET ${NAME}
 )
 
 add_custom_target(${NAME}_flash
-	COMMAND openocd -f interface/cmsis-dap.cfg -f ${PROJECT_SOURCE_DIR}/openocd_scripts/dp32g030.cfg -c "write_image ${PROJECT_SOURCE_DIR}/cmake-build-debug/src/spectrum/spectrum.bin 0x1000" -c "halt" -c "shutdown"
+	COMMAND openocd -f interface/cmsis-dap.cfg -f ${PROJECT_SOURCE_DIR}/openocd_scripts/dp32g030.cfg -c "write_image ${PROJECT_SOURCE_DIR}/build/src/rssi_printer/rssi_printer.bin 0x1000" -c "halt" -c "shutdown"
 	DEPENDS ${NAME}
 )
 

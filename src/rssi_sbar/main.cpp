@@ -15,7 +15,7 @@ int main()
    return 0;
 }
 
-extern "C" __attribute__((interrupt)) void MultiIrq_Handler(unsigned int u32IrqSource)
+extern "C" void MultiIrq_Handler(unsigned int u32IrqSource)
 {
    static bool bFirstInit = false;
    if(!bFirstInit)

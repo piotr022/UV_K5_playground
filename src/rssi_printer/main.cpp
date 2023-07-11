@@ -30,4 +30,5 @@ extern "C" void MultiIrq_Handler(unsigned int u32IrqSource)
    {
       CRssiPrinter::Handle(Fw, FwData);
    }
+    System::JumpToOrginalVector(u32IrqSource);
 }
