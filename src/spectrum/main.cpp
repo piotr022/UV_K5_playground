@@ -17,17 +17,13 @@ int main() {
     return 0;
 }
 
-extern "C" __attribute__((interrupt)) void MultiIrq_Handler(unsigned int u32IrqSource) {
-
+extern "C" void MultiIrq_Handler(unsigned int u32IrqSource)
+{
 
     static bool bFirstInit = false;
     if (!bFirstInit) {
         System::CopyDataSection();
         __libc_init_array();
-
-        //enable swd
-        *(unsigned int *) 0x400B000C = ((*(unsigned int *) 0x400B000C) & 0xF0FF0FFF) | 0x01001000;
-        *(unsigned int *) 0x400B0104 = (*(unsigned int *) 0x400B0104) | 0x4800;
         bFirstInit = true;
     }
 

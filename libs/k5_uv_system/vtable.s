@@ -58,6 +58,7 @@ VectorTable:
 
   .size	VectorTable, .-VectorTable
 
+.global VectorTable
 
 .section .text
 .extern MultiIrq_Handler

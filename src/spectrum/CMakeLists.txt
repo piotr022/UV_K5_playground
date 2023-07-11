@@ -5,7 +5,6 @@ add_executable(${NAME}
 		main.cpp
 		hardware/hardware.cpp
 		dp32g030.s
-		vtable.s
 		)
 
 target_link_libraries(${NAME}
@@ -28,7 +27,7 @@ target_compile_definitions(${NAME} PRIVATE
 
 target_compile_options(${NAME} PRIVATE
         ${COMPILER_OPTIONS}
-        #-flto
+        -flto
 )
 
 target_link_options(${NAME} PRIVATE
