@@ -22,8 +22,6 @@ extern "C" __attribute__((interrupt)) void MultiIrq_Handler(unsigned int u32IrqS
 
     static bool bFirstInit = false;
     if (!bFirstInit) {
-        if (u32IrqSource == 1)
-            System::JumpToOrginalFw();
         System::CopyDataSection();
         __libc_init_array();
 

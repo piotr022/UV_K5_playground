@@ -70,18 +70,6 @@ IRQ_Wrapper02:
 IRQ_Wrapper03:
   movs    r0, #3
   b MultiIrq_Handler
-IRQ_Wrapper04:
-  movs    r0, #4
-  b MultiIrq_Handler
-IRQ_Wrapper05:
-  movs    r0, #5
-  b MultiIrq_Handler
-IRQ_Wrapper06:
-  movs    r0, #6
-  b MultiIrq_Handler
-IRQ_Wrapper07:
-  movs    r0, #7
-  b MultiIrq_Handler
 IRQ_Wrapper08:
   movs    r0, #8
   b MultiIrq_Handler
