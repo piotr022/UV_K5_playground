@@ -32,7 +32,8 @@ namespace System
    };
 
    void JumpToOrginalFw();
-   void CopyDataSection();
+    void JumpToOrginalVector(unsigned int u32IrqSource);
+    void CopyDataSection();
 
    struct TOrgFunctions
    {

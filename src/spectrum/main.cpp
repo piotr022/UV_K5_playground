@@ -6,37 +6,44 @@
 #include <string.h>
 
 Hardware::THardware Hw;
-const System::TOrgFunctions& Fw = System::OrgFunc_01_26;
-const System::TOrgData& FwData = System::OrgData_01_26;
+const System::TOrgFunctions &Fw = System::OrgFunc_01_26;
+const System::TOrgData &FwData = System::OrgData_01_26;
 
 CSpectrum<System::OrgFunc_01_26, System::OrgData_01_26> Spectrum;
 
-int main()
-{
-   System::JumpToOrginalFw();
-   return 0;
-} 
 
-void MultiIrq_Handler(unsigned int u32IrqSource)
-{
-   unsigned int u32Dummy;
-   System::TCortexM0Stacking* pStackedRegs = 
-      (System::TCortexM0Stacking*)(((unsigned int*)&u32Dummy) + 1);
+int main() {
+    System::JumpToOrginalFw();
+    return 0;
+}
 
-   static bool bFirstInit = false;
-   if(!bFirstInit)
-   {
-      System::CopyDataSection();
-      __libc_init_array();
-      bFirstInit = true;
-   }
+extern "C" __attribute__((interrupt)) void MultiIrq_Handler(unsigned int u32IrqSource) {
 
-   bool bPreventWhileKeypadPolling = pStackedRegs->LR > (unsigned int)Fw.PollKeyboard && 
-      pStackedRegs->PC < (unsigned int)Fw.PollKeyboard + 0x100; // i made a mistake and compared PC and LR, but this works fine xD
 
-   static unsigned int u32StupidCounter = 1;
-   if(u32StupidCounter++ > 200 && !bPreventWhileKeypadPolling)
-   {
-      Spectrum.Handle();
-   }
+    static bool bFirstInit = false;
+    if (!bFirstInit) {
+        if (u32IrqSource == 1)
+            System::JumpToOrginalFw();
+        System::CopyDataSection();
+        __libc_init_array();
+
+        //enable swd
+        *(unsigned int *) 0x400B000C = ((*(unsigned int *) 0x400B000C) & 0xF0FF0FFF) | 0x01001000;
+        *(unsigned int *) 0x400B0104 = (*(unsigned int *) 0x400B0104) | 0x4800;
+        bFirstInit = true;
+    }
+
+    unsigned int u32Dummy;
+    System::TCortexM0Stacking *pStackedRegs =
+            (System::TCortexM0Stacking *) (((unsigned int *) &u32Dummy) + 1);
+
+    bool bPreventWhileKeypadPolling = pStackedRegs->LR > (unsigned int) Fw.PollKeyboard &&
+                                      pStackedRegs->PC < (unsigned int) Fw.PollKeyboard +
+                                                         0x100; // i made a mistake and compared PC and LR, but this works fine xD
+
+    static unsigned int u32StupidCounter = 1;
+    if (u32StupidCounter++ > 200 && !bPreventWhileKeypadPolling) {
+        Spectrum.Handle();
+    }
+    System::JumpToOrginalVector(u32IrqSource);
 }
