@@ -8,50 +8,30 @@
 template <const System::TOrgFunctions &Fw,
           const System::TOrgData &FwData,
           Radio::CBK4819<Fw> &RadioDriver>
-class CMessenger
+class CMessenger : public Radio::IRadioUser
 {
 public:
+   static constexpr auto MaxCharsInLine = 128 / 8;
+   friend class CKeyboard<CMessenger>;
+
+   enum class eState : unsigned char
+   {
+      InitFirst,
+      InitRx,
+      InitTx,
+      RxDone,
+      WaitForRx,
+   };
+
    CMessenger()
        : DisplayBuff(FwData.pDisplayBuffer),
          Display(DisplayBuff),
          Keyboard(*this),
+         T9(S8TxBuff),
          bDisplayCleared(true),
-         bEnabled(0){};
-
-   char T9_table[10][4] = {{' ', '\0', '\0', '\0'}, {'\0', '\0', '\0', '\0'}, {'a', 'b', 'c', '\0'}, {'d', 'e', 'f', '\0'}, {'g', 'h', 'i', '\0'}, {'j', 'k', 'l', '\0'}, {'m', 'n', 'o', '\0'}, {'p', 'q', 'r', 's'}, {'t', 'u', 'v', '\0'}, {'w', 'x', 'y', 'z'}};
-   unsigned char numberOfLettersAssignedToKey[10] = {1, 0, 3, 3, 3, 3, 3, 4, 3, 4};
-   unsigned char prev_key = 0, prev_letter = 0;
-   char cMessage[30];
-   unsigned char c_index = 0;
-   bool keyReleased = true;
-
-   void insert_char_to_cMessage(unsigned char key)
-   {
-      if (prev_key == key && key != 14)
-      {
-         c_index = (c_index > 0) ? c_index - 1 : 0;
-         cMessage[c_index++] = T9_table[key][(++prev_letter) % numberOfLettersAssignedToKey[key]];
-      }
-      else
-      {
-         prev_letter = 0;
-         cMessage[c_index++] = T9_table[key][prev_letter];
-      }
-      cMessage[c_index] = '\0';
-      prev_key = key;
-   }
-
-   void process_starkey()
-   {
-      prev_key = 14;
-      prev_letter = 0;
-   }
-
-   void process_backspace()
-   {
-      c_index = (c_index > 0) ? c_index - 1 : 0;
-      cMessage[c_index] = ' ';
-   }
+         bEnabled(0),
+         State(eState::InitRx),
+         u8RxDoneLabelCnt(0xFF){};
 
    void Handle()
    {
@@ -66,9 +46,6 @@ public:
          {
             bDisplayCleared = true;
             ClearDrawings();
-            // Clear cMessage
-            memset(cMessage, 0, 30);
-            c_index = 0;
             Fw.FlushFramebufferToScreen();
          }
 
@@ -79,54 +56,63 @@ public:
       {
       }
 
+      char C8PrintBuff[30];
       bDisplayCleared = false;
-
-      unsigned char key;
-      key = u8LastBtnPressed;
-
-      if (key == 0xff)
-      {
-         keyReleased = true;
-         return;
-      }
-      else if (keyReleased)
-      {
-         keyReleased = false;
-         if (key == 0)
-         { // key 0 for space
-            prev_key = 0;
-            prev_letter = 0;
-            cMessage[c_index++] = ' ';
-         }
-
-         else if (key == 13)
-         {
-            process_backspace();
-            return;
-         }
-
-         else if (key == 14)
-         {
-            process_starkey();
-            return;
-         }
-
-         else if (key == 10)
-         {
-            bEnabled = false;
-            return;
-         }
-
-         else
-         {
-            insert_char_to_cMessage(key);
-         }
-      }
-      prev_key = key;
-      // Display.DrawRectangle(0,0, 7, 7, 0);
       ClearDrawings();
-      Fw.PrintTextOnScreen(cMessage, 0, 128, 0, 8, 0);
+
+      Display.DrawHLine(3, 3 + 10, 1 * 8 + T9.GetIdx() * 8 + 2);
+      // print tx data
+      Fw.FormatString(C8PrintBuff, ">%s", T9.C8WorkingBuff);
+      Fw.PrintTextOnScreen(C8PrintBuff, 0, 128, 0, 8, 0);
+
+      // print rx data
+      char C8Temp = S8RxBuff[MaxCharsInLine];
+      S8RxBuff[MaxCharsInLine] = '\0';
+      Fw.PrintTextOnScreen(S8RxBuff, 1, 128, 3, 8, 0);
+      S8RxBuff[MaxCharsInLine] = C8Temp;
+      Fw.PrintTextOnScreen(S8RxBuff + MaxCharsInLine, 1, 128, 5, 8, 0);
+
+      Display.DrawRectangle(0, (8 * 4) - 6, 127, 24 + 6, false);
+
+      if (u8RxDoneLabelCnt < 100)
+      {
+         u8RxDoneLabelCnt++;
+         Fw.PrintTextOnScreen("  >> RX <<   ", 0, 128, 2, 8, 1);
+      }
+
+      switch (State)
+      {
+      case eState::InitRx:
+      {
+         InitRxHandler();
+         break;
+      }
+
+      case eState::InitTx:
+      {
+         static unsigned char u8TxDelay = 0;
+         if (u8TxDelay++ >= 1)
+         {
+            u8TxDelay = 0;
+            RadioDriver.SendSyncAirCopyMode72((unsigned char *)S8TxBuff);
+            State = eState::InitRx;
+         }
+
+         Fw.PrintTextOnScreen("  >> TX <<   ", 0, 128, 2, 8, 1);
+         break;
+      }
+      default:
+         break;
+      }
+
       Fw.FlushFramebufferToScreen();
+   }
+
+   void RxDoneHandler(unsigned char u8DataLen, bool bCrcOk) override
+   {
+      bEnabled = true;
+      State = eState::InitRx;
+      u8RxDoneLabelCnt = 0;
    }
 
 private:
@@ -143,22 +129,16 @@ private:
 
       if (bEnabled)
       {
-         u8LastBtnPressed = Fw.PollKeyboard();
+         Keyboard.Handle(Fw.PollKeyboard());
       }
 
-      // u8LastBtnPressed = Fw.PollKeyboard();
-      // if (u8LastBtnPressed == EnableKey)
-      // {
-      //    u8PressCnt++;
-      // }
-
-      // if (u8PressCnt > (bEnabled ? 3 : PressDuration))
-      // {
-      //    u8PressCnt = 0;
-      //    bEnabled = !bEnabled;
-      // }
-
       return bEnabled;
+   }
+
+   void InitRxHandler()
+   {
+      RadioDriver.RecieveAsyncAirCopyMode((unsigned char *)S8RxBuff, sizeof(S8RxBuff), this);
+      State = eState::WaitForRx;
    }
 
    void ClearDrawings()
@@ -166,12 +146,37 @@ private:
       memset(FwData.pDisplayBuffer, 0, (DisplayBuff.SizeX / 8) * DisplayBuff.SizeY);
    }
 
+   void HandlePressedButton(unsigned char u8Button)
+   {
+   }
+
+   void HandleReleasedButton(unsigned char u8Button)
+   {
+      if (u8Button == 10)
+      {
+         State = eState::InitTx;
+         return;
+      }
+
+      if (u8Button == 13 && !T9.GetIdx())
+      {
+         bEnabled = false;
+         return;
+      }
+
+      T9.ProcessButton(u8Button);
+   }
+
+   char S8TxBuff[50];
+   char S8RxBuff[72];
    TUV_K5Display DisplayBuff;
    CDisplay<const TUV_K5Display> Display;
    CKeyboard<CMessenger> Keyboard;
+   CT9Decoder<sizeof(S8TxBuff)> T9;
 
    bool bDisplayCleared;
-
    unsigned char u8LastBtnPressed;
    bool bEnabled;
+   eState State;
+   unsigned char u8RxDoneLabelCnt;
 };

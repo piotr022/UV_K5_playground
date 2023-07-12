@@ -30,5 +30,6 @@ class CKeyboard
 
    private:
    KeyboardUserType& KeyboardUser;
+   public:
    unsigned char u8LastKey;
 };

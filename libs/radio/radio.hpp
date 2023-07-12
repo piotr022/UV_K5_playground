@@ -54,6 +54,12 @@ namespace Radio
          Fw.BK4819ConfigureAndStartTxFsk();
          Fw.AirCopyFskSetup();
          Fw.AirCopy72(p8Data);
+         DisablePa();
+      }
+
+      void DisablePa()
+      {
+         Fw.BK4819Write(0x30, Fw.BK4819Read(0x30) & ~0b1010);
       }
 
       void FixIrqEnRegister() // original firmware overrides IRQ_EN reg, so we need to reenable it
@@ -87,6 +93,7 @@ namespace Radio
          // Fw.BK4819Write(0x30, 0);
          // Fw.BK4819Write(0x30, 0b1011'1101'1111'0001);
          Fw.BK4819ConfigureAndStartRxFsk();
+         DisablePa();
          State = eState::RxPending;
       }
 

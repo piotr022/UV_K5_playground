@@ -1,4 +1,5 @@
 ENTRY(Reset_Handler)
+EXTERN(VectorTable)
 
 MEMORY
 {

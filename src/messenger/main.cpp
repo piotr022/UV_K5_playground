@@ -19,7 +19,7 @@ int main()
    return 0;
 } 
 
-void MultiIrq_Handler(unsigned int u32IrqSource)
+extern "C" void MultiIrq_Handler(unsigned int u32IrqSource)
 {
    static bool bFirstInit = false;
    if(!bFirstInit)
@@ -29,8 +29,10 @@ void MultiIrq_Handler(unsigned int u32IrqSource)
       bFirstInit = true;
    }
 
+   RadioDriver.InterruptHandler();
+
    static unsigned int u32StupidCounter = 1;
-   if((!(u32StupidCounter++ % 16) && u32StupidCounter > 200))
+   if((!(u32StupidCounter++ % 1) && u32StupidCounter > 200))
    {
       Messenger.Handle();
    }
