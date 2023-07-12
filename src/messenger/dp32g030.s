@@ -16,4 +16,3 @@ LoopForever:
     b LoopForever
 
 .size Reset_Handler, .-Reset_Handler
-

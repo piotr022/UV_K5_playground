@@ -61,10 +61,11 @@ namespace System
       void(*AirCopy72)(unsigned char*);
       void(*AirCopyFskSetup)();
       void(*BK4819Reset)();
-      void(*IntDivide)(int s32Divident, int s32Divisor);
+      int(*IntDivide)(int s32Divident, int s32Divisor);
       void(*BK4819WriteFrequency)(unsigned int u32Frequency);
       void(*BK4819SetPaGain)(unsigned short u16PaBias, unsigned int u32Frequency);
       void(*BK4819ConfigureAndStartTxFsk)();
+      void(*BK4819ConfigureAndStartRxFsk)();
       
    };
 
@@ -100,6 +101,7 @@ namespace System
       .BK4819WriteFrequency = (decltype(TOrgFunctions::BK4819WriteFrequency) (0xaabc + 1)),
       .BK4819SetPaGain = (decltype(TOrgFunctions::BK4819SetPaGain) (0xaad4 + 1)),
       .BK4819ConfigureAndStartTxFsk = (decltype(TOrgFunctions::BK4819ConfigureAndStartTxFsk) (0x1cd8 + 1)),
+      .BK4819ConfigureAndStartRxFsk = (decltype(TOrgFunctions::BK4819ConfigureAndStartRxFsk) (0xa63c + 1)),
    };
 
    inline const TOrgData OrgData_01_26 =

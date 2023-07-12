@@ -1,4 +1,4 @@
-set(NAME t9_texting)
+set(NAME messenger)
 set(MCU_TARGET_FILES_DIR ../mcu_target_common)
 
 add_executable(${NAME}  

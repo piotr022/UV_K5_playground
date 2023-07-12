@@ -9,19 +9,20 @@
 extern "C" void __libc_init_array();
 
 Radio::CBK4819<System::OrgFunc_01_26> RadioDriver;
-CSpectrum<System::OrgFunc_01_26, 
-   System::OrgData_01_26, RadioDriver> Spectrum;
+CSpectrum<System::OrgFunc_01_26,
+          System::OrgData_01_26, RadioDriver>
+    Spectrum;
 
 int main()
 {
    System::JumpToOrginalFw();
    return 0;
-} 
+}
 
 void MultiIrq_Handler(unsigned int u32IrqSource)
 {
    static bool bFirstInit = false;
-   if(!bFirstInit)
+   if (!bFirstInit)
    {
       System::CopyDataSection();
       __libc_init_array();
@@ -29,9 +30,9 @@ void MultiIrq_Handler(unsigned int u32IrqSource)
    }
 
    RadioDriver.InterruptHandler();
-   
+
    static unsigned int u32StupidCounter = 1;
-   if((!(u32StupidCounter++ % 64) && u32StupidCounter > 200))
+   if ((!(u32StupidCounter++ % 15) && u32StupidCounter > 200))
    {
       Spectrum.Handle();
    }

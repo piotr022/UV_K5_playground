@@ -4,10 +4,10 @@
 #include "keyboard.hpp"
 
 template <const System::TOrgFunctions &Fw, const System::TOrgData &FwData>
-class CT9Texting
+class CMessenger
 {
 public:
-   CT9Texting()
+   CMessenger()
        : DisplayBuff(FwData.pDisplayBuffer),
          Display(DisplayBuff),
          Keyboard(*this),
@@ -166,7 +166,7 @@ private:
 
    TUV_K5Display DisplayBuff;
    CDisplay<const TUV_K5Display> Display;
-   CKeyboard<CT9Texting> Keyboard;
+   CKeyboard<CMessenger> Keyboard;
 
    bool bDisplayCleared;
 
