@@ -13,11 +13,16 @@ CSpectrum<System::OrgFunc_01_26, System::OrgData_01_26> Spectrum;
 
 int main()
 {
-   System::JumpToOrginalFw();
+   Fw.IRQ_RESET();
    return 0;
 }
 
-extern "C" void MultiIrq_Handler(unsigned int u32IrqSource)
+extern "C" void Reset_Handler()
+{
+    Fw.IRQ_RESET();
+}
+
+extern "C" void SysTick_Handler()
 {
    unsigned int u32Dummy;
    System::TCortexM0Stacking* pStackedRegs =
@@ -39,5 +44,6 @@ extern "C" void MultiIrq_Handler(unsigned int u32IrqSource)
    {
       Spectrum.Handle();
    }
-    System::JumpToOrginalVector(u32IrqSource);
+
+    Fw.IRQ_SYSTICK();
 }

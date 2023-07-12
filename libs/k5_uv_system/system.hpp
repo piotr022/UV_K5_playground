@@ -31,8 +31,6 @@ namespace System
       }
    };
 
-   void JumpToOrginalFw();
-   void JumpToOrginalVector(unsigned int u32IrqSource);
    void CopyDataSection();
 
    struct TOrgFunctions
@@ -56,6 +54,8 @@ namespace System
       char* (*sprintf)(char *, const char *, ...);
       void(*FillWithZero)(unsigned char* p8Data, unsigned int u32Size);
       char* (*FormatString)(char *, const char *, ...);
+      void (*IRQ_RESET)(void);
+      void (*IRQ_SYSTICK)(void);
 
    };
 
@@ -81,6 +81,8 @@ namespace System
       .sprintf = (decltype(TOrgFunctions::sprintf) (0xc8ec + 1)),
       .FillWithZero = (decltype(TOrgFunctions::FillWithZero) (0x1AA + 1)),
       .FormatString = (decltype(TOrgFunctions::FormatString) (0xC6E8 + 1)),
+      .IRQ_RESET = (decltype(TOrgFunctions::IRQ_RESET) (0xd4 + 1)),
+      .IRQ_SYSTICK = (decltype(TOrgFunctions::IRQ_SYSTICK) (0xc398 + 1))
    };
 
    inline const TOrgData OrgData_01_26 =
