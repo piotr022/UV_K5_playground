@@ -15,9 +15,9 @@ int main()
 {
    System::JumpToOrginalFw();
    return 0;
-} 
+}
 
-void MultiIrq_Handler(unsigned int u32IrqSource)
+extern "C" void MultiIrq_Handler(unsigned int u32IrqSource)
 {
    unsigned int u32Dummy;
    System::TCortexM0Stacking* pStackedRegs = 
@@ -39,4 +39,5 @@ void MultiIrq_Handler(unsigned int u32IrqSource)
    {
       T9Texting.Handle();
    }
+    System::JumpToOrginalVector(u32IrqSource);
 }

@@ -1,7 +1,7 @@
 set(NAME spectrum)
 set(MCU_TARGET_FILES_DIR ../mcu_target_common)
 
-add_executable(${NAME}  
+add_executable(${NAME}
         main.cpp
         hardware/hardware.cpp
         dp32g030.s

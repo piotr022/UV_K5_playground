@@ -19,7 +19,7 @@ int main()
    return 0;
 }
 
-void MultiIrq_Handler(unsigned int u32IrqSource)
+extern "C" void MultiIrq_Handler(unsigned int u32IrqSource)
 {
    static bool bFirstInit = false;
    if (!bFirstInit)
@@ -36,4 +36,5 @@ void MultiIrq_Handler(unsigned int u32IrqSource)
    {
       Spectrum.Handle();
    }
+    System::JumpToOrginalVector(u32IrqSource);
 }

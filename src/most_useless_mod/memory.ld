@@ -9,6 +9,8 @@ MEMORY
 
 _estack = 0x20001388;
 
+EXTERN(VectorTable)
+
 SECTIONS
 {
     . = 0x0;

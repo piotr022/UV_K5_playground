@@ -11,6 +11,7 @@ target_include_directories(${NAME} PRIVATE
 
 target_sources(${NAME} PRIVATE
 	system.cpp
+	vtable.s
 )
 
 target_link_libraries(${NAME}
