@@ -7,15 +7,21 @@
 
 extern "C" void __libc_init_array();
 
+const System::TOrgFunctions& Fw = System::OrgFunc_01_26;
 CSPong<System::OrgFunc_01_26, System::OrgData_01_26> Pong;
 
 int main()
 {
-   System::JumpToOrginalFw();
+    Fw.IRQ_RESET();
    return 0;
 }
 
-extern "C" void MultiIrq_Handler(unsigned int u32IrqSource)
+extern "C" void Reset_Handler()
+{
+    Fw.IRQ_RESET();
+}
+
+extern "C" void SysTick_Handler()
 {
    static bool bFirstInit = false;
    if(!bFirstInit)
@@ -30,5 +36,5 @@ extern "C" void MultiIrq_Handler(unsigned int u32IrqSource)
    {
       Pong.Handle();
    }
-    System::JumpToOrginalVector(u32IrqSource);
+    Fw.IRQ_SYSTICK();
 }

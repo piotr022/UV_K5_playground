@@ -13,11 +13,16 @@ CT9Texting<System::OrgFunc_01_26, System::OrgData_01_26> T9Texting;
 
 int main()
 {
-   System::JumpToOrginalFw();
-   return 0;
+    Fw.IRQ_RESET();
+    return 0;
 }
 
-extern "C" void MultiIrq_Handler(unsigned int u32IrqSource)
+extern "C" void Reset_Handler()
+{
+    Fw.IRQ_RESET();
+}
+
+extern "C" void SysTick_Handler()
 {
    unsigned int u32Dummy;
    System::TCortexM0Stacking* pStackedRegs = 
@@ -39,5 +44,5 @@ extern "C" void MultiIrq_Handler(unsigned int u32IrqSource)
    {
       T9Texting.Handle();
    }
-    System::JumpToOrginalVector(u32IrqSource);
+    Fw.IRQ_SYSTICK();
 }
