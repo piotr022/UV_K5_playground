@@ -8,53 +8,55 @@
   .size VectorTable, .-VectorTable
 VectorTable:
   .word _estack
-  .word IRQ_Wrapper01 + 1
-  .word IRQ_Wrapper02 + 1
-  .word IRQ_Wrapper03 + 1
-  .word 0x01
-  .word 0x02
-  .word 0x03
-  .word 0x04
-  .word IRQ_Wrapper08 + 1
-  .word IRQ_Wrapper09 + 1
-  .word IRQ_Wrapper10 + 1
-  .word IRQ_Wrapper11 + 1
-  .word IRQ_Wrapper12 + 1
-  .word IRQ_Wrapper13 + 1
-  .word IRQ_Wrapper14 + 1
-  .word IRQ_Wrapper15 + 1
-  .word IRQ_Wrapper16 + 1
-  .word IRQ_Wrapper17 + 1
-  .word IRQ_Wrapper18 + 1
-  .word IRQ_Wrapper19 + 1
-  .word IRQ_Wrapper20 + 1
-  .word IRQ_Wrapper21 + 1
-  .word IRQ_Wrapper22 + 1
-  .word IRQ_Wrapper23 + 1
-  .word IRQ_Wrapper24 + 1
-  .word IRQ_Wrapper25 + 1
-  .word IRQ_Wrapper26 + 1
-  .word IRQ_Wrapper27 + 1
-  .word IRQ_Wrapper28 + 1
-  .word IRQ_Wrapper29 + 1
-  .word IRQ_Wrapper30 + 1
-  .word IRQ_Wrapper31 + 1
-  .word IRQ_Wrapper32 + 1
-  .word IRQ_Wrapper33 + 1
-  .word IRQ_Wrapper34 + 1
-  .word IRQ_Wrapper35 + 1
-  .word IRQ_Wrapper36 + 1
-  .word IRQ_Wrapper37 + 1
-  .word IRQ_Wrapper38 + 1
-  .word IRQ_Wrapper39 + 1
-  .word IRQ_Wrapper40 + 1
-  .word IRQ_Wrapper41 + 1
-  .word IRQ_Wrapper42 + 1
-  .word IRQ_Wrapper43 + 1
-  .word IRQ_Wrapper44 + 1
-  .word IRQ_Wrapper45 + 1
-  .word IRQ_Wrapper46 + 1
-  .word IRQ_Wrapper47 + 1
+  .word IRQ_RESET + 1
+  .word 2   //IRQ_NMI + 1
+  .word 3   //IRQ_HardFault + 1
+  .word 4   //IRQ_MemManage
+  .word 5   //IRQ_BusFault
+  .word 6   //IRQ_UsageFault
+  .word 7   //Reserved1
+  .word 8   //Reserved2
+  .word 9   //Reserved3
+  .word 10  //Reserved4
+  .word 11  //IRQ_SVCall + 1
+  .word 12  //Reserved5
+  .word 13  //Reserved6
+  .word 14  //IRQ_PendSV + 1
+  .word IRQ_SysTick + 1
+  .word 16
+  .word 17
+  .word 18
+  .word 19
+  .word 20
+  .word 21
+  .word 22
+  .word 23
+  .word 24
+  .word 25
+  .word 26
+  .word 27
+  .word 28
+  .word 29
+  .word 30
+  .word 31
+  .word 32
+  .word 33
+  .word 34
+  .word 35
+  .word 36
+  .word 37
+  .word 38
+  .word 39
+  .word 40
+  .word 41
+  .word 42
+  .word 43
+  .word 44
+  .word 45
+  .word 46
+  .word 47
+
+
 
   .size	VectorTable, .-VectorTable
 
@@ -62,39 +64,52 @@ VectorTable:
 
 .section .text
 .extern MultiIrq_Handler
-IRQ_Wrapper01:
+IRQ_RESET:
   movs    r0, #1
   b MultiIrq_Handler
-IRQ_Wrapper02:
+
+/*
+IRQ_NMI:  //jumps to endless loop in Original FW
   movs    r0, #2
   b MultiIrq_Handler
-IRQ_Wrapper03:
+*/
+
+/*
+IRQ_HardFault:   //jumps to endless loop in Original FW
   movs    r0, #3
   b MultiIrq_Handler
-IRQ_Wrapper08:
-  movs    r0, #8
-  b MultiIrq_Handler
-IRQ_Wrapper09:
-  movs    r0, #9
-  b MultiIrq_Handler
-IRQ_Wrapper10:
-  movs    r0, #10
-  b MultiIrq_Handler
-IRQ_Wrapper11:
+*/
+
+//--- all zeros in OFW ----
+//4 MemManage
+//5 BusFault
+//6 UsageFault
+//7 Reserved1
+//8 Reserved2
+//9 Reserved3
+//10 Reserved4
+
+/*
+IRQ_SVCall: //jumps to endless loop in Original FW
   movs    r0, #11
   b MultiIrq_Handler
-IRQ_Wrapper12:
-  movs    r0, #12
-  b MultiIrq_Handler
-IRQ_Wrapper13:
-  movs    r0, #13
-  b MultiIrq_Handler
-IRQ_Wrapper14:
+*/
+
+//12 Reserved5
+//13 Reserved6
+
+/*
+IRQ_PendSV: //jumps to endless loop in Original FW
   movs    r0, #14
   b MultiIrq_Handler
-IRQ_Wrapper15:
+*/
+
+IRQ_SysTick:
   movs    r0, #15
   b MultiIrq_Handler
+
+//every interrupt below jumps to endless loop in OFW
+/*
 IRQ_Wrapper16:
   movs    r0, #16
   b MultiIrq_Handler
@@ -191,3 +206,4 @@ IRQ_Wrapper46:
 IRQ_Wrapper47:
   movs    r0, #47
   b MultiIrq_Handler
+*/
