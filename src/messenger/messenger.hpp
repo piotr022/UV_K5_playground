@@ -2,8 +2,12 @@
 #include "system.hpp"
 #include "uv_k5_display.hpp"
 #include "keyboard.hpp"
+#include "radio.hpp"
+#include "t9.hpp"
 
-template <const System::TOrgFunctions &Fw, const System::TOrgData &FwData>
+template <const System::TOrgFunctions &Fw,
+          const System::TOrgData &FwData,
+          Radio::CBK4819<Fw> &RadioDriver>
 class CMessenger
 {
 public:
@@ -12,9 +16,7 @@ public:
          Display(DisplayBuff),
          Keyboard(*this),
          bDisplayCleared(true),
-         bEnabled(0)
-   {
-   };
+         bEnabled(0){};
 
    char T9_table[10][4] = {{' ', '\0', '\0', '\0'}, {'\0', '\0', '\0', '\0'}, {'a', 'b', 'c', '\0'}, {'d', 'e', 'f', '\0'}, {'g', 'h', 'i', '\0'}, {'j', 'k', 'l', '\0'}, {'m', 'n', 'o', '\0'}, {'p', 'q', 'r', 's'}, {'t', 'u', 'v', '\0'}, {'w', 'x', 'y', 'z'}};
    unsigned char numberOfLettersAssignedToKey[10] = {1, 0, 3, 3, 3, 3, 3, 4, 3, 4};

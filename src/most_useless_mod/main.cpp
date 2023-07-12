@@ -32,9 +32,10 @@ extern "C" void MultiIrq_Handler(unsigned int u32IrqSource)
    RadioDriver.InterruptHandler();
 
    static unsigned int u32StupidCounter = 1;
-   if ((!(u32StupidCounter++ % 15) && u32StupidCounter > 200))
+   if ((!(u32StupidCounter++ % 16) && u32StupidCounter > 200))
    {
       Spectrum.Handle();
    }
-    System::JumpToOrginalVector(u32IrqSource);
+
+   System::JumpToOrginalVector(u32IrqSource);
 }

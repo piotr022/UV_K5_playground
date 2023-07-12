@@ -12,6 +12,7 @@ target_link_libraries(${NAME}
         uv_k5_system
         lcd
         keyboard
+        radio
 )
 
 target_include_directories(${NAME} PUBLIC
