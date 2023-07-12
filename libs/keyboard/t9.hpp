@@ -20,11 +20,7 @@ public:
       }
 
       if (key == 1)
-      { // key 1 for enter
-         if(prev_key != key)
-            c_index++;
-         
-         prev_key = 1;
+      {
          return;
       }
 

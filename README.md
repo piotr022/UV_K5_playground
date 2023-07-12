@@ -1,6 +1,18 @@
 # UV_K5_playground
-## src/spectrum ![auto release build](https://github.com/piotr022/UV_K5_playground/actions/workflows/c-cpp.yml/badge.svg)
-![rssi printer](./docs/spectrum.gif)  
+## src/messenger ![auto release build](https://github.com/piotr022/UV_K5_playground/actions/workflows/c-cpp.yml/badge.svg)
+![messenger](./docs/messenger.gif)  
+AFSK messenger with T9 typing support  
+
+* download mod [uv_k5_01_26_cold_messenger_encoded.bin](https://github.com/piotr022/UV_K5_playground/releases/latest)
+* to enable messenger view press **flash light button**
+* use keyboard to type message
+* press **MENU** to send message
+* press **EXIT** to clear message
+* if message is cleared use **EXIT** to exit messenger view  
+
+To show your appreciation and support for ongoing work, you can make a [donation](https://paypal.me/sq9p).  
+
+![spectrum](./docs/spectrum.gif)  
 **update**  
 Spectrum scanner. It prints a spectrum graph. Zoom in well as resolution can be controled via keyboard.
 
@@ -10,8 +22,6 @@ Spectrum scanner. It prints a spectrum graph. Zoom in well as resolution can be 
 * press **8** / **2** for zoom in / zoom out
 * press **1** / **7** to increase / decrease resolution (smaller resolution == faster update rate)
 * press **PTT** or **EXIT** to disable spectrum view  
-
-To show your appreciation and support for ongoing work, you can make a [donation](https://paypal.me/sq9p).
 
 ## src/rssi_sbar ![auto release build](https://github.com/piotr022/UV_K5_playground/actions/workflows/c-cpp.yml/badge.svg)
 ![rssi printer](./docs/rssi_sbar.png)  

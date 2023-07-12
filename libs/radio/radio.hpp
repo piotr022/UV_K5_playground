@@ -54,7 +54,7 @@ namespace Radio
          Fw.BK4819ConfigureAndStartTxFsk();
          Fw.AirCopyFskSetup();
          Fw.AirCopy72(p8Data);
-         DisablePa();
+         Fw.BK4819SetGpio(1, false);
       }
 
       void DisablePa()
@@ -93,7 +93,6 @@ namespace Radio
          // Fw.BK4819Write(0x30, 0);
          // Fw.BK4819Write(0x30, 0b1011'1101'1111'0001);
          Fw.BK4819ConfigureAndStartRxFsk();
-         DisablePa();
          State = eState::RxPending;
       }
 

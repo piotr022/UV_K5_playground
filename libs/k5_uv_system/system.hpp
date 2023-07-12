@@ -67,6 +67,7 @@ namespace System
       void(*BK4819SetPaGain)(unsigned short u16PaBias, unsigned int u32Frequency);
       void(*BK4819ConfigureAndStartTxFsk)();
       void(*BK4819ConfigureAndStartRxFsk)();
+      void(*BK4819SetGpio)(unsigned int u32Pin, bool bState);
       
    };
 
@@ -103,6 +104,7 @@ namespace System
       .BK4819SetPaGain = (decltype(TOrgFunctions::BK4819SetPaGain) (0xaad4 + 1)),
       .BK4819ConfigureAndStartTxFsk = (decltype(TOrgFunctions::BK4819ConfigureAndStartTxFsk) (0x1cd8 + 1)),
       .BK4819ConfigureAndStartRxFsk = (decltype(TOrgFunctions::BK4819ConfigureAndStartRxFsk) (0xa63c + 1)),
+      .BK4819SetGpio = (decltype(TOrgFunctions::BK4819SetGpio) (0xa794 + 1)),
    };
 
    inline const TOrgData OrgData_01_26 =
