@@ -81,20 +81,21 @@ public:
          Fw.FlushStatusbarBufferToScreen();
       }
 
-      auto *pMenuCheckData = (unsigned char *)DisplayBuff.GetCoursorData(DisplayBuff.GetCoursorPosition(2, 6 * 8 + 1));
       if (Fw.BK4819Read(0x0C) & 0b10)
       {
          u8SqlDelayCnt = 0;
       }
 
+      auto *pMenuCheckData = (unsigned char *)DisplayBuff.GetCoursorData(DisplayBuff.GetCoursorPosition(2, 6 * 8 + 1));
+      auto *pFrequencyScanCheckData = (unsigned char *)DisplayBuff.GetCoursorData(DisplayBuff.GetCoursorPosition(6, 3 * 8 +2));
       auto *pDData = (unsigned char *)DisplayBuff.GetCoursorData(DisplayBuff.GetCoursorPosition(3, 0));
-      if (u8SqlDelayCnt > 20 || *pMenuCheckData == 0xFF)
+      if (u8SqlDelayCnt > 20 || *pMenuCheckData == 0xFF || *pFrequencyScanCheckData)
       {
          if (!bIsCleared)
          {
             bIsCleared = true;
             memset(pDData, 0, DisplayBuff.SizeX);
-            if (*pMenuCheckData != 0xFF)
+            if (*pMenuCheckData != 0xFF || *pFrequencyScanCheckData)
             {
                Fw.FlushFramebufferToScreen();
             }
