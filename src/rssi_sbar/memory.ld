@@ -1,4 +1,5 @@
 ENTRY(Reset_Handler)
+EXTERN(VectorTable)
 
 MEMORY
 {
@@ -8,7 +9,6 @@ MEMORY
 
 _estack = 0x20001388;
 
-EXTERN(VectorTable)
 
 SECTIONS
 {
