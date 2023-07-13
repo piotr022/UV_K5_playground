@@ -25,13 +25,14 @@ SECTIONS
       KEEP(*(.org_fw_rest))
     } > FLASH
 
+    /*
     .org_vectors :
     {
       . = ALIGN(4);
       __org_vectors_start = .;
       KEEP(*(.org_vectors))
     } > FLASH
-
+    */
     .text :
     {
         . = ALIGN(4);
