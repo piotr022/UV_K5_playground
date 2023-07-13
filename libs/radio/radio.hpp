@@ -11,15 +11,28 @@ namespace Radio
       RxDone = 1 << 13,
    };
 
-   enum class eModulation : unsigned char
+   enum class eFskMode : unsigned char
    {
-      Ffsk,
-      Fsk,
+      Fsk1200 = 0,
+      Ffsk1200_1200_1800,
+      Ffsk1200_1200_2400,
+      NoaaSame,
+      ModesCount,
    };
 
-   struct TRadioConf
+   struct TFskModeBits
    {
-      eModulation Modulation;
+      unsigned char u8TxModeBits;
+      unsigned char u8RxBandWidthBits;
+      unsigned char u8RxModeBits;
+   };
+
+   inline const TFskModeBits ModesBits[(int)eFskMode::ModesCount] =
+   {// Tx mode    Rx badwitdh       Rx Mode
+      {0b000,        0b000,         0b000},  // Fsk1200
+      {0b001,        0b001,         0b111},  // Ffsk1200_1200_1800
+      {0b011,        0b100,         0b100},  // Ffsk1200_1200_2400
+      {0b101,        0b010,         0b000},  // NoaaSame
    };
 
    enum class eState : unsigned char
@@ -53,6 +66,7 @@ namespace Radio
       {
          Fw.BK4819ConfigureAndStartTxFsk();
          Fw.AirCopyFskSetup();
+         SetFskMode(eFskMode::Fsk1200);
          Fw.AirCopy72(p8Data);
          Fw.BK4819SetGpio(1, false);
       }
@@ -60,6 +74,18 @@ namespace Radio
       void DisablePa()
       {
          Fw.BK4819Write(0x30, Fw.BK4819Read(0x30) & ~0b1010);
+      }
+
+      void SetFskMode(eFskMode Mode)
+      {
+         auto const& ModeParams = ModesBits[(int)Mode];
+         auto Reg58 = Fw.BK4819Read(0x58);
+         Reg58 &= ~((0b111 << 1) | (0b111 << 10) | (0b111 << 13));
+         Reg58 |=   (ModeParams.u8RxBandWidthBits << 1) 
+                  | (ModeParams.u8RxModeBits << 10)
+                  | (ModeParams.u8TxModeBits << 13);
+         Fw.BK4819Write(0x58, 0);
+         Fw.BK4819Write(0x58, Reg58);
       }
 
       void FixIrqEnRegister() // original firmware overrides IRQ_EN reg, so we need to reenable it
@@ -85,13 +111,7 @@ namespace Radio
          u16RxDataLen = 0;
 
          Fw.AirCopyFskSetup();
-         // Fw.BK4819Write(0x2, 0);               // clear irq
-         // Fw.BK4819Write(0x59, 1 << 14);               // clear rx fifo
-         // Fw.BK4819Write(0x59, 0b0011'0000'0110'1000); // enable rx
-         // Fw.BK4819Write(0x3f, 1 << 13);               // enable rx done irq
-
-         // Fw.BK4819Write(0x30, 0);
-         // Fw.BK4819Write(0x30, 0b1011'1101'1111'0001);
+         SetFskMode(eFskMode::Fsk1200);
          Fw.BK4819ConfigureAndStartRxFsk();
          State = eState::RxPending;
       }

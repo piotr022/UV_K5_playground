@@ -230,7 +230,7 @@ public:
        10000000, // 10^7
        100000000 // 10^8
    };
-   void PrintFixedDigitsNumber2(int s32Number, unsigned char u8DigsToCut = 2)
+   void PrintFixedDigitsNumber2(int s32Number, unsigned char u8DigsToCut = 2, unsigned char u8FixedDigtsCnt = 0)
    {
       char U8NumBuff[11] = {0}; // 9 digits, sign, and null terminator
       int startIdx = 0;
@@ -263,6 +263,11 @@ public:
          U8NumBuff[isNegative] = '0';
 
       // Print the string from the start index
+      if(u8FixedDigtsCnt)
+      {
+         startIdx = 9 - u8DigsToCut - u8FixedDigtsCnt;
+      }
+
       Print(U8NumBuff + startIdx);
    }
 

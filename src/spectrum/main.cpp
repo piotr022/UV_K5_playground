@@ -11,6 +11,7 @@ const System::TOrgData& FwData = System::OrgData_01_26;
 
 CSpectrum<System::OrgFunc_01_26, System::OrgData_01_26> Spectrum;
 
+
 int main()
 {
    Fw.IRQ_RESET();

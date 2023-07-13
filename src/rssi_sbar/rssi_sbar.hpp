@@ -44,24 +44,41 @@ namespace Rssi
 class CRssiPrinter
 {
 public:
-   static constexpr auto ChartStartX = 5 * 7 + 8 + 3*7;//32;
+   static constexpr auto ChartStartX = 5 * 7 + 8 + 3 * 7; // 32;
    static constexpr auto BlockSizeX = 4;
    static constexpr auto BlockSizeY = 7;
    static constexpr auto BlockSpace = 1;
    static constexpr auto BlocksCnt = (128 - ChartStartX) / (BlockSizeX + BlockSpace);
    static constexpr auto LinearBlocksCnt = 9;
+   static constexpr auto VoltageOffset = 77;
    static void Handle(const System::TOrgFunctions &Fw, const System::TOrgData &FwData)
    {
       static bool bIsCleared = true;
       static unsigned char u8SqlDelayCnt = 0xFF;
 
       TUV_K5Display DisplayBuff(FwData.pDisplayBuffer);
+      TUV_K5Display StatusBarBuff(FwData.pStatusBarData);
       const TUV_K5SmallNumbers FontSmallNr(FwData.pSmallDigs);
       CDisplay Display(DisplayBuff);
+      CDisplay DisplayStatusBar(StatusBarBuff);
+      DisplayStatusBar.SetFont(&FontSmallNr);
 
       if (!(GPIOC->DATA & 0b1))
       {
          return;
+      }
+
+      static unsigned int u32DrawVoltagePsc = 0;
+      if (u32DrawVoltagePsc++ % 16)
+      {
+         memset(FwData.pStatusBarData + VoltageOffset, 0, 4 * 5);
+         DisplayStatusBar.SetCoursor(0, VoltageOffset);
+         DisplayStatusBar.PrintFixedDigitsNumber2(*FwData.p16Voltage, 2, 1);
+         memset(FwData.pStatusBarData + VoltageOffset + 7 + 1, 0b1100000, 2); // dot
+         DisplayStatusBar.SetCoursor(0, VoltageOffset + 7 + 4);
+         DisplayStatusBar.PrintFixedDigitsNumber2(*FwData.p16Voltage, 0, 2);
+         memcpy(FwData.pStatusBarData + VoltageOffset + 4 * 6 + 2, FwData.pSmallLeters + 128 * 2 + 102, 5); // V character
+         Fw.FlushStatusbarBufferToScreen();
       }
 
       auto *pMenuCheckData = (unsigned char *)DisplayBuff.GetCoursorData(DisplayBuff.GetCoursorPosition(2, 6 * 8 + 1));
@@ -140,7 +157,7 @@ public:
 
       if (u8BlocksToFill > 9)
       {
-         memcpy(pDData + 5*7, FwData.pSmallLeters + 109 - 3*8, 8);
+         memcpy(pDData + 5 * 7, FwData.pSmallLeters + 109 - 3 * 8, 8);
          C8SignalString[1] = '0';
          C8SignalString[0] = '0' + u8BlocksToFill - 9;
       }
