@@ -33,6 +33,38 @@ struct TUV_K5Display : public IBitmap<128, 56, 8>
    }
 };
 
+struct TUV_K5StatusBar : public IBitmap<128, 8, 8>
+{
+   constexpr TUV_K5StatusBar(const unsigned char* p8ScreenData) : IBitmap(p8ScreenData){};
+   bool GetPixel(unsigned char u8X, unsigned char u8Y) const override
+   {
+      return 0;
+   }
+
+   void SetPixel(unsigned char u8X, unsigned char u8Y) const override
+   {
+      unsigned char u8Line = u8Y / LineHeight;
+      unsigned char* pStart = (unsigned char*)pBuffStart;
+      auto Position = GetCoursorPosition(u8Line, u8X);
+      if(Position > (SizeY / LineHeight) * SizeX)
+      {
+         return;
+      }
+      
+      *(pStart + Position) |= 0b1 << (u8Y % LineHeight);
+   }
+
+   void* GetCoursorData(unsigned short u16CoursorPosition) const override
+   {
+      return (void*) (&pBuffStart[u16CoursorPosition]);
+   }
+
+   void ClearAll() override
+   {
+      memset((void*)pBuffStart, 0, (SizeY / LineHeight) * SizeX);
+   }
+};
+
 struct TUV_K5SmallNumbers : public IFont
 {
    static constexpr auto FixedSizeY = 7;

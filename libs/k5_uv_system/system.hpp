@@ -68,7 +68,8 @@ namespace System
       void(*BK4819ConfigureAndStartTxFsk)();
       void(*BK4819ConfigureAndStartRxFsk)();
       void(*BK4819SetGpio)(unsigned int u32Pin, bool bState);
-      
+      void(*FlushStatusbarBufferToScreen)();
+      void(*UpdateStatusBar)();
    };
 
    struct TOrgData
@@ -76,7 +77,9 @@ namespace System
       unsigned char* pDisplayBuffer;
       unsigned char* pSmallDigs;
       unsigned char* pSmallLeters;
-      unsigned char *p8FlashLightStatus;
+      unsigned char* p8FlashLightStatus;
+      unsigned char* pStatusBarData;
+      unsigned short* p16Voltage;
    };
 
    inline const TOrgFunctions OrgFunc_01_26 =
@@ -105,6 +108,8 @@ namespace System
       .BK4819ConfigureAndStartTxFsk = (decltype(TOrgFunctions::BK4819ConfigureAndStartTxFsk) (0x1cd8 + 1)),
       .BK4819ConfigureAndStartRxFsk = (decltype(TOrgFunctions::BK4819ConfigureAndStartRxFsk) (0xa63c + 1)),
       .BK4819SetGpio = (decltype(TOrgFunctions::BK4819SetGpio) (0xa794 + 1)),
+      .FlushStatusbarBufferToScreen = (decltype(TOrgFunctions::FlushStatusbarBufferToScreen) (0xb6b0 + 1)),
+      .UpdateStatusBar = (decltype(TOrgFunctions::UpdateStatusBar) (0x9c10 + 1)),
    };
 
    inline const TOrgData OrgData_01_26 =
@@ -113,6 +118,8 @@ namespace System
       .pSmallDigs = (decltype(TOrgData::pSmallDigs)) 0xD620,
       .pSmallLeters = (decltype(TOrgData::pSmallLeters)) 0xD348,
       .p8FlashLightStatus = (decltype(TOrgData::p8FlashLightStatus)) 0x200003b3,
+      .pStatusBarData = (decltype(TOrgData::pStatusBarData)) 0x20000684,
+      .p16Voltage = (decltype(TOrgData::p16Voltage)) 0x20000406,
    };
 }
 
