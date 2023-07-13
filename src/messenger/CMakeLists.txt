@@ -1,4 +1,4 @@
-set(NAME t9_texting)
+set(NAME messenger)
 set(MCU_TARGET_FILES_DIR ../mcu_target_common)
 
 add_executable(${NAME}  
@@ -12,6 +12,7 @@ target_link_libraries(${NAME}
         uv_k5_system
         lcd
         keyboard
+        radio
 )
 
 target_include_directories(${NAME} PUBLIC

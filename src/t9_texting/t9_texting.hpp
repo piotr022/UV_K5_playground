@@ -1,6 +1,7 @@
 #pragma once
 #include "system.hpp"
 #include "uv_k5_display.hpp"
+#include "keyboard.hpp"
 
 template <const System::TOrgFunctions &Fw, const System::TOrgData &FwData>
 class CT9Texting
@@ -9,6 +10,7 @@ public:
    CT9Texting()
        : DisplayBuff(FwData.pDisplayBuffer),
          Display(DisplayBuff),
+         Keyboard(*this),
          bDisplayCleared(true),
          bEnabled(0)
    {
@@ -164,6 +166,8 @@ private:
 
    TUV_K5Display DisplayBuff;
    CDisplay<const TUV_K5Display> Display;
+   CKeyboard<CT9Texting> Keyboard;
+
    bool bDisplayCleared;
 
    unsigned char u8LastBtnPressed;

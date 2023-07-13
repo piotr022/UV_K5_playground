@@ -36,7 +36,7 @@ jobs:
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_PROJECT_rssi_printer_encoded:BOOL=ON
 
     - name: Build
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target rssi_printer_encoded rssi_sbar_encoded pong_encoded most_useless_mod_encoded spectrum_encoded
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target rssi_printer_encoded rssi_sbar_encoded pong_encoded most_useless_mod_encoded spectrum_encoded messenger_encoded
 
     - name: Upload rssi_printer_encoded as artifact
       uses: actions/upload-artifact@v2
@@ -67,6 +67,12 @@ jobs:
       with:
         name: spectrum_encoded
         path: ${{github.workspace}}/build/src/spectrum/spectrum_encoded.bin
+
+    - name: Upload messenger_encoded as artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: messenger_encoded
+        path: ${{github.workspace}}/build/src/messenger/messenger_encoded.bin
 
     - name: Get the date
       id: date
@@ -131,4 +137,14 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }} 
         asset_path: ${{github.workspace}}/build/src/spectrum/spectrum_encoded.bin
         asset_name: ${{ format('uv_k5_26_spectrum_v{0}.bin', github.run_number) }}
+        asset_content_type: application/octet-stream
+
+    - name: Upload Release Asset messenger_encoded
+      uses: actions/upload-release-asset@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} 
+        asset_path: ${{github.workspace}}/build/src/messenger/messenger_encoded.bin
+        asset_name: ${{ format('uv_k5_26_cold_messenger_encoded_v{0}.bin', github.run_number) }}
         asset_content_type: application/octet-stream

@@ -54,6 +54,18 @@ namespace System
       char* (*sprintf)(char *, const char *, ...);
       void(*FillWithZero)(unsigned char* p8Data, unsigned int u32Size);
       char* (*FormatString)(char *, const char *, ...);
+      void(*PlayTone)(unsigned int u32Frequency, unsigned int u32TuningGain);
+      void(*PrintSmallDigits)(unsigned int u32Len, const int* p32Number, int s32X, int s32Y);
+      void(*PrintFrequency)(int frequency,int xpos,int ypos,int param_4,int param_5);
+      void(*AirCopy72)(unsigned char*);
+      void(*AirCopyFskSetup)();
+      void(*BK4819Reset)();
+      int(*IntDivide)(int s32Divident, int s32Divisor);
+      void(*BK4819WriteFrequency)(unsigned int u32Frequency);
+      void(*BK4819SetPaGain)(unsigned short u16PaBias, unsigned int u32Frequency);
+      void(*BK4819ConfigureAndStartTxFsk)();
+      void(*BK4819ConfigureAndStartRxFsk)();
+      void(*BK4819SetGpio)(unsigned int u32Pin, bool bState);
       void (*IRQ_RESET)(void);
       void (*IRQ_SYSTICK)(void);
 
@@ -71,7 +83,7 @@ namespace System
    {
       .PrintTextOnScreen = (decltype(TOrgFunctions::PrintTextOnScreen))(0x874C + 1),
       .FillScreenMemory = (decltype(TOrgFunctions::FillScreenMemory))(0xb70c + 1),
-      .DelayMs = (decltype(TOrgFunctions::DelayMs))   (0xD0EE + 1),
+      .DelayMs = (decltype(TOrgFunctions::DelayMs))   (0xD0EC + 1),
       .DelayUs = (decltype(TOrgFunctions::DelayUs))   (0xD100 + 1),
       .WriteSerialData = (int(*)(unsigned char*, unsigned char))(0xBE44 + 1),
       .BK4819Write = (decltype(TOrgFunctions::BK4819Write) (0xAF00 + 1)),
@@ -81,6 +93,18 @@ namespace System
       .sprintf = (decltype(TOrgFunctions::sprintf) (0xc8ec + 1)),
       .FillWithZero = (decltype(TOrgFunctions::FillWithZero) (0x1AA + 1)),
       .FormatString = (decltype(TOrgFunctions::FormatString) (0xC6E8 + 1)),
+      .PlayTone = (decltype(TOrgFunctions::PlayTone) (0x9F14 + 1)),
+      .PrintSmallDigits = (decltype(TOrgFunctions::PrintSmallDigits) (0x870C + 1)),
+      .PrintFrequency = (decltype(TOrgFunctions::PrintFrequency) (0x864C + 1)),
+      .AirCopy72 = (decltype(TOrgFunctions::AirCopy72) (0xA67C + 1)),
+      .AirCopyFskSetup = (decltype(TOrgFunctions::AirCopyFskSetup) (0xA518 + 1)),
+      .BK4819Reset = (decltype(TOrgFunctions::BK4819Reset) (0xa7cc + 1)),
+      .IntDivide = (decltype(TOrgFunctions::IntDivide) (0x128 + 1)),
+      .BK4819WriteFrequency = (decltype(TOrgFunctions::BK4819WriteFrequency) (0xaabc + 1)),
+      .BK4819SetPaGain = (decltype(TOrgFunctions::BK4819SetPaGain) (0xaad4 + 1)),
+      .BK4819ConfigureAndStartTxFsk = (decltype(TOrgFunctions::BK4819ConfigureAndStartTxFsk) (0x1cd8 + 1)),
+      .BK4819ConfigureAndStartRxFsk = (decltype(TOrgFunctions::BK4819ConfigureAndStartRxFsk) (0xa63c + 1)),
+      .BK4819SetGpio = (decltype(TOrgFunctions::BK4819SetGpio) (0xa794 + 1)),
       .IRQ_RESET = (decltype(TOrgFunctions::IRQ_RESET) (0xd4 + 1)),
       .IRQ_SYSTICK = (decltype(TOrgFunctions::IRQ_SYSTICK) (0xc398 + 1))
    };

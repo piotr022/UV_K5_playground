@@ -194,18 +194,7 @@ private:
       {
          bEnabled = false;
       }
-      // u8LastBtnPressed = Fw.PollKeyboard();
-      // if (u8LastBtnPressed == EnableKey)
-      // {
-      //    u8PressCnt++;
-      // }
-
-      // if (u8PressCnt > (bEnabled ? 3 : PressDuration))
-      // {
-      //    u8PressCnt = 0;
-      //    bEnabled = !bEnabled;
-      // }
-
+      
       return bEnabled;
    }
 
