@@ -85,10 +85,12 @@ public:
          break;
 
       case 2: // bw up
+         bChangingSettings = true;
          u32ScanRange += BWStep;
          break;
 
       case 8: // bw down
+         bChangingSettings = true;
          u32ScanRange -= u32ScanRange > BWStep ? BWStep : 0;
          break;
 
@@ -99,6 +101,10 @@ public:
       case 7: // res down
          if (u8ResolutionDiv)
             u8ResolutionDiv--;
+         break;
+
+      default:
+         bChangingSettings = false;
          break;
       }
 
@@ -116,7 +122,7 @@ public:
          }
 
          auto const FreqOffset = (u8Pos * u32ScanRange) >> 7;
-         if (!u8Pos || (u8Pos & u8ResolutionDiv) == u8ResolutionDiv)
+         if (!u8Pos || (u8Pos & (bChangingSettings ? 2 : u8ResolutionDiv)) == (bChangingSettings ? 2 : u8ResolutionDiv))
          {
             Rssi = GetRssi(u32OldFreq - (u32ScanRange >> 1) + FreqOffset);
          }
@@ -194,7 +200,7 @@ private:
       {
          bEnabled = false;
       }
-      
+
       return bEnabled;
    }
 
@@ -207,6 +213,7 @@ private:
    const TUV_K5SmallNumbers FontSmallNr;
    CDisplay<const TUV_K5Display> Display;
    bool bDisplayCleared;
+   bool bChangingSettings = false;
 
    unsigned int u32ScanRange;
    unsigned int u32OldFreq;
