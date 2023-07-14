@@ -11,16 +11,23 @@ public:
 
    void ProcessButton(unsigned char key)
    {
+      if (key == 15)
+      {
+         number_mode = !number_mode;
+         return; // add a return to prevent processing this key normally
+      }
+
+      if (number_mode && key <= 9)
+      {
+         C8WorkingBuff[c_index++] = '0' + key; // add the number to the working buffer
+         C8WorkingBuff[c_index] = '\0';        // ensure string is null-terminated
+         return;                               // add a return to prevent processing this key normally
+      }
       if (key == 0)
       { // key 0 for space
          prev_key = 0;
          prev_letter = 0;
          C8WorkingBuff[c_index++] = ' ';
-         return;
-      }
-
-      if (key == 1)
-      {
          return;
       }
 
@@ -68,9 +75,11 @@ public:
    }
 
    char (&C8WorkingBuff)[u8BuffSize];
+
 private:
-   static constexpr char T9_table[10][4] = {{' ', '\0', '\0', '\0'}, {'\0', '\0', '\0', '\0'}, {'a', 'b', 'c', '\0'}, {'d', 'e', 'f', '\0'}, {'g', 'h', 'i', '\0'}, {'j', 'k', 'l', '\0'}, {'m', 'n', 'o', '\0'}, {'p', 'q', 'r', 's'}, {'t', 'u', 'v', '\0'}, {'w', 'x', 'y', 'z'}};
-   static constexpr unsigned char numberOfLettersAssignedToKey[10] = {1, 0, 3, 3, 3, 3, 3, 4, 3, 4};
+   static constexpr char T9_table[10][8] = {{' ', '\0', '\0', '\0', '\0', '\0', '\0', '\0'}, {'.', ',', '\'', '!', '?', '/', '#', '$'}, {'a', 'b', 'c', 'A', 'B', 'C', '\0', '\0'}, {'d', 'e', 'f', 'D', 'E', 'F', '\0', '\0'}, {'g', 'h', 'i', 'G', 'H', 'I', '\0', '\0'}, {'j', 'k', 'l', 'J', 'K', 'L', '\0', '\0'}, {'m', 'n', 'o', 'M', 'N', 'O', '\0', '\0'}, {'p', 'q', 'r', 's', 'P', 'Q', 'R', 'S'}, {'t', 'u', 'v', 'T', 'U', 'V', '\0', '\0'}, {'w', 'x', 'y', 'z', 'W', 'X', 'Y', 'Z'}};
+   static constexpr unsigned char numberOfLettersAssignedToKey[10] = {1, 8, 6, 6, 6, 6, 6, 8, 6, 8};
    unsigned char prev_key = 0, prev_letter = 0;
    unsigned char c_index = 0;
+   bool number_mode = false;
 };
