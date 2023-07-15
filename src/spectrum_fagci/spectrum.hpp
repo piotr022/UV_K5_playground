@@ -33,6 +33,8 @@ public:
   u32 highestPeakF = 0;
   u32 FStart;
 
+  u8 rssiTriggerLevel = 128;
+
   CSpectrum()
       : DisplayBuff(FwData.pDisplayBuffer), FontSmallNr(FwData.pSmallDigs),
         Display(DisplayBuff), bDisplayCleared(true), u32ScanRange(1600_KHz),
@@ -48,20 +50,29 @@ public:
     rssiMin = 255;
     rssiMax = 0;
 
-    for (u8 i = 0; i < 64; ++i, fMeasure += 25_KHz) {
-      rssi = rssiHistory[i] = GetRssi(fMeasure);
-      if (rssi > rssiMax) {
-        rssiMax = rssi;
-        fPeak = fMeasure;
-        xPeak = i << 1;
-      }
-      if (rssi < rssiMin) {
-        rssiMin = rssi;
+    if (highestPeakRssi >= rssiTriggerLevel) {
+      Fw.BK4819Write(0x47, u16OldAfSettings);
+      SetFrequency(highestPeakF);
+      Fw.DelayUs(1000000);
+      Fw.BK4819Write(0x47, 0);
+      highestPeakRssi = rssiHistory[highestPeakX] =
+          GetRssi(highestPeakF, scanDelay);
+    } else {
+      for (u8 i = 0; i < 64; ++i, fMeasure += 25_KHz) {
+        rssi = rssiHistory[i] = GetRssi(fMeasure, scanDelay);
+        if (rssi > rssiMax) {
+          rssiMax = rssi;
+          fPeak = fMeasure;
+          xPeak = i << 1;
+        }
+        if (rssi < rssiMin) {
+          rssiMin = rssi;
+        }
       }
     }
 
     ++highestPeakT;
-    if (rssiMax > highestPeakRssi || highestPeakT >= 8) {
+    if (highestPeakT >= 8 || rssiMax > highestPeakRssi) {
       highestPeakT = 0;
       highestPeakRssi = rssiMax;
       highestPeakX = xPeak;
@@ -70,11 +81,11 @@ public:
   }
 
   inline void DrawSpectrum() {
-    u8 rssi, sub;
+    u8 rssi;
+
     for (u8 i = 0; i < 128; ++i) {
       rssi = rssiHistory[i >> 1];
-      sub = clamp(rssi - rssiMin, 0, DrawingSizeY);
-      Display.DrawHLine(DrawingEndY - sub, DrawingEndY, i);
+      Display.DrawHLine(Rssi2Y(rssi), DrawingEndY, i);
     }
     Display.SetCoursor(0, 0);
     Display.PrintFixedDigitsNumber2(scanDelay, 0);
@@ -84,6 +95,16 @@ public:
 
     Display.SetCoursor(6, 8 * 2 + 10 * 7);
     Display.PrintFixedDigitsNumber2(highestPeakF);
+
+    Display.SetCoursor(0, 8 * 2 + 10 * 7);
+    Display.PrintFixedDigitsNumber2(rssiTriggerLevel, 0);
+
+    Display.SetCoursor(1, 8 * 2 + 10 * 7);
+    Display.PrintFixedDigitsNumber2(highestPeakRssi, 0);
+  }
+
+  inline void DrawRssiTriggerLevel() {
+    Display.DrawLine(0, 127, Rssi2Y(rssiTriggerLevel));
   }
 
   inline void DrawTicks() {
@@ -118,6 +139,15 @@ public:
     case 7:
       UpdateScanDelay(-50);
       break;
+    case 2:
+      UpdateRssiTriggerLevel(5);
+      break;
+    case 8:
+      UpdateRssiTriggerLevel(-5);
+      break;
+    case 10: // menu (OK)
+      SetFrequencyAndExit(highestPeakF);
+      break;
     case 11: // up
       UpdateCurrentFreq(100_KHz);
       break;
@@ -133,6 +163,7 @@ public:
     DrawTicks();
     DrawArrow(highestPeakX);
     DrawSpectrum();
+    DrawRssiTriggerLevel();
   }
 
   void Update() {
@@ -149,15 +180,18 @@ public:
     Measure();
   }
 
+  void UpdateRssiTriggerLevel(char diff) {
+    rssiTriggerLevel = clampAdd(rssiTriggerLevel, diff, 0, 128);
+    OnUserInput();
+  }
+
   void UpdateScanDelay(short diff) {
-    scanDelay += diff;
-    scanDelay = clamp(scanDelay, 100, 2000);
+    scanDelay = clampAdd(scanDelay, diff, 500, 4000);
     OnUserInput();
   }
 
   void UpdateCurrentFreq(long long diff) {
-    currentFreq += diff;
-    currentFreq = clamp(currentFreq, 18_MHz, 1300_MHz);
+    currentFreq = clampAdd(currentFreq, diff, 18_MHz, 1300_MHz);
     OnUserInput();
   }
 
@@ -166,10 +200,7 @@ public:
     FStart = currentFreq - (u32ScanRange >> 1);
 
     // reset peak
-    highestPeakT = 0;
-    highestPeakRssi = 0;
-    highestPeakX = 0;
-    highestPeakF = 0;
+    highestPeakT = 8;
   }
 
   void Handle() {
@@ -200,6 +231,10 @@ private:
     }
   }
 
+  void SetFrequencyAndExit(u32 f) {
+    // not implemented
+  }
+
   void SetFrequency(unsigned int u32Freq) {
     Fw.BK4819Write(0x39, ((u32Freq >> 16) & 0xFFFF));
     Fw.BK4819Write(0x38, (u32Freq & 0xFFFF));
@@ -207,7 +242,7 @@ private:
     Fw.BK4819Write(0x30, 0xbff1);
   }
 
-  u8 GetRssi(u32 f, u16 delay = 800) {
+  u8 GetRssi(u32 f, u32 delay = 800) {
     SetFrequency(f);
     Fw.DelayUs(delay);
     return Fw.BK4819Read(0x67);
@@ -237,12 +272,43 @@ private:
     return working;
   }
 
+  inline u8 Rssi2Y(u8 rssi) {
+    return DrawingEndY - ((rssi - rssiMin) >> 1);
+    // u8 rssiLimit = (scanDelay - 68) >> 4;
+    /* u8 modRssi = rssi - rssiMin;
+    u8 rest = 255 - rssiMin;
+    u8 div = 0;
+    if (rest > 128)
+      div = 7;
+    if (rest > 64)
+      div = 6;
+    if (rest > 32)
+      div = 5;
+    if (rest > 16)
+      div = 4;
+    if (rest > 8)
+      div = 3;
+    if (rest > 4)
+      div = 2;
+    if (rest > 2)
+      div = 1;
+    return DrawingEndY - (modRssi << (7 - div)); */
+  }
+
   unsigned clamp(unsigned v, unsigned min, unsigned max) {
     if (v < min)
       return min;
     if (v > max)
       return max;
     return v;
+  }
+
+  unsigned clampAdd(unsigned v, signed add, signed long long min,
+                    signed long long max) {
+    signed long long next = v + add;
+    /* if(next > max) return max;
+    if(next < min) return min; */
+    return next;
   }
 
   unsigned modulo(unsigned num, unsigned div) {
