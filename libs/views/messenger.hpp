@@ -1,17 +1,19 @@
 #pragma once
+#include "system.hpp"
 #include "uv_k5_display.hpp"
-#include "keyboard.hpp"
-#include "radio.hpp"
 #include "t9.hpp"
+#include "radio.hpp"
+#include "manager.hpp"
 
-template <const System::TOrgFunctions &Fw,
-          const System::TOrgData &FwData,
-          Radio::CBK4819<Fw> &RadioDriver>
-class CMessenger : public Radio::IRadioUser
+template <
+    TUV_K5Display &DisplayBuff,
+    const System::TOrgFunctions &Fw,
+    const System::TOrgData &FwData,
+    Radio::CBK4819<Fw> &RadioDriver>
+class CMessenger : public Radio::IRadioUser, public IView
 {
 public:
    static constexpr auto MaxCharsInLine = 128 / 8;
-   friend class CKeyboard<CMessenger>;
 
    enum class eState : unsigned char
    {
@@ -23,10 +25,7 @@ public:
    };
 
    CMessenger()
-       : DisplayBuff(FwData.pDisplayBuffer),
-         Display(DisplayBuff),
-         Keyboard(*this),
-         T9(S8TxBuff),
+       : T9(S8TxBuff),
          bDisplayCleared(true),
          bEnabled(0),
          State(eState::InitRx),
@@ -128,7 +127,7 @@ private:
 
       if (bEnabled)
       {
-         Keyboard.Handle(Fw.PollKeyboard());
+         // Keyboard.Handle(Fw.PollKeyboard());
       }
 
       return bEnabled;
@@ -145,11 +144,11 @@ private:
       memset(FwData.pDisplayBuffer, 0, (DisplayBuff.SizeX / 8) * DisplayBuff.SizeY);
    }
 
-   void HandlePressedButton(unsigned char u8Button)
+   void HandlePressedButton(unsigned char u8Button) override
    {
    }
 
-   void HandleReleasedButton(unsigned char u8Button)
+   void HandleReleasedButton(unsigned char u8Button) override
    {
       if (u8Button == 10)
       {
@@ -168,9 +167,7 @@ private:
 
    char S8TxBuff[50];
    char S8RxBuff[72];
-   TUV_K5Display DisplayBuff;
    CDisplay<const TUV_K5Display> Display;
-   CKeyboard<CMessenger> Keyboard;
    CT9Decoder<sizeof(S8TxBuff)> T9;
 
    bool bDisplayCleared;
