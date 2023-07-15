@@ -83,11 +83,11 @@ public:
 
     // draw arrow
     u8 *peakPos = FwData.pDisplayBuffer + BarPos + highestPeakX;
-    xPeak > 1 && (*(peakPos - 2) |= 0b01000000);
-    xPeak > 0 && (*(peakPos - 1) |= 0b01100000);
+    highestPeakX > 1 && (*(peakPos - 2) |= 0b01000000);
+    highestPeakX > 0 && (*(peakPos - 1) |= 0b01100000);
     (*(peakPos) |= 0b01110000);
-    xPeak < 127 && (*(peakPos + 1) |= 0b01100000);
-    xPeak < 128 && (*(peakPos + 2) |= 0b01000000);
+    highestPeakX < 127 && (*(peakPos + 1) |= 0b01100000);
+    highestPeakX < 128 && (*(peakPos + 2) |= 0b01000000);
 
     // draw spectrum
     for (i = 0; i < 128; ++i) {
