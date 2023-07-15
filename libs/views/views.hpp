@@ -10,7 +10,7 @@ enum eScreenRefreshFlag : unsigned char
 class CViewStack;
 struct TViewContext
 {
-   CViewStack* pViewStack;
+   CViewStack& ViewStack;
    unsigned int u32SystemCounter;
    union
    {

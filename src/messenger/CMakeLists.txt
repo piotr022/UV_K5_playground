@@ -13,6 +13,7 @@ target_link_libraries(${NAME}
         lcd
         keyboard
         radio
+        views
 )
 
 target_include_directories(${NAME} PUBLIC
@@ -38,8 +39,6 @@ target_link_options(${NAME} PRIVATE
         -flto
         -mcpu=cortex-m0
         -mthumb
-        -mfpu=auto
-        -mfloat-abi=soft
         -specs=nosys.specs
         -specs=nano.specs
         -lc

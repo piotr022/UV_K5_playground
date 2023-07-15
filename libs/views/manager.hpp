@@ -11,22 +11,31 @@ template <const System::TOrgFunctions &Fw,
    unsigned char RegisteredViews>
 class CViewManager
 {
+   static constexpr auto ManagerStartupDelay = 200;
    friend class CKeyboard<CViewManager>;
 
-   IView* (&Modules)[RegisteredViews];
+   IView* const (&Modules)[RegisteredViews];
    CViewStack MainViewStack;
    TViewContext MainViewContext;
    CKeyboard<CViewManager> Keyboard;
 
    public:
-   constexpr CViewManager(IView* (&_Modules)[RegisteredViews])
+   constexpr CViewManager(IView* const (&_Modules)[RegisteredViews])
       :  Modules(_Modules),
-         MainViewContext({&MainViewStack, 0, 0}),
+         MainViewContext({MainViewStack, 0, 0}),
          Keyboard(*this)
          {};
    
    void Handle()
    {
+      MainViewContext.u32SystemCounter++;
+      if(MainViewContext.u32SystemCounter < ManagerStartupDelay)
+      {
+         return;
+      }
+
+      CheckOriginalFwStatus();
+
       unsigned char u8ScreenRefreshFlag = 0;
       if(!(MainViewContext.u32SystemCounter % BackgroundViewPrescaler))
       {
@@ -51,8 +60,6 @@ class CViewManager
       {
          Fw.FlushStatusbarBufferToScreen();
       }
-      
-      MainViewContext.u32SystemCounter++;
    }
 
    private:
@@ -66,7 +73,7 @@ class CViewManager
             continue;
          }
 
-         u8ScreenRefreshFlag |= pModule->Handle(MainViewContext);
+         u8ScreenRefreshFlag |= pModule->HandleBackground(MainViewContext);
       }
 
       return u8ScreenRefreshFlag;
