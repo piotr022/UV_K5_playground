@@ -72,7 +72,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: spectrum_fagci_encoded
-        path: ${{github.workspace}}/build/src/spectrum_fagci/spectrum_encoded.bin
+        path: ${{github.workspace}}/build/src/spectrum_fagci/spectrum_fagci_encoded.bin
 
     - name: Upload messenger_encoded as artifact
       uses: actions/upload-artifact@v2
@@ -151,7 +151,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} 
-        asset_path: ${{github.workspace}}/build/src/spectrum_fagci/spectrum_encoded.bin
+        asset_path: ${{github.workspace}}/build/src/spectrum_fagci/spectrum_fagci_encoded.bin
         asset_name: ${{ format('uv_k5_26_spectrum_fagci_v{0}.bin', github.run_number) }}
         asset_content_type: application/octet-stream
 
