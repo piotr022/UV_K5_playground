@@ -26,10 +26,12 @@ public:
   static constexpr auto DrawingEndY = 42;
   static constexpr u32 BarPos = 640; // 5 * 128
   u8 rssiHistory[128] = {};
+  u8 rssiMin = 255, rssiMax = 0;
   u8 highestPeakX = 0;
   u8 highestPeakT = 0;
   u8 highestPeakRssi = 0;
   u32 highestPeakF = 0;
+  u32 FStart;
 
   CSpectrum()
       : DisplayBuff(FwData.pDisplayBuffer), FontSmallNr(FwData.pSmallDigs),
@@ -38,16 +40,15 @@ public:
     Display.SetFont(&FontSmallNr);
   };
 
-  void Render() {
-    const u32 FStart = currentFreq - (u32ScanRange >> 1);
-    u8 i, sub, barValue;
-    u8 rssi = 0, rssiMin = 255, rssiMax = 0;
-    u32 fPeak;
-
-    // measure
+  inline void Measure() {
+    u8 rssi = 0;
     u8 xPeak = 0;
-    u32 fMeasure = FStart;
-    for (i = 0; i < 64; ++i, fMeasure += 25_KHz) {
+    u32 fPeak, fMeasure = FStart;
+
+    rssiMin = 255;
+    rssiMax = 0;
+
+    for (u8 i = 0; i < 64; ++i, fMeasure += 25_KHz) {
       rssi = rssiHistory[i] = GetRssi(fMeasure);
       if (rssi > rssiMax) {
         rssiMax = rssi;
@@ -66,31 +67,11 @@ public:
       highestPeakX = xPeak;
       highestPeakF = fPeak;
     }
+  }
 
-    // draw bars by freq
-    u32 f = modulo(FStart, 1_MHz);
-    for (i = 0; i < 128; ++i, f += 12500_Hz) {
-      barValue = 0b00001000;
-      modulo(f, 100_KHz) || (barValue |= 0b00010000);
-      modulo(f, 500_KHz) || (barValue |= 0b00100000);
-      modulo(f, 1_MHz) || (barValue |= 0b11000000);
-
-      *(FwData.pDisplayBuffer + BarPos + i) |= barValue;
-    }
-
-    // draw center
-    *(FwData.pDisplayBuffer + BarPos + 64) |= 0b10101010;
-
-    // draw arrow
-    u8 *peakPos = FwData.pDisplayBuffer + BarPos + highestPeakX;
-    highestPeakX > 1 && (*(peakPos - 2) |= 0b01000000);
-    highestPeakX > 0 && (*(peakPos - 1) |= 0b01100000);
-    (*(peakPos) |= 0b01110000);
-    highestPeakX < 127 && (*(peakPos + 1) |= 0b01100000);
-    highestPeakX < 128 && (*(peakPos + 2) |= 0b01000000);
-
-    // draw spectrum
-    for (i = 0; i < 128; ++i) {
+  inline void DrawSpectrum() {
+    u8 rssi, sub;
+    for (u8 i = 0; i < 128; ++i) {
       rssi = rssiHistory[i >> 1];
       sub = clamp(rssi - rssiMin, 0, DrawingSizeY);
       Display.DrawHLine(DrawingEndY - sub, DrawingEndY, i);
@@ -105,41 +86,84 @@ public:
     Display.PrintFixedDigitsNumber2(highestPeakF);
   }
 
-  void Update() {
-    if (bDisplayCleared) {
-      currentFreq = GetFrequency();
-      u16OldAfSettings = Fw.BK4819Read(0x47);
-      Fw.BK4819Write(0x47, 0); // mute AF during scan
+  inline void DrawTicks() {
+    u32 f = modulo(FStart, 1_MHz);
+    for (u8 i = 0; i < 128; ++i, f += 12500_Hz) {
+      u8 barValue = 0b00001000;
+      modulo(f, 100_KHz) || (barValue |= 0b00010000);
+      modulo(f, 500_KHz) || (barValue |= 0b00100000);
+      modulo(f, 1_MHz) || (barValue |= 0b11000000);
+
+      *(FwData.pDisplayBuffer + BarPos + i) |= barValue;
     }
 
-    bDisplayCleared = false;
+    // center
+    *(FwData.pDisplayBuffer + BarPos + 64) |= 0b10101010;
+  }
+
+  inline void DrawArrow(u8 x) {
+    u8 *peakPos = FwData.pDisplayBuffer + BarPos + x;
+    x > 1 && (*(peakPos - 2) |= 0b01000000);
+    x > 0 && (*(peakPos - 1) |= 0b01100000);
+    (*(peakPos) |= 0b01110000);
+    x < 127 && (*(peakPos + 1) |= 0b01100000);
+    x < 128 && (*(peakPos + 2) |= 0b01000000);
+  }
+
+  void HandleUserInput() {
     switch (u8LastBtnPressed) {
     case 1:
-      OnUserInput();
-      if (scanDelay < 2000)
-        scanDelay += 50;
+      UpdateScanDelay(50);
       break;
     case 7:
-      OnUserInput();
-      if (scanDelay > 100)
-        scanDelay -= 50;
+      UpdateScanDelay(-50);
       break;
     case 11: // up
-      OnUserInput();
-      currentFreq += 100_KHz;
+      UpdateCurrentFreq(100_KHz);
       break;
-
     case 12: // down
-      OnUserInput();
-      currentFreq -= 100_KHz;
+      UpdateCurrentFreq(-100_KHz);
       break;
     default:
       isUserInput = false;
     }
   }
 
-  void OnUserInput() {
+  void Render() {
+    DrawTicks();
+    DrawArrow(highestPeakX);
+    DrawSpectrum();
+  }
+
+  void Update() {
+    if (bDisplayCleared) {
+      currentFreq = GetFrequency();
+      OnUserInput();
+      u16OldAfSettings = Fw.BK4819Read(0x47);
+      Fw.BK4819Write(0x47, 0); // mute AF during scan
+    }
+    bDisplayCleared = false;
+
+    HandleUserInput();
+
+    Measure();
+  }
+
+  void UpdateScanDelay(short diff) {
+    scanDelay += diff;
+    scanDelay = clamp(scanDelay, 100, 2000);
+    OnUserInput();
+  }
+
+  void UpdateCurrentFreq(long long diff) {
+    currentFreq += diff;
+    currentFreq = clamp(currentFreq, 18_MHz, 1300_MHz);
+    OnUserInput();
+  }
+
+  inline void OnUserInput() {
     isUserInput = true;
+    FStart = currentFreq - (u32ScanRange >> 1);
 
     // reset peak
     highestPeakT = 0;
