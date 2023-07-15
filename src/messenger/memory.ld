@@ -4,7 +4,7 @@ EXTERN(VectorTable)
 MEMORY
 {
     RAM (rwx) : ORIGIN = 0x2000138C, LENGTH = 300
-    FLASH (rx)  : ORIGIN = 0x00000000, LENGTH = 60K
+    FLASH (rx)  : ORIGIN = 0x00000000, LENGTH = 61K
 }
 
 _estack = 0x20001388;
