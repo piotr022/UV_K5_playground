@@ -3,20 +3,15 @@
 #include "uv_k5_display.hpp"
 
 typedef unsigned char u8;
+typedef signed short i16;
 typedef unsigned short u16;
 typedef unsigned int u32;
+typedef signed long long i64;
+typedef unsigned long long u64;
 
-static constexpr auto operator""_Hz(unsigned long long Hertz) {
-  return Hertz / 10;
-}
-
-static constexpr auto operator""_KHz(unsigned long long KiloHertz) {
-  return KiloHertz * 1000_Hz;
-}
-
-static constexpr auto operator""_MHz(unsigned long long KiloHertz) {
-  return KiloHertz * 1000_KHz;
-}
+static constexpr auto operator""_Hz(u64 Hz) { return Hz / 10; }
+static constexpr auto operator""_KHz(u64 KHz) { return KHz * 1000_Hz; }
+static constexpr auto operator""_MHz(u64 KHz) { return KHz * 1000_KHz; }
 
 template <const System::TOrgFunctions &Fw, const System::TOrgData &FwData>
 class CSpectrum {
@@ -33,7 +28,7 @@ public:
   u32 highestPeakF = 0;
   u32 FStart;
 
-  u8 rssiTriggerLevel = 128;
+  u8 rssiTriggerLevel = 95;
 
   CSpectrum()
       : DisplayBuff(FwData.pDisplayBuffer), FontSmallNr(FwData.pSmallDigs),
@@ -51,11 +46,14 @@ public:
     rssiMax = 0;
 
     if (highestPeakRssi >= rssiTriggerLevel) {
+      // listen for 1s
       Fw.BK4819Write(0x47, u16OldAfSettings);
       SetFrequency(highestPeakF);
       Fw.DelayUs(1000000);
+
+      // check signal level
       Fw.BK4819Write(0x47, 0);
-      highestPeakRssi = rssiHistory[highestPeakX] =
+      highestPeakRssi = rssiMax = rssiHistory[highestPeakX] =
           GetRssi(highestPeakF, scanDelay);
     } else {
       for (u8 i = 0; i < 64; ++i, fMeasure += 25_KHz) {
@@ -96,11 +94,11 @@ public:
     Display.SetCoursor(6, 8 * 2 + 10 * 7);
     Display.PrintFixedDigitsNumber2(highestPeakF);
 
-    Display.SetCoursor(0, 8 * 2 + 10 * 7);
-    Display.PrintFixedDigitsNumber2(rssiTriggerLevel, 0);
-
-    Display.SetCoursor(1, 8 * 2 + 10 * 7);
+    Display.SetCoursor(0, 8 * 2 + 5 * 7);
     Display.PrintFixedDigitsNumber2(highestPeakRssi, 0);
+
+    Display.SetCoursor(0, 8 * 2 + 13 * 7);
+    Display.PrintFixedDigitsNumber2(rssiTriggerLevel, 0);
   }
 
   inline void DrawRssiTriggerLevel() {
@@ -120,6 +118,19 @@ public:
 
     // center
     *(FwData.pDisplayBuffer + BarPos + 64) |= 0b10101010;
+
+    *(FwData.pDisplayBuffer + 84) |= 0b00000010;
+    *(FwData.pDisplayBuffer + 85) |= 0b00111110;
+    *(FwData.pDisplayBuffer + 86) |= 0b00000010;
+    
+    *(FwData.pDisplayBuffer + 88) |= 0b00111110;
+    *(FwData.pDisplayBuffer + 89) |= 0b00011010;
+    *(FwData.pDisplayBuffer + 90) |= 0b00101110;
+
+    *(FwData.pDisplayBuffer + 92) |= 0b00111110;
+    *(FwData.pDisplayBuffer + 93) |= 0b00100010;
+    *(FwData.pDisplayBuffer + 94) |= 0b00101010;
+    *(FwData.pDisplayBuffer + 95) |= 0b00111010;
   }
 
   inline void DrawArrow(u8 x) {
@@ -180,17 +191,17 @@ public:
     Measure();
   }
 
-  void UpdateRssiTriggerLevel(char diff) {
-    rssiTriggerLevel = clampAdd(rssiTriggerLevel, diff, 0, 128);
+  void UpdateRssiTriggerLevel(i16 diff) {
+    rssiTriggerLevel = clampAdd(rssiTriggerLevel, diff, 10, 255);
     OnUserInput();
   }
 
-  void UpdateScanDelay(short diff) {
+  void UpdateScanDelay(i16 diff) {
     scanDelay = clampAdd(scanDelay, diff, 500, 4000);
     OnUserInput();
   }
 
-  void UpdateCurrentFreq(long long diff) {
+  void UpdateCurrentFreq(i64 diff) {
     currentFreq = clampAdd(currentFreq, diff, 18_MHz, 1300_MHz);
     OnUserInput();
   }
@@ -249,11 +260,11 @@ private:
   }
 
   u32 GetFrequency() {
-    return ((Fw.BK4819Read(0x39) << 16) | Fw.BK4819Read(0x38));
+    return (Fw.BK4819Read(0x39) << 16) | Fw.BK4819Read(0x38);
   }
 
   bool FreeToDraw() {
-    bool bFlashlight = (GPIOC->DATA & GPIO_PIN_3);
+    bool bFlashlight = GPIOC->DATA & GPIO_PIN_3;
     if (bFlashlight) {
       working = true;
       GPIOC->DATA &= ~GPIO_PIN_3;
@@ -273,7 +284,7 @@ private:
   }
 
   inline u8 Rssi2Y(u8 rssi) {
-    return DrawingEndY - ((rssi - rssiMin) >> 1);
+    return clamp(DrawingEndY - ((rssi - rssiMin) >> 1), 1, DrawingEndY);
     // u8 rssiLimit = (scanDelay - 68) >> 4;
     /* u8 modRssi = rssi - rssiMin;
     u8 rest = 255 - rssiMin;
@@ -303,11 +314,12 @@ private:
     return v;
   }
 
-  unsigned clampAdd(unsigned v, signed add, signed long long min,
-                    signed long long max) {
-    signed long long next = v + add;
-    /* if(next > max) return max;
-    if(next < min) return min; */
+  i64 clampAdd(i64 v, i64 add, i64 min, i64 max) {
+    i64 next = v + add;
+    if (next > max)
+      return max;
+    if (next < min)
+      return min;
     return next;
   }
 
