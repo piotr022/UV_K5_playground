@@ -63,6 +63,22 @@ namespace Radio
          return (Fw.BK4819Read(0x39) << 16) | Fw.BK4819Read(0x38);
       }
 
+      signed short GetRssi()
+      {
+         short s16Rssi = ((Fw.BK4819Read(0x67) >> 1) & 0xFF);
+         return s16Rssi - 160;
+      }
+
+      bool IsSqlOpen()
+      {
+         return Fw.BK4819Read(0x0C) & 0b10;
+      }
+
+      unsigned char GetAFAmplitude()
+      {
+         return 0b111111 - (Fw.BK4819Read(0x6F) & 0b111111);
+      }
+
       void SendSyncAirCopyMode72(unsigned char *p8Data)
       {
          Fw.BK4819ConfigureAndStartTxFsk();

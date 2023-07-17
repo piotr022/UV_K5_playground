@@ -229,9 +229,10 @@ public:
 
       if (s32Number < 0)
       {
-         U8NumBuff[0] = '-';
+         PrintCharacter('-');
+         // U8NumBuff[0] = '-';
          s32Number = -s32Number;
-         isNegative = true;
+         // isNegative = true;
       }
 
       for (int i = 8; i >= u8DigsToCut; --i) // assuming powersOfTen is an array of powers of 10

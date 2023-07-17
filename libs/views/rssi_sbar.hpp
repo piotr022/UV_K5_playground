@@ -1,6 +1,8 @@
 #pragma once
 #include "system.hpp"
 #include "uv_k5_display.hpp"
+#include "radio.hpp"
+#include "registers.hpp"
 
 namespace Rssi
 {
@@ -23,12 +25,15 @@ namespace Rssi
 
    struct TRssi
    {
-      TRssi(unsigned char u8Val)
+      TRssi(){};
+      TRssi(signed short s16Rssi)
+      :s16Rssi(s16Rssi)
       {
+         s16Rssi *= -1;
          unsigned char i;
          for (i = 0; i < sizeof(U8RssiMap); i++)
          {
-            if (u8Val >= U8RssiMap[i])
+            if (s16Rssi >= U8RssiMap[i])
             {
                u8SValue = i + 1;
                return;
@@ -37,6 +42,7 @@ namespace Rssi
          u8SValue = i + 1;
       }
 
+      short s16Rssi;
       unsigned char u8SValue;
    };
 }
@@ -46,7 +52,9 @@ template <
     const System::TOrgData &FwData,
     TUV_K5Display &DisplayBuff,
     CDisplay<TUV_K5Display> &Display,
-    const TUV_K5SmallNumbers &FontSmallNr>
+    CDisplay<TUV_K5Display> &DisplayStatusBar,
+    const TUV_K5SmallNumbers &FontSmallNr,
+    Radio::CBK4819<Fw> &RadioDriver>
 class CRssiSbar : public IView
 {
 public:
@@ -57,133 +65,20 @@ public:
    static constexpr auto BlocksCnt = (128 - ChartStartX) / (BlockSizeX + BlockSpace);
    static constexpr auto LinearBlocksCnt = 9;
    static constexpr auto VoltageOffset = 77;
-   // eScreenRefreshFlag HandleBackground(TViewContext &Context) override
-   // {
-   //    static bool bIsCleared = true;
-   //    static unsigned char u8SqlDelayCnt = 0xFF;
+   static constexpr auto MaxBarPoints = 13;
+   static inline unsigned char *const pDData = FwData.pDisplayBuffer + 128 * 3;
 
-   //    // TUV_K5Display StatusBarBuff(FwData.pStatusBarData);
-   //    // CDisplay<TUV_K5Display> DisplayStatusBar(StatusBarBuff);
-   //    // DisplayStatusBar.SetFont(&FontSmallNr);
 
-   //    if (Context.OriginalFwStatus.b1RadioSpiCommInUse)
-   //    {
-   //       return eScreenRefreshFlag::NoRefresh;
-   //    }
+   unsigned int u32DrawVoltagePsc = 0;
+   Rssi::TRssi RssiData;
+   unsigned char u8AfAmp = 0;
+   bool bPtt = false;
 
-   //    // static unsigned int u32DrawVoltagePsc = 0;
-   //    // if (u32DrawVoltagePsc++ % 16)
-   //    // {
-   //    //    memset(FwData.pStatusBarData + VoltageOffset, 0, 4 * 5);
-   //    //    DisplayStatusBar.SetCoursor(0, VoltageOffset);
-   //    //    DisplayStatusBar.PrintFixedDigitsNumber2(*FwData.p16Voltage, 2, 1);
-   //    //    memset(FwData.pStatusBarData + VoltageOffset + 7 + 1, 0b1100000, 2); // dot
-   //    //    DisplayStatusBar.SetCoursor(0, VoltageOffset + 7 + 4);
-   //    //    DisplayStatusBar.PrintFixedDigitsNumber2(*FwData.p16Voltage, 0, 2);
-   //    //    memcpy(FwData.pStatusBarData + VoltageOffset + 4 * 6 + 2, FwData.pSmallLeters + 128 * 2 + 102, 5); // V character
-   //    //    Fw.FlushStatusbarBufferToScreen();
-   //    // }
-
-   //    if (Fw.BK4819Read(0x0C) & 0b10)
-   //    {
-   //       u8SqlDelayCnt = 0;
-   //    }
-
-   //    auto *pDData = (unsigned char *)DisplayBuff.GetCoursorData(DisplayBuff.GetCoursorPosition(3, 0));
-   //    if (u8SqlDelayCnt > 20 || Context.OriginalFwStatus.b1MenuDrawed)
-   //    {
-   //       if (!bIsCleared)
-   //       {
-   //          bIsCleared = true;
-   //          memset(pDData, 0, DisplayBuff.SizeX);
-   //          if (!Context.OriginalFwStatus.b1MenuDrawed)
-   //          {
-   //             return eScreenRefreshFlag::MainScreen;
-   //          }
-   //       }
-
-   //       return eScreenRefreshFlag::NoRefresh;
-   //    }
-
-   //    u8SqlDelayCnt++;
-   //    bIsCleared = false;
-
-   //    memset(pDData, 0, DisplayBuff.SizeX);
-
-   //    Display.SetCoursor(3, 0);
-   //    Display.SetFont(&FontSmallNr);
-
-   //    char C8RssiString[] = "g000";
-   //    unsigned char u8Rssi = ((Fw.BK4819Read(0x67) >> 1) & 0xFF);
-   //    if (!u8Rssi)
-   //    {
-   //       return eScreenRefreshFlag::NoRefresh;
-   //    }
-
-   //    if (u8Rssi > 160)
-   //    {
-   //       u8Rssi -= 160;
-   //    }
-   //    else
-   //    {
-   //       u8Rssi = 160 - u8Rssi;
-   //       C8RssiString[0] = '-';
-   //    }
-
-   //    u8Rssi += 10;
-   //    unsigned char u8RssiCpy = u8Rssi;
-   //    unsigned char hundreds = 0;
-   //    while (u8RssiCpy >= 100)
-   //    {
-   //       hundreds++;
-   //       u8RssiCpy -= 100;
-   //    }
-
-   //    unsigned char tens = 0;
-   //    while (u8RssiCpy >= 10)
-   //    {
-   //       tens++;
-   //       u8RssiCpy -= 10;
-   //    }
-
-   //    C8RssiString[1] = '0' + hundreds;
-   //    C8RssiString[2] = '0' + tens;
-   //    C8RssiString[3] = '0' + u8RssiCpy;
-   //    Display.Print(C8RssiString);
-
-   //    unsigned char u8Sub = (u8Rssi * BlocksCnt) >> 7;
-   //    unsigned char u8BlocksToFill = (u8Sub > BlocksCnt ? BlocksCnt : u8Sub);
-   //    u8BlocksToFill = Rssi::TRssi(u8Rssi).u8SValue;
-
-   //    char C8SignalString[] = "  ";
-
-   //    if (u8BlocksToFill > 9)
-   //    {
-   //       memcpy(pDData + 5 * 7, FwData.pSmallLeters + 109 - 3 * 8, 8);
-   //       C8SignalString[1] = '0';
-   //       C8SignalString[0] = '0' + u8BlocksToFill - 9;
-   //    }
-   //    else
-   //    {
-   //       memcpy(pDData + 5 * 7, FwData.pSmallLeters + 109, 8);
-   //       C8SignalString[0] = '0' + u8BlocksToFill;
-   //       C8SignalString[1] = ' ';
-   //    }
-
-   //    Display.SetCoursor(3, 5 * 7 + 8);
-   //    Display.Print(C8SignalString);
-
-   //    u8BlocksToFill = u8BlocksToFill > 13 ? 13 : u8BlocksToFill;
-   //    for (unsigned char i = 0; i < u8BlocksToFill; i++)
-   //    {
-   //       unsigned char u8BlockHeight = i + 1 > BlockSizeY ? BlockSizeY : i + 1;
-   //       unsigned char u8X = i * (BlockSizeX + BlockSpace) + ChartStartX;
-   //       Display.DrawRectangle(u8X, 24 + BlockSizeY - u8BlockHeight, BlockSizeX,
-   //                             u8BlockHeight, i < LinearBlocksCnt);
-   //    }
-
-   //    return eScreenRefreshFlag::MainScreen;
-   // }
+   CRssiSbar()
+   {
+      Display.SetFont(&FontSmallNr);
+      DisplayStatusBar.SetFont(&FontSmallNr);
+   }
 
    eScreenRefreshFlag HandleBackground(TViewContext &Context) override
    {
@@ -195,13 +90,13 @@ public:
          return eScreenRefreshFlag::NoRefresh;
       }
 
-      if (Fw.BK4819Read(0x0C) & 0b10)
+      bPtt = !(GPIOC->DATA & GPIO_PIN_5);
+      if (RadioDriver.IsSqlOpen() || bPtt)
       {
          u8SqlDelayCnt = 0;
       }
 
-      unsigned char *pDData = FwData.pDisplayBuffer + 128 * 3;
-      if (u8SqlDelayCnt > 20 || Context.OriginalFwStatus.b1MenuDrawed)
+      if (u8SqlDelayCnt > 10 || Context.OriginalFwStatus.b1MenuDrawed)
       {
          if (!bIsCleared)
          {
@@ -219,76 +114,110 @@ public:
       u8SqlDelayCnt++;
       bIsCleared = false;
 
-      memset(pDData, 0, DisplayBuff.SizeX);
-
-      Display.SetCoursor(3, 0);
-      Display.SetFont(&FontSmallNr);
-
-      short u8Rssi = (Fw.BK4819Read(0x67) & 0xFF);
-      if (!u8Rssi)
+      if (Context.ViewStack.GetTop() || !(u32DrawVoltagePsc++ % 8))
       {
-         return eScreenRefreshFlag::NoRefresh;
+         PrintBatteryVoltage();
+         return eScreenRefreshFlag::StatusBar;
       }
 
-      if (u8Rssi > 160)
+      if(bPtt)
       {
-         u8Rssi -= 160;
+         RssiData.s16Rssi = RadioDriver.GetAFAmplitude();
+         RssiData.u8SValue = (MaxBarPoints * RssiData.s16Rssi) >> 6;
       }
       else
       {
-         u8Rssi = 160 - u8Rssi;
-         Display.Print("-");
+         RssiData = RadioDriver.GetRssi();
       }
 
-      u8Rssi += 10;
-      unsigned char u8RssiCpy = u8Rssi;
-      unsigned char hundreds = 0;
-      while (u8RssiCpy >= 100)
+      ProcessDrawings();
+      return eScreenRefreshFlag::MainScreen;
+   }
+
+   void ProcessDrawings()
+   {
+      ClearSbarLine();
+      
+      PrintNumber(RssiData.s16Rssi);
+      PrintSValue(RssiData.u8SValue);
+      PrintSbar(RssiData.u8SValue);
+   }
+
+   void ClearSbarLine()
+   {
+      memset(pDData, 0, DisplayBuff.SizeX);
+   }
+
+   void PrintNumber(short s16Number)
+   {
+      Display.SetCoursor(3, 0);
+      if(s16Number > 0)
       {
-         hundreds++;
-         u8RssiCpy -= 100;
+         Display.PrintCharacter(' ');
       }
 
-      unsigned char tens = 0;
-      while (u8RssiCpy >= 10)
+      Display.PrintFixedDigitsNumber2(s16Number, 0, 3);
+   }
+
+   void PrintSValue(unsigned char u8SValue)
+   {
+      if(bPtt) // print TX
       {
-         tens++;
-         u8RssiCpy -= 10;
+         memcpy(pDData + 5 * 7, FwData.pSmallLeters + 128*2 + 8*3 + 2, 15);
+         unsigned char* pNegative = pDData + 5 * 7 - 2;
+         for(unsigned char i = 0; i < 19; i++)
+         {
+            *pNegative++ ^= 0xFF;
+         }
+         return;
       }
-
-      Display.Print("g" + '0' + hundreds + '0' + tens + '0' + u8RssiCpy);
-
-      unsigned char u8Sub = (u8Rssi * BlocksCnt) >> 7;
-      unsigned char u8BlocksToFill = (u8Sub > BlocksCnt ? BlocksCnt : u8Sub);
-      u8BlocksToFill = Rssi::TRssi(u8Rssi).u8SValue;
 
       char C8SignalString[] = "  ";
-
-      if (u8BlocksToFill > 9)
+      if (u8SValue > 9)
       {
          memcpy(pDData + 5 * 7, FwData.pSmallLeters + 109 - 3 * 8, 8);
          C8SignalString[1] = '0';
-         C8SignalString[0] = '0' + u8BlocksToFill - 9;
+         C8SignalString[0] = '0' + u8SValue - 9;
       }
       else
       {
          memcpy(pDData + 5 * 7, FwData.pSmallLeters + 109, 8);
-         C8SignalString[0] = '0' + u8BlocksToFill;
+         C8SignalString[0] = '0' + u8SValue;
          C8SignalString[1] = ' ';
       }
 
       Display.SetCoursor(3, 5 * 7 + 8);
       Display.Print(C8SignalString);
+   }
 
-      u8BlocksToFill = u8BlocksToFill > 13 ? 13 : u8BlocksToFill;
-      for (unsigned char i = 0; i < u8BlocksToFill; i++)
+   void PrintSbar(unsigned char u8SValue)
+   {
+      u8SValue = u8SValue > MaxBarPoints ? MaxBarPoints : u8SValue;
+      for (unsigned char i = 0; i < u8SValue; i++)
       {
          unsigned char u8BlockHeight = i + 1 > BlockSizeY ? BlockSizeY : i + 1;
          unsigned char u8X = i * (BlockSizeX + BlockSpace) + ChartStartX;
          Display.DrawRectangle(u8X, 24 + BlockSizeY - u8BlockHeight, BlockSizeX,
                                u8BlockHeight, i < LinearBlocksCnt);
       }
+   }
 
-      return eScreenRefreshFlag::MainScreen;
+   void PrintBatteryVoltage()
+   {
+      if(*(FwData.pStatusBarData + VoltageOffset + 4 * 6 + 1) || 
+          *(FwData.pStatusBarData + VoltageOffset + 4 * 6 - 6))
+      {  // disable printing when function or charging icon are printed
+         return;
+      }
+
+      unsigned short u16Voltage = *FwData.p16Voltage > 1000 ? 999 : *FwData.p16Voltage;
+
+      memset(FwData.pStatusBarData + VoltageOffset, 0, 4 * 5);
+      DisplayStatusBar.SetCoursor(0, VoltageOffset);
+      DisplayStatusBar.PrintFixedDigitsNumber2(u16Voltage, 2, 1);
+      memset(FwData.pStatusBarData + VoltageOffset + 7 + 1, 0b1100000, 2); // dot
+      DisplayStatusBar.SetCoursor(0, VoltageOffset + 7 + 4);
+      DisplayStatusBar.PrintFixedDigitsNumber2(u16Voltage, 0, 2);
+      memcpy(FwData.pStatusBarData + VoltageOffset + 4 * 6 + 2, FwData.pSmallLeters + 128 * 2 + 102, 5); // V character
    }
 };
