@@ -85,7 +85,8 @@ public:
       static bool bIsCleared = true;
       static unsigned char u8SqlDelayCnt = 0xFF;
 
-      if (Context.OriginalFwStatus.b1RadioSpiCommInUse)
+      if (Context.OriginalFwStatus.b1RadioSpiCommInUse ||
+          Context.OriginalFwStatus.b1LcdSpiCommInUse)
       {
          return eScreenRefreshFlag::NoRefresh;
       }

@@ -86,6 +86,7 @@ class CViewManager
       MainViewContext.OriginalFwStatus.b1MenuDrawed = *pMenuCheckData == 0xFF;
       MainViewContext.OriginalFwStatus.b1FrequencyScan = *pFrequencyScanCheckData;
       MainViewContext.OriginalFwStatus.b1RadioSpiCommInUse = !(GPIOC->DATA & 0b1);
+      MainViewContext.OriginalFwStatus.b1LcdSpiCommInUse = !(GPIOB->DATA & GPIO_PIN_9);
    }
 
    void HandlePressedButton(unsigned char u8Key)

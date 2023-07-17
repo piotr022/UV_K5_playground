@@ -21,6 +21,7 @@ struct TViewContext
          unsigned char b1LockScreen : 1;
          unsigned char b1FrequencyScan : 1;
          unsigned char b1RadioSpiCommInUse : 1;
+         unsigned char b1LcdSpiCommInUse : 1;
       };
    }OriginalFwStatus;
 };
