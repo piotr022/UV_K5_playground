@@ -28,7 +28,7 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
 set(COMPILER_OPTIONS -mthumb -mcpu=cortex-m0 -mfpu=auto -mfloat-abi=soft -fno-exceptions 
 -msoft-float -fdata-sections -ffunction-sections -Wall $<$<COMPILE_LANGUAGE:CXX>:-Wno-register> -Wno-unknown-pragmas 
--O${OPTI_FLAG} -Wl,--gc-sections $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>
+-O${OPTI_FLAG} -Wl,--gc-sections $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti> 
 )
 
 add_subdirectory(libs)

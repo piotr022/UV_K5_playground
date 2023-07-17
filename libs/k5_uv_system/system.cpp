@@ -18,3 +18,8 @@ void System::CopyDataSection()
       *sdata_ptr++ = *sidata_ptr++;
    }
 }
+
+extern "C" unsigned int __wrap___udivsi3(unsigned int a, unsigned int b)
+{
+   return OrgFunc_01_26.IntDivide(a, b);
+}

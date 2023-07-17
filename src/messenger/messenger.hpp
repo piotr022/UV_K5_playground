@@ -7,7 +7,7 @@
 template <const System::TOrgFunctions &Fw,
           const System::TOrgData &FwData,
           Radio::CBK4819<Fw> &RadioDriver>
-class CMessenger : public Radio::IRadioUser
+class CMessenger
 {
 public:
    static constexpr auto MaxCharsInLine = 128 / 8;
@@ -107,7 +107,7 @@ public:
       Fw.FlushFramebufferToScreen();
    }
 
-   void RxDoneHandler(unsigned char u8DataLen, bool bCrcOk) override
+   void RxDoneHandler(unsigned char u8DataLen, bool bCrcOk)
    {
       bEnabled = true;
       State = eState::InitRx;
@@ -136,7 +136,7 @@ private:
 
    void InitRxHandler()
    {
-      RadioDriver.RecieveAsyncAirCopyMode((unsigned char *)S8RxBuff, sizeof(S8RxBuff), this);
+      RadioDriver.RecieveAsyncAirCopyMode((unsigned char *)S8RxBuff, sizeof(S8RxBuff), Radio::CallbackRxDoneType(this, &CMessenger::RxDoneHandler));
       State = eState::WaitForRx;
    }
 
