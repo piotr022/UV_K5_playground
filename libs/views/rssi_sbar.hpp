@@ -90,6 +90,12 @@ public:
          return eScreenRefreshFlag::NoRefresh;
       }
 
+      if (Context.ViewStack.GetTop() || !(u32DrawVoltagePsc++ % 8))
+      {
+         PrintBatteryVoltage();
+         return eScreenRefreshFlag::StatusBar;
+      }
+
       bPtt = !(GPIOC->DATA & GPIO_PIN_5);
       if (RadioDriver.IsSqlOpen() || bPtt)
       {
@@ -113,12 +119,6 @@ public:
 
       u8SqlDelayCnt++;
       bIsCleared = false;
-
-      if (Context.ViewStack.GetTop() || !(u32DrawVoltagePsc++ % 8))
-      {
-         PrintBatteryVoltage();
-         return eScreenRefreshFlag::StatusBar;
-      }
 
       if(bPtt)
       {
