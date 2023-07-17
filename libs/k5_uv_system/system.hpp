@@ -43,7 +43,6 @@ namespace System
          unsigned int u32Centered
          );
 
-      void(*FillScreenMemory)(unsigned int u32Param1);
       void(*DelayMs)(unsigned int u32Ms);
       void(*DelayUs)(unsigned int u32Us);
       int(*WriteSerialData)(unsigned char* p8Data, unsigned char u8Len);
@@ -51,10 +50,7 @@ namespace System
       unsigned int(*BK4819Read)(unsigned int u32Address);
       void(*FlushFramebufferToScreen)(void);
       unsigned int(*PollKeyboard)(void);
-      char* (*sprintf)(char *, const char *, ...);
-      void(*FillWithZero)(unsigned char* p8Data, unsigned int u32Size);
       char* (*FormatString)(char *, const char *, ...);
-      void(*PlayTone)(unsigned int u32Frequency, unsigned int u32TuningGain);
       void(*PrintSmallDigits)(unsigned int u32Len, const int* p32Number, int s32X, int s32Y);
       void(*PrintFrequency)(int frequency,int xpos,int ypos,int param_4,int param_5);
       void(*AirCopy72)(unsigned char*);
@@ -86,7 +82,6 @@ namespace System
    inline const TOrgFunctions OrgFunc_01_26 =
    {
       .PrintTextOnScreen = (decltype(TOrgFunctions::PrintTextOnScreen))(0x874C + 1),
-      .FillScreenMemory = (decltype(TOrgFunctions::FillScreenMemory))(0xb70c + 1),
       .DelayMs = (decltype(TOrgFunctions::DelayMs))   (0xD0EC + 1),
       .DelayUs = (decltype(TOrgFunctions::DelayUs))   (0xD100 + 1),
       .WriteSerialData = (int(*)(unsigned char*, unsigned char))(0xBE44 + 1),
@@ -94,10 +89,7 @@ namespace System
       .BK4819Read = (decltype(TOrgFunctions::BK4819Read) (0xA960 + 1)),
       .FlushFramebufferToScreen = (decltype(TOrgFunctions::FlushFramebufferToScreen) (0xB638 + 1)),
       .PollKeyboard = (decltype(TOrgFunctions::PollKeyboard) (0xb0b8 + 1)),
-      .sprintf = (decltype(TOrgFunctions::sprintf) (0xc8ec + 1)),
-      .FillWithZero = (decltype(TOrgFunctions::FillWithZero) (0x1AA + 1)),
       .FormatString = (decltype(TOrgFunctions::FormatString) (0xC6E8 + 1)),
-      .PlayTone = (decltype(TOrgFunctions::PlayTone) (0x9F14 + 1)),
       .PrintSmallDigits = (decltype(TOrgFunctions::PrintSmallDigits) (0x870C + 1)),
       .PrintFrequency = (decltype(TOrgFunctions::PrintFrequency) (0x864C + 1)),
       .AirCopy72 = (decltype(TOrgFunctions::AirCopy72) (0xA67C + 1)),

@@ -3,7 +3,7 @@ EXTERN(VectorTable)
 
 MEMORY
 {
-    RAM (rwx) : ORIGIN = 0x2000138C, LENGTH = 256
+    RAM (rwx) : ORIGIN = 0x2000138C, LENGTH = 300
     FLASH (rx)  : ORIGIN = 0x00000000, LENGTH = 60K
 }
 
@@ -43,6 +43,8 @@ SECTIONS
         KEEP (*(.init))
         KEEP (*(.fini))
         . = ALIGN(4);
+        /* __udivsi3 = __wrap___udivsi3; */
+
     } >FLASH
 
     .preinit_array     :
@@ -86,5 +88,8 @@ SECTIONS
         *(.bss)       
       _ebss = .;
     } >RAM
-    
+
+      /DISCARD/ :
+  {
+  }    
 }
