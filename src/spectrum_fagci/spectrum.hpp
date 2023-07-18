@@ -27,6 +27,7 @@ public:
   u8 highestPeakRssi = 0;
   u32 highestPeakF = 0;
   u32 FStart;
+  u32 FEnd;
 
   u8 rssiTriggerLevel = 95;
 
@@ -122,7 +123,7 @@ public:
     *(FwData.pDisplayBuffer + 84) |= 0b00000010;
     *(FwData.pDisplayBuffer + 85) |= 0b00111110;
     *(FwData.pDisplayBuffer + 86) |= 0b00000010;
-    
+
     *(FwData.pDisplayBuffer + 88) |= 0b00111110;
     *(FwData.pDisplayBuffer + 89) |= 0b00011010;
     *(FwData.pDisplayBuffer + 90) |= 0b00101110;
@@ -209,9 +210,13 @@ public:
   inline void OnUserInput() {
     isUserInput = true;
     FStart = currentFreq - (u32ScanRange >> 1);
+    FEnd = currentFreq + (u32ScanRange >> 1);
 
     // reset peak
     highestPeakT = 8;
+    highestPeakF = currentFreq;
+    highestPeakRssi = 0;
+    highestPeakX = 64;
   }
 
   void Handle() {
