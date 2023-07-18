@@ -12,6 +12,8 @@ typedef unsigned long long u64;
 static constexpr auto operator""_Hz(u64 Hz) { return Hz / 10; }
 static constexpr auto operator""_KHz(u64 KHz) { return KHz * 1000_Hz; }
 static constexpr auto operator""_MHz(u64 KHz) { return KHz * 1000_KHz; }
+static constexpr auto operator""_ms(u64 us) { return us * 1000; }
+static constexpr auto operator""_s(u64 us) { return us * 1000_ms; }
 
 template <const System::TOrgFunctions &Fw, const System::TOrgData &FwData>
 class CSpectrum {
@@ -20,7 +22,7 @@ public:
   static constexpr auto DrawingSizeY = 16 + 6 * 8;
   static constexpr auto DrawingEndY = 42;
   static constexpr u32 BarPos = 640; // 5 * 128
-  u8 rssiHistory[128] = {};
+  u8 rssiHistory[64] = {};
   u8 rssiMin = 255, rssiMax = 0;
   u8 highestPeakX = 0;
   u8 highestPeakT = 0;
@@ -28,6 +30,7 @@ public:
   u32 highestPeakF = 0;
   u32 FStart;
   u32 FEnd;
+  u32 fMeasure;
 
   u8 rssiTriggerLevel = 95;
 
@@ -39,34 +42,49 @@ public:
   };
 
   inline void Measure() {
+    if (highestPeakRssi >= rssiTriggerLevel) {
+      // listen
+      if (fMeasure != highestPeakF) {
+        fMeasure = highestPeakF;
+        SetFrequency(fMeasure);
+        Fw.BK4819Write(0x47, u16OldAfSettings);
+      }
+      Fw.DelayUs(1_s);
+
+      // check signal level
+      Fw.BK4819Write(0x47, 0); // AF
+
+      // reset RSSI w/o setting freq
+      Fw.BK4819Write(0x30, 0);
+      Fw.BK4819Write(0x30, 0xbff1);
+
+      Fw.DelayUs(scanDelay);
+      highestPeakRssi = Fw.BK4819Read(0x67);
+
+      rssiHistory[highestPeakX >> 1] = highestPeakRssi;
+      Fw.BK4819Write(0x47, u16OldAfSettings);
+      return;
+    }
+
     u8 rssi = 0;
-    u8 xPeak = 0;
-    u32 fPeak, fMeasure = FStart;
+    u8 xPeak = 64;
+    u32 fPeak = currentFreq;
+
+    Fw.BK4819Write(0x47, 0);
 
     rssiMin = 255;
     rssiMax = 0;
+    fMeasure = FStart;
 
-    if (highestPeakRssi >= rssiTriggerLevel) {
-      // listen for 1s
-      Fw.BK4819Write(0x47, u16OldAfSettings);
-      SetFrequency(highestPeakF);
-      Fw.DelayUs(1000000);
-
-      // check signal level
-      Fw.BK4819Write(0x47, 0);
-      highestPeakRssi = rssiMax = rssiHistory[highestPeakX] =
-          GetRssi(highestPeakF, scanDelay);
-    } else {
-      for (u8 i = 0; i < 64; ++i, fMeasure += 25_KHz) {
-        rssi = rssiHistory[i] = GetRssi(fMeasure, scanDelay);
-        if (rssi > rssiMax) {
-          rssiMax = rssi;
-          fPeak = fMeasure;
-          xPeak = i << 1;
-        }
-        if (rssi < rssiMin) {
-          rssiMin = rssi;
-        }
+    for (u8 i = 0; i < 64; ++i, fMeasure += 25_KHz) {
+      rssi = rssiHistory[i] = GetRssi(fMeasure, scanDelay);
+      if (rssi > rssiMax) {
+        rssiMax = rssi;
+        fPeak = fMeasure;
+        xPeak = i << 1;
+      }
+      if (rssi < rssiMin) {
+        rssiMin = rssi;
       }
     }
 
@@ -80,12 +98,12 @@ public:
   }
 
   inline void DrawSpectrum() {
-    u8 rssi;
-
     for (u8 i = 0; i < 128; ++i) {
-      rssi = rssiHistory[i >> 1];
-      Display.DrawHLine(Rssi2Y(rssi), DrawingEndY, i);
+      Display.DrawHLine(Rssi2Y(rssiHistory[i >> 1]), DrawingEndY, i);
     }
+  }
+
+  inline void DrawNums() {
     Display.SetCoursor(0, 0);
     Display.PrintFixedDigitsNumber2(scanDelay, 0);
 
@@ -176,6 +194,7 @@ public:
     DrawArrow(highestPeakX);
     DrawSpectrum();
     DrawRssiTriggerLevel();
+    DrawNums();
   }
 
   void Update() {
@@ -213,10 +232,10 @@ public:
     FEnd = currentFreq + (u32ScanRange >> 1);
 
     // reset peak
-    highestPeakT = 8;
-    highestPeakF = currentFreq;
+    highestPeakT = 0;
     highestPeakRssi = 0;
     highestPeakX = 64;
+    highestPeakF = currentFreq;
   }
 
   void Handle() {
