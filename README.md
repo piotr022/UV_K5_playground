@@ -26,7 +26,7 @@ Spectrum scanner. It prints a spectrum graph. Zoom in well as resolution can be 
 
 ## src/rssi_sbar ![auto release build](https://github.com/piotr022/UV_K5_playground/actions/workflows/c-cpp.yml/badge.svg)
 ![rssi printer](./docs/rssi_sbar.png)  
-sbar with calibrated S steps
+sbar with calibrated S steps, on TX prints mic in amplitude
 * download mod [uv_k5_01_26_rssi_sbar_encoded.bin](https://github.com/piotr022/UV_K5_playground/releases/latest)
 * flash with original quansheng update tool  
 

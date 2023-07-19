@@ -1,17 +1,20 @@
 #pragma once
+#include "system.hpp"
 #include "uv_k5_display.hpp"
-#include "keyboard.hpp"
-#include "radio.hpp"
 #include "t9.hpp"
+#include "radio.hpp"
+#include "manager.hpp"
 
-template <const System::TOrgFunctions &Fw,
-          const System::TOrgData &FwData,
-          Radio::CBK4819<Fw> &RadioDriver>
-class CMessenger
+template <
+    TUV_K5Display &DisplayBuff,
+    CDisplay<TUV_K5Display> &Display,
+    const System::TOrgFunctions &Fw,
+    const System::TOrgData &FwData,
+    Radio::CBK4819<Fw> &RadioDriver>
+class CMessenger : public IView
 {
 public:
    static constexpr auto MaxCharsInLine = 128 / 8;
-   friend class CKeyboard<CMessenger>;
 
    enum class eState : unsigned char
    {
@@ -23,60 +26,47 @@ public:
    };
 
    CMessenger()
-       : DisplayBuff(FwData.pDisplayBuffer),
-         Display(DisplayBuff),
-         Keyboard(*this),
-         T9(S8TxBuff),
+       : T9(S8TxBuff),
          bDisplayCleared(true),
          bEnabled(0),
          State(eState::InitRx),
          u8RxDoneLabelCnt(0xFF){};
 
-   void Handle()
+   eScreenRefreshFlag HandleBackground(TViewContext &Context) override
    {
-      if (!(GPIOC->DATA & 0b1))
-      {
-         return;
-      }
-
       if (!FreeToDraw())
       {
          if (!bDisplayCleared)
          {
             bDisplayCleared = true;
             ClearDrawings();
-            Fw.FlushFramebufferToScreen();
+            Context.ViewStack.Pop();
+            return eScreenRefreshFlag::MainScreen;
          }
 
-         return;
+         return eScreenRefreshFlag::NoRefresh;
       }
 
-      if (bDisplayCleared)
+      Context.ViewStack.Push(*this);
+      return eScreenRefreshFlag::NoRefresh;
+   }
+
+   eScreenRefreshFlag HandleMainView(TViewContext &Context)
+   {
+      if (Context.OriginalFwStatus.b1RadioSpiCommInUse)
       {
+         return eScreenRefreshFlag::NoRefresh;
       }
 
-      char C8PrintBuff[30];
-      bDisplayCleared = false;
-      ClearDrawings();
-
-      Display.DrawHLine(3, 3 + 10, 1 * 8 + T9.GetIdx() * 8 + 2);
-      // print tx data
-      Fw.FormatString(C8PrintBuff, ">%s", T9.C8WorkingBuff);
-      Fw.PrintTextOnScreen(C8PrintBuff, 0, 128, 0, 8, 0);
-
-      // print rx data
-      char C8Temp = S8RxBuff[MaxCharsInLine];
-      S8RxBuff[MaxCharsInLine] = '\0';
-      Fw.PrintTextOnScreen(S8RxBuff, 1, 128, 3, 8, 0);
-      S8RxBuff[MaxCharsInLine] = C8Temp;
-      Fw.PrintTextOnScreen(S8RxBuff + MaxCharsInLine, 1, 128, 5, 8, 0);
-
+      ClearDrawingsIfNeeded();
+      PrintTxData();
+      PrintRxData();
       Display.DrawRectangle(0, (8 * 4) - 6, 127, 24 + 6, false);
 
       if (u8RxDoneLabelCnt < 100)
       {
          u8RxDoneLabelCnt++;
-         Fw.PrintTextOnScreen("  >> RX <<   ", 0, 128, 2, 8, 1);
+         Fw.PrintTextOnScreen("> RX <", 0, 128, 2, 8, 1);
       }
 
       switch (State)
@@ -86,27 +76,56 @@ public:
          InitRxHandler();
          break;
       }
-
       case eState::InitTx:
       {
-         static unsigned char u8TxDelay = 0;
-         if (u8TxDelay++ >= 1)
-         {
-            u8TxDelay = 0;
-            RadioDriver.SendSyncAirCopyMode72((unsigned char *)S8TxBuff);
-            State = eState::InitRx;
-         }
-
-         Fw.PrintTextOnScreen("  >> TX <<   ", 0, 128, 2, 8, 1);
+         HandleInitTx();
          break;
       }
       default:
          break;
       }
 
-      Fw.FlushFramebufferToScreen();
+      return eScreenRefreshFlag::MainScreen;
    }
 
+   void ClearDrawingsIfNeeded()
+   {
+      if (bDisplayCleared)
+      {
+         bDisplayCleared = false;
+         ClearDrawings();
+      }
+   }
+
+   void PrintTxData()
+   {
+      char C8PrintBuff[30];
+      Fw.FormatString(C8PrintBuff, ">%s", T9.C8WorkingBuff);
+      Fw.PrintTextOnScreen(C8PrintBuff, 0, 128, 0, 8, 0);
+   }
+
+   void PrintRxData()
+   {
+      // char *tempRxBuff = S8RxBuff + MaxCharsInLine;
+      // char C8Temp = tempRxBuff[MaxCharsInLine];
+      // S8RxBuff[MaxCharsInLine] = '\0';
+      Fw.PrintTextOnScreen(S8RxBuff, 1, 128, 3, 8, 0);
+      // S8RxBuff[MaxCharsInLine] = C8Temp;
+      // Fw.PrintTextOnScreen(tempRxBuff, 1, 128, 5, 8, 0);
+   }
+
+   void HandleInitTx()
+   {
+      static unsigned char u8TxDelay = 0;
+      if (u8TxDelay++ >= 1)
+      {
+         u8TxDelay = 0;
+         RadioDriver.SendSyncAirCopyMode72((unsigned char *)S8TxBuff);
+         State = eState::InitRx;
+      }
+
+      Fw.PrintTextOnScreen("> TX <", 0, 128, 2, 8, 1);
+   }
    void RxDoneHandler(unsigned char u8DataLen, bool bCrcOk)
    {
       bEnabled = true;
@@ -128,7 +147,7 @@ private:
 
       if (bEnabled)
       {
-         Keyboard.Handle(Fw.PollKeyboard());
+         // Keyboard.Handle(Fw.PollKeyboard());
       }
 
       return bEnabled;
@@ -145,11 +164,11 @@ private:
       memset(FwData.pDisplayBuffer, 0, (DisplayBuff.SizeX / 8) * DisplayBuff.SizeY);
    }
 
-   void HandlePressedButton(unsigned char u8Button)
+   void HandlePressedButton(unsigned char u8Button) override
    {
    }
 
-   void HandleReleasedButton(unsigned char u8Button)
+   void HandleReleasedButton(unsigned char u8Button) override
    {
       if (u8Button == 10)
       {
@@ -168,9 +187,6 @@ private:
 
    char S8TxBuff[50];
    char S8RxBuff[72];
-   TUV_K5Display DisplayBuff;
-   CDisplay<const TUV_K5Display> Display;
-   CKeyboard<CMessenger> Keyboard;
    CT9Decoder<sizeof(S8TxBuff)> T9;
 
    bool bDisplayCleared;

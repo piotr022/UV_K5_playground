@@ -6,7 +6,7 @@
 template <const System::TOrgFunctions &Fw,
           const System::TOrgData &FwData,
           Radio::CBK4819<Fw> &RadioDriver>
-class CSpectrum : public Radio::IRadioUser
+class CSpectrum
 {
 public:
    static constexpr auto StepSize = 0xFFFF / TUV_K5Display::SizeX;
@@ -40,7 +40,7 @@ public:
 
          Fw.DelayMs(600);
          //memset(U8Buff, 0, sizeof(U8Buff));
-         RadioDriver.RecieveAsyncAirCopyMode(U8Buff, sizeof(U8Buff), this);
+         RadioDriver.RecieveAsyncAirCopyMode(U8Buff, sizeof(U8Buff), Radio::CallbackRxDoneType(this, &CSpectrum::RxDoneHandler));
          State = eState::RxPending;
          // while(State == eState::RxPending)
          // {
@@ -132,7 +132,7 @@ public:
       }
    }
 
-   void RxDoneHandler(unsigned char u8DataLen, bool bCrcOk) override
+   void RxDoneHandler(unsigned char u8DataLen, bool bCrcOk)
    {
       State = eState::RxDone;
    }

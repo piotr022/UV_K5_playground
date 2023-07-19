@@ -124,42 +124,33 @@ public:
       }
    }
 
-   void DrawRectangle(unsigned char sx, unsigned char sy, unsigned int width, unsigned int height, bool bFilled)
+   void DrawRectangle(unsigned char sx, unsigned char sy, unsigned char width, unsigned char height, bool bFilled)
    {
+      unsigned char maxX = (sx + width < Bitmap.SizeX) ? sx + width : Bitmap.SizeX;
+      unsigned char maxY = (sy + height < Bitmap.SizeY) ? sy + height : Bitmap.SizeY;
+
       // Draw vertical lines
-      for (unsigned int y = sy; y < sy + height; y++)
+      for (unsigned char y = sy; y < maxY; y++)
       {
-         if (y < Bitmap.SizeY)
-         {
-            Bitmap.SetPixel(sx, y);
-            Bitmap.SetPixel(sx + width - 1, y);
-         }
+         Bitmap.SetPixel(sx, y);
+         Bitmap.SetPixel(maxX - 1, y);
       }
 
       // Draw horizontal lines
-      for (unsigned int x = sx; x < sx + width; x++)
+      for (unsigned char x = sx; x < maxX; x++)
       {
-         if (x < Bitmap.SizeX)
-         {
-            Bitmap.SetPixel(x, sy);
-            Bitmap.SetPixel(x, sy + height - 1);
-         }
+         Bitmap.SetPixel(x, sy);
+         Bitmap.SetPixel(x, maxY - 1);
       }
 
       // If filled, draw horizontal lines within the rectangle
       if (bFilled)
       {
-         for (unsigned int x = sx + 1; x < sx + width - 1; x++)
+         for (unsigned char x = sx + 1; x < maxX - 1; x++)
          {
-            if (x < Bitmap.SizeX)
+            for (unsigned char y = sy + 1; y < maxY - 1; y++)
             {
-               for (unsigned int y = sy + 1; y < sy + height - 1; y++)
-               {
-                  if (y < Bitmap.SizeY)
-                  {
-                     Bitmap.SetPixel(x, y);
-                  }
-               }
+               Bitmap.SetPixel(x, y);
             }
          }
       }
@@ -238,9 +229,10 @@ public:
 
       if (s32Number < 0)
       {
-         U8NumBuff[0] = '-';
+         PrintCharacter('-');
+         // U8NumBuff[0] = '-';
          s32Number = -s32Number;
-         isNegative = true;
+         // isNegative = true;
       }
 
       for (int i = 8; i >= u8DigsToCut; --i) // assuming powersOfTen is an array of powers of 10
@@ -263,7 +255,7 @@ public:
          U8NumBuff[isNegative] = '0';
 
       // Print the string from the start index
-      if(u8FixedDigtsCnt)
+      if (u8FixedDigtsCnt)
       {
          startIdx = 9 - u8DigsToCut - u8FixedDigtsCnt;
       }

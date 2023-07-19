@@ -12,26 +12,28 @@ TUV_K5Display DisplayBuff(FwData.pDisplayBuffer);
 const TUV_K5SmallNumbers FontSmallNr(FwData.pSmallDigs);
 CDisplay Display(DisplayBuff);
 
-TUV_K5Display StatusBarBuff(FwData.pStatusBarData);
-CDisplay DisplayStatusBar(StatusBarBuff);
-
 Radio::CBK4819<System::OrgFunc_01_26> RadioDriver;
+CMessenger<
+    DisplayBuff,
+    Display,
+    System::OrgFunc_01_26,
+    System::OrgData_01_26,
+    RadioDriver>
+    Messenger;
 
 CRssiSbar<
     System::OrgFunc_01_26,
     System::OrgData_01_26,
     DisplayBuff,
     Display,
-    DisplayStatusBar,
-    FontSmallNr,
-    RadioDriver>
+    FontSmallNr>
     RssiSbar;
 
-static IView * const Views[] = {&RssiSbar};
+static IView * const Views[] = {&Messenger, &RssiSbar};
 CViewManager<
     System::OrgFunc_01_26,
     System::OrgData_01_26,
-    8, 2, sizeof(Views) / sizeof(*Views)>
+    16, 2, sizeof(Views) / sizeof(*Views)>
     Manager(Views);
 
 int main()

@@ -38,10 +38,8 @@ target_link_options(${NAME} PRIVATE
         -flto
         -mcpu=cortex-m0
         -mthumb
-        -mfpu=auto
-        -mfloat-abi=soft
-        -specs=nosys.specs
         -specs=nano.specs
+        # -static-libgcc# -lc
         -lc
         -lm
         -lnosys

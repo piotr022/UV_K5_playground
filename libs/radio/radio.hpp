@@ -2,6 +2,7 @@
 #include "system.hpp"
 #include "registers.hpp"
 #include <functional>
+#include "callback.hpp"
 
 namespace Radio
 {
@@ -27,7 +28,7 @@ namespace Radio
       unsigned char u8RxModeBits;
    };
 
-   inline const TFskModeBits ModesBits[(int)eFskMode::ModesCount] =
+   constexpr TFskModeBits ModesBits[(int)eFskMode::ModesCount] =
    {// Tx mode    Rx badwitdh       Rx Mode
       {0b000,        0b000,         0b000},  // Fsk1200
       {0b001,        0b001,         0b111},  // Ffsk1200_1200_1800
@@ -41,14 +42,14 @@ namespace Radio
       RxPending,
    };
 
-   struct IRadioUser
-   {
-      virtual void RxDoneHandler(unsigned char u8DataLen, bool bCrcOk){};
-   };
-
+   using CallbackRxDoneType = CCallback<void, unsigned char, bool>;
    template <const System::TOrgFunctions &Fw>
    class CBK4819
    {
+      CallbackRxDoneType CallbackRxDone;
+      unsigned char *p8RxBuff;
+      unsigned char u8RxBuffSize;
+
    public:
       CBK4819() : State(eState::Idle), u16RxDataLen(0){};
 
@@ -62,11 +63,26 @@ namespace Radio
          return (Fw.BK4819Read(0x39) << 16) | Fw.BK4819Read(0x38);
       }
 
+      signed short GetRssi()
+      {
+         short s16Rssi = ((Fw.BK4819Read(0x67) >> 1) & 0xFF);
+         return s16Rssi - 160;
+      }
+
+      bool IsSqlOpen()
+      {
+         return Fw.BK4819Read(0x0C) & 0b10;
+      }
+
+      unsigned char GetAFAmplitude()
+      {
+         return 0b111111 - (Fw.BK4819Read(0x6F) & 0b111111);
+      }
+
       void SendSyncAirCopyMode72(unsigned char *p8Data)
       {
          Fw.BK4819ConfigureAndStartTxFsk();
          Fw.AirCopyFskSetup();
-         SetFskMode(eFskMode::Fsk1200);
          Fw.AirCopy72(p8Data);
          Fw.BK4819SetGpio(1, false);
       }
@@ -98,20 +114,19 @@ namespace Radio
          }
       }
 
-      void RecieveAsyncAirCopyMode(unsigned char *p8Data, unsigned char u8DataLen, IRadioUser *pUser)
+      void RecieveAsyncAirCopyMode(unsigned char *p8Data, unsigned char u8DataLen, CallbackRxDoneType Callback)
       {
          if (!p8Data || !u8DataLen)
          {
             return;
          }
 
-         pRadioUser = pUser;
+         CallbackRxDone = Callback;
          p8RxBuff = p8Data;
          u8RxBuffSize = u8DataLen;
          u16RxDataLen = 0;
 
          Fw.AirCopyFskSetup();
-         SetFskMode(eFskMode::Fsk1200);
          Fw.BK4819ConfigureAndStartRxFsk();
          State = eState::RxPending;
       }
@@ -152,10 +167,7 @@ namespace Radio
          ClearRxFifoBuff();
          DisableFskModem();
          State = eState::Idle;
-         if (pRadioUser)
-         {
-            pRadioUser->RxDoneHandler(u16RxDataLen, CheckCrc());
-         }
+         CallbackRxDone(u16RxDataLen, CheckCrc());
       }
 
       void InterruptHandler()
@@ -208,15 +220,8 @@ namespace Radio
          if (u16RxDataLen >= u8RxBuffSize)
          {
             State = eState::Idle;
-            if (pRadioUser)
-            {
-               pRadioUser->RxDoneHandler(u8RxBuffSize, CheckCrc());
-            }
+            CallbackRxDone(u8RxBuffSize, CheckCrc());
          }
       }
-
-      IRadioUser *pRadioUser;
-      unsigned char *p8RxBuff;
-      unsigned char u8RxBuffSize;
    };
 }
