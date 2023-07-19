@@ -5,6 +5,7 @@
 typedef unsigned char u8;
 typedef signed short i16;
 typedef unsigned short u16;
+typedef signed int i32;
 typedef unsigned int u32;
 typedef signed long long i64;
 typedef unsigned long long u64;
@@ -18,11 +19,13 @@ static constexpr auto operator""_s(u64 us) { return us * 1000_ms; }
 template <const System::TOrgFunctions &Fw, const System::TOrgData &FwData>
 class CSpectrum {
 public:
-  static constexpr u8 EnableKey = 13;
+  static constexpr auto EnableKey = 13;
   static constexpr auto DrawingSizeY = 16 + 6 * 8;
   static constexpr auto DrawingEndY = 42;
-  static constexpr u32 BarPos = 640; // 5 * 128
-  u8 rssiHistory[64] = {};
+  static constexpr auto BarPos = 5 * 128;
+
+  u8 measurementsCount = 64;
+  u8 rssiHistory[128] = {};
   u8 rssiMin = 255, rssiMax = 0;
   u8 highestPeakX = 0;
   u8 highestPeakT = 0;
@@ -36,8 +39,8 @@ public:
 
   CSpectrum()
       : DisplayBuff(FwData.pDisplayBuffer), FontSmallNr(FwData.pSmallDigs),
-        Display(DisplayBuff), bDisplayCleared(true), u32ScanRange(1600_KHz),
-        working(0), scanDelay(800), isUserInput(false) {
+        Display(DisplayBuff), bDisplayCleared(true), sampleZoom(1), scanStep(25_KHz), working(0),
+        scanDelay(800), isUserInput(false) {
     Display.SetFont(&FontSmallNr);
   };
 
@@ -47,22 +50,16 @@ public:
       if (fMeasure != highestPeakF) {
         fMeasure = highestPeakF;
         SetFrequency(fMeasure);
-        Fw.BK4819Write(0x47, u16OldAfSettings);
       }
+      Fw.BK4819Write(0x47, u16OldAfSettings);
       Fw.DelayUs(1_s);
 
       // check signal level
       Fw.BK4819Write(0x47, 0); // AF
 
-      // reset RSSI w/o setting freq
-      Fw.BK4819Write(0x30, 0);
-      Fw.BK4819Write(0x30, 0xbff1);
+      highestPeakRssi = GetRssi(fMeasure, scanDelay);
 
-      Fw.DelayUs(scanDelay);
-      highestPeakRssi = Fw.BK4819Read(0x67);
-
-      rssiHistory[highestPeakX >> 1] = highestPeakRssi;
-      Fw.BK4819Write(0x47, u16OldAfSettings);
+      rssiHistory[highestPeakX >> sampleZoom] = highestPeakRssi;
       return;
     }
 
@@ -76,15 +73,15 @@ public:
     rssiMax = 0;
     fMeasure = FStart;
 
-    for (u8 i = 0; i < 64; ++i, fMeasure += 25_KHz) {
+    for (u8 i = 0; i < measurementsCount; ++i, fMeasure += scanStep) {
       rssi = rssiHistory[i] = GetRssi(fMeasure, scanDelay);
+      if (rssi < rssiMin) {
+        rssiMin = rssi;
+      }
       if (rssi > rssiMax) {
         rssiMax = rssi;
         fPeak = fMeasure;
-        xPeak = i << 1;
-      }
-      if (rssi < rssiMin) {
-        rssiMin = rssi;
+        xPeak = i << sampleZoom;
       }
     }
 
@@ -98,8 +95,8 @@ public:
   }
 
   inline void DrawSpectrum() {
-    for (u8 i = 0; i < 128; ++i) {
-      Display.DrawHLine(Rssi2Y(rssiHistory[i >> 1]), DrawingEndY, i);
+    for (u8 x = 0; x < 128; ++x) {
+      Display.DrawHLine(Rssi2Y(rssiHistory[x >> sampleZoom]), DrawingEndY, x);
     }
   }
 
@@ -107,16 +104,22 @@ public:
     Display.SetCoursor(0, 0);
     Display.PrintFixedDigitsNumber2(scanDelay, 0);
 
-    Display.SetCoursor(6, 0);
-    Display.PrintFixedDigitsNumber2(currentFreq);
-
-    Display.SetCoursor(6, 8 * 2 + 10 * 7);
-    Display.PrintFixedDigitsNumber2(highestPeakF);
-
     Display.SetCoursor(0, 8 * 2 + 5 * 7);
+    Display.PrintFixedDigitsNumber2(scanStep << (7 - sampleZoom));
+
+    Display.SetCoursor(1, 8 * 2 + 6 * 7);
+    Display.PrintFixedDigitsNumber2(scanStep);
+
+    Display.SetCoursor(1, 8 * 2 + 13 * 7);
     Display.PrintFixedDigitsNumber2(highestPeakRssi, 0);
 
-    Display.SetCoursor(0, 8 * 2 + 13 * 7);
+    Display.SetCoursor(0, 8 * 2 + 10 * 7);
+    Display.PrintFixedDigitsNumber2(highestPeakF);
+
+    Display.SetCoursor(6, 8 * 2 + 4 * 7);
+    Display.PrintFixedDigitsNumber2(currentFreq);
+
+    Display.SetCoursor(1, 0);
     Display.PrintFixedDigitsNumber2(rssiTriggerLevel, 0);
   }
 
@@ -126,30 +129,18 @@ public:
 
   inline void DrawTicks() {
     u32 f = modulo(FStart, 1_MHz);
-    for (u8 i = 0; i < 128; ++i, f += 12500_Hz) {
+    u32 step = scanStep >> sampleZoom;
+    for (u8 i = 0; i < 128; ++i, f += step) {
       u8 barValue = 0b00001000;
-      modulo(f, 100_KHz) || (barValue |= 0b00010000);
-      modulo(f, 500_KHz) || (barValue |= 0b00100000);
-      modulo(f, 1_MHz) || (barValue |= 0b11000000);
+      modulo(f, 100_KHz) < step && (barValue |= 0b00010000);
+      modulo(f, 500_KHz) < step && (barValue |= 0b00100000);
+      modulo(f, 1_MHz) < step && (barValue |= 0b11000000);
 
       *(FwData.pDisplayBuffer + BarPos + i) |= barValue;
     }
 
     // center
     *(FwData.pDisplayBuffer + BarPos + 64) |= 0b10101010;
-
-    *(FwData.pDisplayBuffer + 84) |= 0b00000010;
-    *(FwData.pDisplayBuffer + 85) |= 0b00111110;
-    *(FwData.pDisplayBuffer + 86) |= 0b00000010;
-
-    *(FwData.pDisplayBuffer + 88) |= 0b00111110;
-    *(FwData.pDisplayBuffer + 89) |= 0b00011010;
-    *(FwData.pDisplayBuffer + 90) |= 0b00101110;
-
-    *(FwData.pDisplayBuffer + 92) |= 0b00111110;
-    *(FwData.pDisplayBuffer + 93) |= 0b00100010;
-    *(FwData.pDisplayBuffer + 94) |= 0b00101010;
-    *(FwData.pDisplayBuffer + 95) |= 0b00111010;
   }
 
   inline void DrawArrow(u8 x) {
@@ -164,19 +155,28 @@ public:
   void HandleUserInput() {
     switch (u8LastBtnPressed) {
     case 1:
-      UpdateScanDelay(50);
+      UpdateScanDelay(100);
       break;
     case 7:
-      UpdateScanDelay(-50);
+      UpdateScanDelay(-100);
       break;
     case 2:
-      UpdateRssiTriggerLevel(5);
+      UpdateSampleZoom(1);
       break;
     case 8:
+      UpdateSampleZoom(-1);
+      break;
+    case 3:
+      UpdateRssiTriggerLevel(5);
+      break;
+    case 9:
       UpdateRssiTriggerLevel(-5);
       break;
-    case 10: // menu (OK)
-      SetFrequencyAndExit(highestPeakF);
+    case 4:
+      UpdateScanStep(-1);
+      break;
+    case 6:
+      UpdateScanStep(1);
       break;
     case 11: // up
       UpdateCurrentFreq(100_KHz);
@@ -211,31 +211,50 @@ public:
     Measure();
   }
 
-  void UpdateRssiTriggerLevel(i16 diff) {
-    rssiTriggerLevel = clampAdd(rssiTriggerLevel, diff, 10, 255);
+  void UpdateRssiTriggerLevel(i32 diff) {
+    rssiTriggerLevel = clamp(rssiTriggerLevel + diff, 10, 255);
     OnUserInput();
   }
 
-  void UpdateScanDelay(i16 diff) {
-    scanDelay = clampAdd(scanDelay, diff, 500, 4000);
+  void UpdateScanDelay(i32 diff) {
+    scanDelay = clamp(scanDelay + diff, 500, 4000);
+    OnUserInput();
+  }
+
+  void UpdateSampleZoom(i32 diff) {
+    sampleZoom = clamp(sampleZoom + diff, 0, 5);
+    measurementsCount = 1 << (7 - sampleZoom);
     OnUserInput();
   }
 
   void UpdateCurrentFreq(i64 diff) {
-    currentFreq = clampAdd(currentFreq, diff, 18_MHz, 1300_MHz);
+    currentFreq = clamp(currentFreq + diff, 18_MHz, 1300_MHz);
     OnUserInput();
+  }
+
+  void UpdateScanStep(i32 diff) {
+      if(diff > 0 && scanStep < 25_KHz) {
+          scanStep <<= 1;
+      }
+      if(diff < 0 && scanStep > 6250_Hz) {
+          scanStep >>= 1;
+      }
+      OnUserInput();
   }
 
   inline void OnUserInput() {
     isUserInput = true;
-    FStart = currentFreq - (u32ScanRange >> 1);
-    FEnd = currentFreq + (u32ScanRange >> 1);
+    u32 halfOfScanRange = scanStep << (6 - sampleZoom);
+    FStart = currentFreq - halfOfScanRange;
+    FEnd = currentFreq + halfOfScanRange;
 
     // reset peak
     highestPeakT = 0;
     highestPeakRssi = 0;
     highestPeakX = 64;
     highestPeakF = currentFreq;
+
+    Fw.DelayUs(90_ms);
   }
 
   void Handle() {
@@ -266,13 +285,9 @@ private:
     }
   }
 
-  void SetFrequencyAndExit(u32 f) {
-    // not implemented
-  }
-
-  void SetFrequency(unsigned int u32Freq) {
-    Fw.BK4819Write(0x39, ((u32Freq >> 16) & 0xFFFF));
-    Fw.BK4819Write(0x38, (u32Freq & 0xFFFF));
+  void SetFrequency(u32 f) {
+    Fw.BK4819Write(0x39, (f >> 16) & 0xFFFF);
+    Fw.BK4819Write(0x38, f & 0xFFFF);
     Fw.BK4819Write(0x30, 0);
     Fw.BK4819Write(0x30, 0xbff1);
   }
@@ -309,28 +324,9 @@ private:
 
   inline u8 Rssi2Y(u8 rssi) {
     return clamp(DrawingEndY - ((rssi - rssiMin) >> 1), 1, DrawingEndY);
-    // u8 rssiLimit = (scanDelay - 68) >> 4;
-    /* u8 modRssi = rssi - rssiMin;
-    u8 rest = 255 - rssiMin;
-    u8 div = 0;
-    if (rest > 128)
-      div = 7;
-    if (rest > 64)
-      div = 6;
-    if (rest > 32)
-      div = 5;
-    if (rest > 16)
-      div = 4;
-    if (rest > 8)
-      div = 3;
-    if (rest > 4)
-      div = 2;
-    if (rest > 2)
-      div = 1;
-    return DrawingEndY - (modRssi << (7 - div)); */
   }
 
-  unsigned clamp(unsigned v, unsigned min, unsigned max) {
+  inline i32 clamp(i32 v, i32 min, i32 max) {
     if (v < min)
       return min;
     if (v > max)
@@ -338,16 +334,7 @@ private:
     return v;
   }
 
-  i64 clampAdd(i64 v, i64 add, i64 min, i64 max) {
-    i64 next = v + add;
-    if (next > max)
-      return max;
-    if (next < min)
-      return min;
-    return next;
-  }
-
-  unsigned modulo(unsigned num, unsigned div) {
+  inline u32 modulo(u32 num, u32 div) {
     while (num >= div)
       num -= div;
     return num;
@@ -358,7 +345,8 @@ private:
   CDisplay<const TUV_K5Display> Display;
   bool bDisplayCleared;
 
-  u32 u32ScanRange;
+  u8 sampleZoom;
+  u32 scanStep;
   u32 currentFreq;
   u16 u16OldAfSettings;
   u8 u8LastBtnPressed;
