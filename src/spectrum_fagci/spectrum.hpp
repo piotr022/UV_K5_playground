@@ -24,8 +24,8 @@ public:
   static constexpr auto DrawingEndY = 42;
   static constexpr auto BarPos = 5 * 128;
 
-  u8 measurementsCount = 64;
   u8 rssiHistory[128] = {};
+  u8 measurementsCount = 32;
   u8 rssiMin = 255, rssiMax = 0;
   u8 highestPeakX = 0;
   u8 highestPeakT = 0;
@@ -35,12 +35,12 @@ public:
   u32 FEnd;
   u32 fMeasure;
 
-  u8 rssiTriggerLevel = 95;
+  u8 rssiTriggerLevel = 65;
 
   CSpectrum()
       : DisplayBuff(FwData.pDisplayBuffer), FontSmallNr(FwData.pSmallDigs),
-        Display(DisplayBuff), bDisplayCleared(true), sampleZoom(1), scanStep(25_KHz), working(0),
-        scanDelay(800), isUserInput(false) {
+        Display(DisplayBuff), bDisplayCleared(true), sampleZoom(2),
+        scanStep(25_KHz), working(0), scanDelay(800), isUserInput(false) {
     Display.SetFont(&FontSmallNr);
   };
 
@@ -155,10 +155,10 @@ public:
   void HandleUserInput() {
     switch (u8LastBtnPressed) {
     case 1:
-      UpdateScanDelay(100);
+      UpdateScanDelay(200);
       break;
     case 7:
-      UpdateScanDelay(-100);
+      UpdateScanDelay(-200);
       break;
     case 2:
       UpdateSampleZoom(1);
@@ -217,12 +217,12 @@ public:
   }
 
   void UpdateScanDelay(i32 diff) {
-    scanDelay = clamp(scanDelay + diff, 500, 4000);
+    scanDelay = clamp(scanDelay + diff, 800, 3200);
     OnUserInput();
   }
 
   void UpdateSampleZoom(i32 diff) {
-    sampleZoom = clamp(sampleZoom + diff, 0, 5);
+    sampleZoom = clamp(sampleZoom - diff, 0, 5);
     measurementsCount = 1 << (7 - sampleZoom);
     OnUserInput();
   }
@@ -233,13 +233,13 @@ public:
   }
 
   void UpdateScanStep(i32 diff) {
-      if(diff > 0 && scanStep < 25_KHz) {
-          scanStep <<= 1;
-      }
-      if(diff < 0 && scanStep > 6250_Hz) {
-          scanStep >>= 1;
-      }
-      OnUserInput();
+    if (diff > 0 && scanStep < 25_KHz) {
+      scanStep <<= 1;
+    }
+    if (diff < 0 && scanStep > 6250_Hz) {
+      scanStep >>= 1;
+    }
+    OnUserInput();
   }
 
   inline void OnUserInput() {
@@ -323,7 +323,7 @@ private:
   }
 
   inline u8 Rssi2Y(u8 rssi) {
-    return clamp(DrawingEndY - ((rssi - rssiMin) >> 1), 1, DrawingEndY);
+    return clamp(DrawingEndY - (rssi - rssiMin), 1, DrawingEndY);
   }
 
   inline i32 clamp(i32 v, i32 min, i32 max) {
