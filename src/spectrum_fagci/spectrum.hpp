@@ -1,6 +1,7 @@
 #pragma once
 #include "system.hpp"
 #include "uv_k5_display.hpp"
+#include "radio.hpp"
 
 typedef unsigned char u8;
 typedef signed short i16;
@@ -16,10 +17,10 @@ static constexpr auto operator""_MHz(u64 KHz) { return KHz * 1000_KHz; }
 static constexpr auto operator""_ms(u64 us) { return us * 1000; }
 static constexpr auto operator""_s(u64 us) { return us * 1000_ms; }
 
-template <const System::TOrgFunctions &Fw, const System::TOrgData &FwData>
+template <const System::TOrgFunctions &Fw, const System::TOrgData &FwData, Radio::CBK4819<Fw> &RadioDriver>
 class CSpectrum {
 public:
-  static constexpr auto EnableKey = 13;
+  static constexpr auto ExitKey = 13;
   static constexpr auto DrawingSizeY = 16 + 6 * 8;
   static constexpr auto DrawingEndY = 42;
   static constexpr auto BarPos = 5 * 128;
@@ -31,16 +32,12 @@ public:
   u8 highestPeakT = 0;
   u8 highestPeakRssi = 0;
   u32 highestPeakF = 0;
-  u32 FStart;
-  u32 FEnd;
-  u32 fMeasure;
-
-  u8 rssiTriggerLevel = 65;
+  u32 FStart, FEnd, fMeasure;
 
   CSpectrum()
       : DisplayBuff(FwData.pDisplayBuffer), FontSmallNr(FwData.pSmallDigs),
-        Display(DisplayBuff), bDisplayCleared(true), sampleZoom(2),
-        scanStep(25_KHz), working(0), scanDelay(800), isUserInput(false) {
+        Display(DisplayBuff), scanDelay(800), sampleZoom(2), scanStep(25_KHz),
+        rssiTriggerLevel(65) {
     Display.SetFont(&FontSmallNr);
   };
 
@@ -190,11 +187,13 @@ public:
   }
 
   void Render() {
+    DisplayBuff.ClearAll();
     DrawTicks();
     DrawArrow(highestPeakX);
     DrawSpectrum();
     DrawRssiTriggerLevel();
     DrawNums();
+    Fw.FlushFramebufferToScreen();
   }
 
   void Update() {
@@ -258,20 +257,26 @@ public:
   }
 
   void Handle() {
-    if (!(GPIOC->DATA & 0b1)) {
+    if (RadioDriver.IsLockedByOrgFw()) {
       return;
     }
 
-    if (!FreeToDraw()) {
+    if (!working) {
+      if (IsFlashLightOn()) {
+        working = true;
+        TurnOffFlashLight();
+      }
+      return;
+    }
+
+    u8LastBtnPressed = Fw.PollKeyboard();
+    if (u8LastBtnPressed == ExitKey) {
+      working = false;
       RestoreParams();
       return;
     }
-
     Update();
-
-    DisplayBuff.ClearAll();
     Render();
-    Fw.FlushFramebufferToScreen();
   }
 
 private:
@@ -302,24 +307,10 @@ private:
     return (Fw.BK4819Read(0x39) << 16) | Fw.BK4819Read(0x38);
   }
 
-  bool FreeToDraw() {
-    bool bFlashlight = GPIOC->DATA & GPIO_PIN_3;
-    if (bFlashlight) {
-      working = true;
-      GPIOC->DATA &= ~GPIO_PIN_3;
-      *FwData.p8FlashLightStatus = 3;
-    }
-
-    if (working) {
-      u8LastBtnPressed = Fw.PollKeyboard();
-    }
-
-    bool bPtt = !(GPIOC->DATA & GPIO_PIN_5);
-    if (bPtt || u8LastBtnPressed == EnableKey) {
-      working = false;
-    }
-
-    return working;
+  inline bool IsFlashLightOn() { return GPIOC->DATA & GPIO_PIN_3; }
+  inline void TurnOffFlashLight() {
+    GPIOC->DATA &= ~GPIO_PIN_3;
+    *FwData.p8FlashLightStatus = 3;
   }
 
   inline u8 Rssi2Y(u8 rssi) {
@@ -343,14 +334,17 @@ private:
   TUV_K5Display DisplayBuff;
   const TUV_K5SmallNumbers FontSmallNr;
   CDisplay<const TUV_K5Display> Display;
-  bool bDisplayCleared;
 
-  u8 sampleZoom;
-  u32 scanStep;
+  u8 u8LastBtnPressed;
   u32 currentFreq;
   u16 u16OldAfSettings;
-  u8 u8LastBtnPressed;
-  bool working;
+
   u16 scanDelay;
-  bool isUserInput;
+  u8 sampleZoom;
+  u32 scanStep;
+  u8 rssiTriggerLevel;
+
+  bool working = false;
+  bool isUserInput = false;
+  bool bDisplayCleared = true;
 };
