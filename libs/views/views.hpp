@@ -29,15 +29,14 @@ struct TViewContext
 struct IView
 {
    IView* pNext;
-   
    // only called by manager only when on top of view stack
    virtual eScreenRefreshFlag HandleMainView(TViewContext& Context) {return eScreenRefreshFlag::NoRefresh;} 
 
    // always called, can be used to update some notifications on status bar
    virtual eScreenRefreshFlag HandleBackground(TViewContext& Context) {return eScreenRefreshFlag::NoRefresh;} 
 
-   virtual void HandlePressedButton(unsigned char u8Key) {};
-   virtual void HandleReleasedButton(unsigned char u8Key) {};
+   virtual void HandlePressedButton(TViewContext& Context, unsigned char u8Key) {};
+   virtual void HandleReleasedButton(TViewContext& Context, unsigned char u8Key) {};
 };
 
 class CViewStack

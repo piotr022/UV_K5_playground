@@ -3,6 +3,7 @@
 #include "uv_k5_display.hpp"
 #include "radio.hpp"
 #include "registers.hpp"
+#include "menu.hpp"
 
 namespace Rssi
 {
@@ -27,7 +28,7 @@ namespace Rssi
    {
       TRssi(){};
       TRssi(signed short s16Rssi)
-      :s16Rssi(s16Rssi)
+          : s16Rssi(s16Rssi)
       {
          s16Rssi *= -1;
          unsigned char i;
@@ -55,7 +56,7 @@ template <
     CDisplay<TUV_K5Display> &DisplayStatusBar,
     const TUV_K5SmallNumbers &FontSmallNr,
     Radio::CBK4819<Fw> &RadioDriver>
-class CRssiSbar : public IView
+class CRssiSbar : public IView, public IMenuElement
 {
 public:
    static constexpr auto ChartStartX = 5 * 7 + 8 + 3 * 7; // 32;
@@ -68,16 +69,34 @@ public:
    static constexpr auto MaxBarPoints = 13;
    static inline unsigned char *const pDData = FwData.pDisplayBuffer + 128 * 3;
 
-
    unsigned int u32DrawVoltagePsc = 0;
    Rssi::TRssi RssiData;
    unsigned char u8AfAmp = 0;
    bool bPtt = false;
+   bool b59Mode = false;
 
    CRssiSbar()
    {
       Display.SetFont(&FontSmallNr);
       DisplayStatusBar.SetFont(&FontSmallNr);
+   }
+
+   const char *GetLabel() override
+   {
+      if (!b59Mode)
+         return "S-metr  normal";
+
+      return "S-metr    59";
+   }
+
+   void HandleUserAction(unsigned char u8Button) override
+   {
+      if (u8Button != Button::Ok)
+      {
+         return;
+      }
+
+      b59Mode = !b59Mode;
    }
 
    eScreenRefreshFlag HandleBackground(TViewContext &Context) override
@@ -121,9 +140,14 @@ public:
       u8SqlDelayCnt++;
       bIsCleared = false;
 
-      if(bPtt)
+      if(b59Mode)
+      {
+         RssiData = 0;
+      }
+      else if (bPtt)
       {
          RssiData.s16Rssi = RadioDriver.GetAFAmplitude();
+         RssiData.s16Rssi = RssiData.s16Rssi < 30 ? 0 : RssiData.s16Rssi - 30; 
          RssiData.u8SValue = (MaxBarPoints * RssiData.s16Rssi) >> 6;
       }
       else
@@ -138,7 +162,7 @@ public:
    void ProcessDrawings()
    {
       ClearSbarLine();
-      
+
       PrintNumber(RssiData.s16Rssi);
       PrintSValue(RssiData.u8SValue);
       PrintSbar(RssiData.u8SValue);
@@ -152,7 +176,7 @@ public:
    void PrintNumber(short s16Number)
    {
       Display.SetCoursor(3, 0);
-      if(s16Number > 0)
+      if (s16Number > 0)
       {
          Display.PrintCharacter(' ');
       }
@@ -162,11 +186,11 @@ public:
 
    void PrintSValue(unsigned char u8SValue)
    {
-      if(bPtt) // print TX
+      if (bPtt) // print TX
       {
-         memcpy(pDData + 5 * 7, FwData.pSmallLeters + 128*2 + 8*3 + 2, 15);
-         unsigned char* pNegative = pDData + 5 * 7 - 2;
-         for(unsigned char i = 0; i < 19; i++)
+         memcpy(pDData + 5 * 7, FwData.pSmallLeters + 128 * 2 + 8 * 3 + 2, 15);
+         unsigned char *pNegative = pDData + 5 * 7 - 2;
+         for (unsigned char i = 0; i < 19; i++)
          {
             *pNegative++ ^= 0xFF;
          }
@@ -174,7 +198,12 @@ public:
       }
 
       char C8SignalString[] = "  ";
-      if (u8SValue > 9)
+      if(b59Mode)
+      {
+         C8SignalString[0] = '5';
+         C8SignalString[1] = '9';
+      }
+      else if (u8SValue > 9)
       {
          memcpy(pDData + 5 * 7, FwData.pSmallLeters + 109 - 3 * 8, 8);
          C8SignalString[1] = '0';
@@ -205,7 +234,7 @@ public:
 
    void PrintBatteryVoltage()
    {
-      if(*(FwData.pStatusBarData + VoltageOffset + 4 * 6 + 1) || 
+      if(*(FwData.pStatusBarData + VoltageOffset + 4 * 6 + 1) ||
           *(FwData.pStatusBarData + VoltageOffset + 4 * 6 - 6))
       {  // disable printing when function or charging icon are printed
          return;

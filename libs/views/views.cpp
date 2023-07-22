@@ -3,3 +3,6 @@
 #include "rssi_printer.hpp"
 #include "rssi_sbar.hpp"
 #include "messenger.hpp"
+#include "am_tx.hpp"
+#include "menu.hpp"
+#include "heater.hpp"

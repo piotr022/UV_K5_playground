@@ -49,6 +49,17 @@ struct TGpio
    unsigned int DIR;
 };
 
+struct TSysCon
+{
+   unsigned int CLK_SEL;
+   unsigned int DIV_CLK_GATE;
+   unsigned int DEV_CLK_GATE;
+   unsigned int RC_FREQ_DELTA;
+   unsigned int CHIP_ID[4];
+   unsigned int PLL_CTRL;
+   unsigned int PLL_ST;
+};
+
 #define GPIO_BASE 0x400B0000
 #define GPIO ((TPort*)GPIO_BASE)
 #define __BKPT(value)                       __asm volatile ("bkpt "#value)
@@ -79,3 +90,8 @@ struct TGpio
 #define GPIO_PIN_13 (1 << 13)
 #define GPIO_PIN_14 (1 << 14)
 #define GPIO_PIN_15 (1 << 15)
+
+#define SYSCON_BASE 0x40000000
+#define SYSCON ((TSysCon*)SYSCON_BASE)
+
+

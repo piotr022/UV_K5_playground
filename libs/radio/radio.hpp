@@ -4,6 +4,21 @@
 #include <functional>
 #include "callback.hpp"
 
+static constexpr auto operator""_Hz(unsigned long long Hertz)
+{
+   return Hertz / 10;
+}
+
+static constexpr auto operator""_KHz(unsigned long long KiloHertz)
+{
+   return KiloHertz * 1000_Hz;
+}
+
+static constexpr auto operator""_MHz(unsigned long long KiloHertz)
+{
+   return KiloHertz * 1000_KHz;
+}
+
 namespace Radio
 {
    enum eIrq : unsigned short
@@ -29,11 +44,12 @@ namespace Radio
    };
 
    constexpr TFskModeBits ModesBits[(int)eFskMode::ModesCount] =
-   {// Tx mode    Rx badwitdh       Rx Mode
-      {0b000,        0b000,         0b000},  // Fsk1200
-      {0b001,        0b001,         0b111},  // Ffsk1200_1200_1800
-      {0b011,        0b100,         0b100},  // Ffsk1200_1200_2400
-      {0b101,        0b010,         0b000},  // NoaaSame
+       {
+           // Tx mode    Rx badwitdh       Rx Mode
+           {0b000, 0b000, 0b000}, // Fsk1200
+           {0b001, 0b001, 0b111}, // Ffsk1200_1200_1800
+           {0b011, 0b100, 0b100}, // Ffsk1200_1200_2400
+           {0b101, 0b010, 0b000}, // NoaaSame
    };
 
    enum class eState : unsigned char
@@ -53,10 +69,10 @@ namespace Radio
    public:
       CBK4819() : State(eState::Idle), u16RxDataLen(0){};
 
-      void SetFrequency(unsigned int u32FrequencyD10)
-      {
-         Fw.BK4819WriteFrequency(u32FrequencyD10);
-      }
+      // void SetFrequency(unsigned int u32FrequencyD10)
+      // {
+      //    Fw.BK4819WriteFrequency(u32FrequencyD10);
+      // }
 
       unsigned int GetFrequency()
       {
@@ -69,14 +85,60 @@ namespace Radio
          return s16Rssi - 160;
       }
 
+      bool IsTx()
+      {
+         return Fw.BK4819Read(0x30) & 0b10;
+      }
+
       bool IsSqlOpen()
       {
          return Fw.BK4819Read(0x0C) & 0b10;
       }
 
+      void SetFrequency(unsigned int u32Freq)
+      {
+         Fw.BK4819Write(0x39, ((u32Freq >> 16) & 0xFFFF));
+         Fw.BK4819Write(0x38, (u32Freq & 0xFFFF));
+         auto OldReg = Fw.BK4819Read(0x30);
+         Fw.BK4819Write(0x30, 0);
+         Fw.BK4819Write(0x30, OldReg);
+      }
+
+      void SetAgcTable(unsigned short* p16AgcTable)
+      {
+         for(unsigned char i = 0; i < 5; i++)
+         {
+            Fw.BK4819Write(0x10 + i, p16AgcTable[i]);
+         }
+      }
+
+      void GetAgcTable(unsigned short* p16AgcTable)
+      {
+         for(unsigned char i = 0; i < 5; i++)
+         {
+            p16AgcTable[i] = Fw.BK4819Read(0x10 + i);
+         }
+      }
+
+      void SetDeviationPresent(unsigned char u8Present)
+      {
+         auto Reg40 = Fw.BK4819Read(0x40);
+         Reg40 &= ~(1 << 12);
+         Reg40 |= (u8Present << 12);
+         Fw.BK4819Write(0x40, Reg40);
+      }
+
+      void SetCalibration(unsigned char bOn)
+      {
+         auto Reg30 = Fw.BK4819Read(0x31);
+         Reg30 &= ~(1 << 3);
+         Reg30 |= (bOn << 3);
+         Fw.BK4819Write(0x31, Reg30);
+      }
+
       unsigned char GetAFAmplitude()
       {
-         return 0b111111 - (Fw.BK4819Read(0x6F) & 0b111111);
+         return Fw.BK4819Read(0x6F) & 0b1111111;
       }
 
       void SendSyncAirCopyMode72(unsigned char *p8Data)
@@ -94,12 +156,10 @@ namespace Radio
 
       void SetFskMode(eFskMode Mode)
       {
-         auto const& ModeParams = ModesBits[(int)Mode];
+         auto const &ModeParams = ModesBits[(int)Mode];
          auto Reg58 = Fw.BK4819Read(0x58);
          Reg58 &= ~((0b111 << 1) | (0b111 << 10) | (0b111 << 13));
-         Reg58 |=   (ModeParams.u8RxBandWidthBits << 1) 
-                  | (ModeParams.u8RxModeBits << 10)
-                  | (ModeParams.u8TxModeBits << 13);
+         Reg58 |= (ModeParams.u8RxBandWidthBits << 1) | (ModeParams.u8RxModeBits << 10) | (ModeParams.u8TxModeBits << 13);
          Fw.BK4819Write(0x58, 0);
          Fw.BK4819Write(0x58, Reg58);
       }
@@ -107,8 +167,8 @@ namespace Radio
       void FixIrqEnRegister() // original firmware overrides IRQ_EN reg, so we need to reenable it
       {
          auto const OldIrqEnReg = Fw.BK4819Read(0x3F);
-         if((OldIrqEnReg & (eIrq::FifoAlmostFull | eIrq::RxDone)) != 
-            (eIrq::FifoAlmostFull | eIrq::RxDone))
+         if ((OldIrqEnReg & (eIrq::FifoAlmostFull | eIrq::RxDone)) !=
+             (eIrq::FifoAlmostFull | eIrq::RxDone))
          {
             Fw.BK4819Write(0x3F, OldIrqEnReg | eIrq::FifoAlmostFull | eIrq::RxDone);
          }
@@ -176,7 +236,6 @@ namespace Radio
          {
             return;
          }
-
 
          if (State == eState::RxPending)
          {

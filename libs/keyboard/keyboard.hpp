@@ -1,5 +1,16 @@
 #pragma once
 
+namespace Button
+{
+   enum : unsigned char
+   {
+      Ok = 10,
+      Up = 11,
+      Down = 12,
+      Exit = 13,
+   };
+}
+
 template<class KeyboardUserType>
 class CKeyboard
 {

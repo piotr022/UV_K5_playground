@@ -24,7 +24,8 @@ class CViewManager
       :  Modules(_Modules),
          MainViewContext({MainViewStack, 0, 0}),
          Keyboard(*this)
-         {};
+         {
+         };
    
    void Handle()
    {
@@ -46,7 +47,9 @@ class CViewManager
       if(pViewStackTop && !(MainViewContext.u32SystemCounter 
                               % MainViewPrescaler))
       {
-         Keyboard.Handle(Fw.PollKeyboard());
+         if(!MainViewContext.OriginalFwStatus.b1RadioSpiCommInUse)
+            Keyboard.Handle(Fw.PollKeyboard());
+
          u8ScreenRefreshFlag |= 
             pViewStackTop->HandleMainView(MainViewContext);
       }
@@ -94,7 +97,7 @@ class CViewManager
       auto* const pTop = MainViewStack.GetTop();
       if(pTop)
       {
-         pTop->HandlePressedButton(u8Key);
+         pTop->HandlePressedButton(MainViewContext, u8Key);
       }
    }
 
@@ -103,7 +106,7 @@ class CViewManager
       auto* const pTop = MainViewStack.GetTop();
       if(pTop)
       {
-         pTop->HandleReleasedButton(u8Key);
+         pTop->HandleReleasedButton(MainViewContext, u8Key);
       }
    }
 };
