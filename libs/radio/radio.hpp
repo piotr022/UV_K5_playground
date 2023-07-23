@@ -74,12 +74,12 @@ namespace Radio
       //    Fw.BK4819WriteFrequency(u32FrequencyD10);
       // }
 
-      unsigned int GetFrequency()
+      static unsigned int GetFrequency()
       {
          return (Fw.BK4819Read(0x39) << 16) | Fw.BK4819Read(0x38);
       }
 
-      signed short GetRssi()
+      static signed short GetRssi()
       {
          short s16Rssi = ((Fw.BK4819Read(0x67) >> 1) & 0xFF);
          return s16Rssi - 160;
@@ -95,7 +95,7 @@ namespace Radio
          return Fw.BK4819Read(0x0C) & 0b10;
       }
 
-      void SetFrequency(unsigned int u32Freq)
+      static void SetFrequency(unsigned int u32Freq)
       {
          Fw.BK4819Write(0x39, ((u32Freq >> 16) & 0xFFFF));
          Fw.BK4819Write(0x38, (u32Freq & 0xFFFF));
