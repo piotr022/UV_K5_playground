@@ -45,6 +45,7 @@ public:
     rssiHistory[highestPeakX >> sampleZoom] = highestPeakRssi;
 
     if (highestPeakRssi >= rssiTriggerLevel) {
+      RadioDriver.ToggleAFDAC(true);
       Listen(1000000);
       return true;
     }
@@ -58,6 +59,7 @@ public:
     u32 fPeak = currentFreq, fMeasure = FStart;
 
     rssiMin = 255;
+    RadioDriver.ToggleAFDAC(false);
 
     for (u8 i = 0; i < measurementsCount; ++i, fMeasure += scanStep) {
       rssi = rssiHistory[i] = GetRssi(fMeasure);
@@ -163,9 +165,11 @@ public:
       break;
     case 4:
       UpdateScanStep(-1);
+      UpdateSampleZoom(1);
       break;
     case 6:
       UpdateScanStep(1);
+      UpdateSampleZoom(-1);
       break;
     case 11: // up
       UpdateCurrentFreq(frequencyChangeStep);
