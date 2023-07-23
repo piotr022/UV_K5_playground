@@ -64,6 +64,8 @@ namespace System
       void(*BK4819SetGpio)(unsigned int u32Pin, bool bState);
       void(*FlushStatusbarBufferToScreen)();
       void(*UpdateStatusBar)();
+      void(*AdcReadout)(unsigned short* p16Data1, unsigned short* p16Data2);
+      void(*SomeAmStuff)(unsigned int u32Param);
       void (*IRQ_RESET)(void);
       void (*IRQ_SYSTICK)(void);
 
@@ -103,6 +105,8 @@ namespace System
       .BK4819SetGpio = (decltype(TOrgFunctions::BK4819SetGpio) (0xa794 + 1)),
       .FlushStatusbarBufferToScreen = (decltype(TOrgFunctions::FlushStatusbarBufferToScreen) (0xb6b0 + 1)),
       .UpdateStatusBar = (decltype(TOrgFunctions::UpdateStatusBar) (0x9c10 + 1)),
+      .AdcReadout = (decltype(TOrgFunctions::AdcReadout) (0x9d7c + 1)),
+      .SomeAmStuff = (decltype(TOrgFunctions::SomeAmStuff) (0xc158 + 1)),
       .IRQ_RESET = (decltype(TOrgFunctions::IRQ_RESET) (0xd4 + 1)),
       .IRQ_SYSTICK = (decltype(TOrgFunctions::IRQ_SYSTICK) (0xc398 + 1))
    };

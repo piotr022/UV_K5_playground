@@ -5,6 +5,7 @@
 #include "am_tx.hpp"
 #include "rssi_sbar.hpp"
 #include "manager.hpp"
+#include "heater.hpp"
 
 const System::TOrgFunctions &Fw = System::OrgFunc_01_26;
 const System::TOrgData &FwData = System::OrgData_01_26;
@@ -27,31 +28,31 @@ CRssiSbar<
     FontSmallNr,
     RadioDriver>
     RssiSbar;
+// CAmTx<
+//     System::OrgFunc_01_26,
+//     System::OrgData_01_26,
+//     DisplayBuff,
+//     Display,
+//     DisplayStatusBar,
+//     FontSmallNr,
+//     RadioDriver>
+//     AmTx;
 
-#ifdef AM_TX
-CAmTx<
-    System::OrgFunc_01_26,
-    System::OrgData_01_26,
-    DisplayBuff,
-    Display,
-    DisplayStatusBar,
-    FontSmallNr,
-    RadioDriver>
-    AmTx;
-#endif
+CHeater<System::OrgFunc_01_26> Heater;
+CAmRx<System::OrgFunc_01_26> AmRx;
+// CMicVal<System::OrgFunc_01_26, RadioDriver> MicVal;
+// CRssiVal<System::OrgFunc_01_26, RadioDriver> RssiVal;
 
-static IView *const Views[] =
-{
-    &RssiSbar,
-#ifdef AM_TX
-    &AmTx,
-#endif
-};
+static IMenuElement * const MainMenuElements[] = {&Heater, &AmRx, &RssiSbar};
 
+CMenu<System::OrgFunc_01_26,
+      System::OrgData_01_26> Menu(MainMenuElements);
+
+static IView * const Views[] = {&RssiSbar, &Menu};
 CViewManager<
     System::OrgFunc_01_26,
     System::OrgData_01_26,
-    8, 2, sizeof(Views) / sizeof(*Views)>
+    8, 1, sizeof(Views) / sizeof(*Views)>
     Manager(Views);
 
 int main()
@@ -75,7 +76,7 @@ extern "C" void SysTick_Handler()
       bFirstInit = true;
    }
 
-   RadioDriver.InterruptHandler();
+   // RadioDriver.InterruptHandler();
    Manager.Handle();
    Fw.IRQ_SYSTICK();
 }
