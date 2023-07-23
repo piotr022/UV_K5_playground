@@ -49,6 +49,11 @@ public:
       u16CoursorPosition = (u8Line * Bitmap.SizeX) + u8X;
    }
 
+   void SetCoursorXY(unsigned char x, unsigned char y) const
+   {
+      u16CoursorPosition = x + (y << 4);
+   }
+
    void SetFont(const IFont *pFont) const
    {
       pCurrentFont = pFont;
