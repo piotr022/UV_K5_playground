@@ -183,6 +183,8 @@ public:
     case 15:
       UpdateFreqChangeStep(-100_KHz);
       break;
+    case 5:
+      ToggleBacklight();
     default:
       isUserInput = false;
     }
@@ -316,6 +318,10 @@ private:
   inline void TurnOffFlashLight() {
     GPIOC->DATA &= ~GPIO_PIN_3;
     *FwData.p8FlashLightStatus = 3;
+  }
+
+  inline void ToggleBacklight() {
+      GPIOB->DATA ^= GPIO_PIN_6;
   }
 
   inline u8 Rssi2Y(u8 rssi) {
