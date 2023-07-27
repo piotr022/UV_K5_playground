@@ -120,6 +120,14 @@ public:
     Fw.BK4819Write(0x30, Reg);
   }
 
+  static void ToggleRXDSP(bool enabled) {
+    auto Reg = Fw.BK4819Read(0x30);
+    Reg &= ~1;
+    if (enabled)
+      Reg |= 1;
+    Fw.BK4819Write(0x30, Reg);
+  }
+
   void SendSyncAirCopyMode72(unsigned char *p8Data) {
     Fw.BK4819ConfigureAndStartTxFsk();
     Fw.AirCopyFskSetup();
