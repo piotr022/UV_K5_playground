@@ -31,7 +31,7 @@ public:
   CSpectrum()
       : DisplayBuff(FwData.pDisplayBuffer), FontSmallNr(FwData.pSmallDigs),
         Display(DisplayBuff), scanDelay(800), sampleZoom(2), scanStep(25_KHz),
-        frequencyChangeStep(100_KHz), rssiTriggerLevel(65) {
+        frequencyChangeStep(100_KHz), rssiTriggerLevel(65), stickyPeakTrigger(false) {
     Display.SetFont(&FontSmallNr);
   };
 
@@ -47,17 +47,12 @@ public:
       RadioDriver.ToggleAFDAC(true);
     }
 
-    // measure peak for this moment
+    Listen(1000000);
 
-    highestPeakRssi = GetRssi(); // also sets freq for us
+    highestPeakRssi = GetRssi();
     rssiHistory[highestPeakX >> sampleZoom] = highestPeakRssi;
 
-    if (highestPeakRssi >= rssiTriggerLevel) {
-      Listen(1000000);
-      return true;
-    }
-
-    return false;
+    return true;
   }
 
   inline void Scan() {
@@ -67,6 +62,7 @@ public:
 
     rssiMin = 255;
     fMeasure = FStart;
+
     RadioDriver.ToggleAFDAC(false);
     Fw.BK4819Write(0x47, 0);
 
@@ -124,7 +120,9 @@ public:
   }
 
   inline void DrawRssiTriggerLevel() {
-    Display.DrawLine(0, 127, Rssi2Y(rssiTriggerLevel));
+    for (u8 x = 0; x < 128; x += stickyPeakTrigger ? 2 : 4) {
+      Display.DrawLine(x, x + 2, Rssi2Y(rssiTriggerLevel));
+    }
   }
 
   inline void DrawTicks() {
@@ -194,8 +192,9 @@ public:
       break;
     case 5:
       ToggleBacklight();
-    default:
-      isUserInput = false;
+    case 0:
+      stickyPeakTrigger = !stickyPeakTrigger;
+      OnUserInput();
     }
   }
 
@@ -261,7 +260,6 @@ public:
   }
 
   inline void OnUserInput() {
-    isUserInput = true;
     u32 halfOfScanRange = scanStep << (6 - sampleZoom);
     FStart = currentFreq - halfOfScanRange;
 
@@ -316,7 +314,12 @@ private:
   }
 
   u8 GetRssi() {
-    Fw.BK4819Read(0x67); //reset RSSI =)
+    if (!stickyPeakTrigger) {
+      // reset RSSI register
+      RadioDriver.ToggleRXDSP(false);
+      RadioDriver.ToggleRXDSP(true);
+    }
+
     Fw.DelayUs(scanDelay);
     return Fw.BK4819Read(0x67);
   }
@@ -365,8 +368,8 @@ private:
   u32 scanStep;
   u32 frequencyChangeStep;
   u8 rssiTriggerLevel;
+  bool stickyPeakTrigger;
 
   bool working = false;
-  bool isUserInput = false;
   bool bDisplayCleared = true;
 };
