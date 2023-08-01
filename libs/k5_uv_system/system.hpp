@@ -69,27 +69,27 @@ namespace System
       void (*IRQ_RESET)(void);
       void (*IRQ_SYSTICK)(void);
       // API available in the SRAM overlay installed by FW
-      void ConfigureTrimValuesFromNVR(void);
-      unsigned int FLASH_ReadNvrWord(unsigned int u32Offset);
-      void SystemReset(void);
-      void FLASH_SetProgramTime(void);
-      void FLASH_SetMode(unsigned int u32Mode);
-      void FLASH_WakeFromDeepSleep(void);
-      void FLASH_SetEraseTime(void);
-      void FLASH_SetReadMode(unsigned int u32Mode);
-      void FLASH_Set_NVR_SEL(unsigned int u32Sel);
-      unsigned int FLASH_ReadByAPB(unsigned int u32Offset);
-      unsigned int FLASH_ReadByAHB(unsigned int u32Offset);
-      void FLASH_Unlock(void);
-      void FLASH_Lock(void);
-      void FLASH_MaskUnlock(void);
-      void FLASH_SetMaskSel(unsigned int u32Mask);
-      void FLASH_MaskLock(void);
-      void FLASH_Init(unsigned int u32ReadMode);
-      void FLASH_Start(void);
-      int FLASH_IsInitBusy(void);
-      int FLASH_IsBusy(void);
-      int FLASH_RebootToBootloader(void);
+      void (*ConfigureTrimValuesFromNVR)(void);
+      unsigned int (*FLASH_ReadNvrWord)(unsigned int u32Offset);
+      void (*SystemReset)(void);
+      void (*FLASH_SetProgramTime)(void);
+      void (*FLASH_SetMode)(unsigned int u32Mode);
+      void (*FLASH_WakeFromDeepSleep)(void);
+      void (*FLASH_SetEraseTime)(void);
+      void (*FLASH_SetReadMode)(unsigned int u32Mode);
+      void (*FLASH_Set_NVR_SEL)(unsigned int u32Sel);
+      unsigned int (*FLASH_ReadByAPB)(unsigned int u32Offset);
+      unsigned int (*FLASH_ReadByAHB)(unsigned int u32Offset);
+      void (*FLASH_Unlock)(void);
+      void (*FLASH_Lock)(void);
+      void (*FLASH_MaskUnlock)(void);
+      void (*FLASH_SetMaskSel)(unsigned int u32Mask);
+      void (*FLASH_MaskLock)(void);
+      void (*FLASH_Init)(unsigned int u32ReadMode);
+      void (*FLASH_Start)(void);
+      int (*FLASH_IsInitBusy)(void);
+      int (*FLASH_IsBusy)(void);
+      int (*FLASH_RebootToBootloader)(void);
    };
 
    struct TOrgData
