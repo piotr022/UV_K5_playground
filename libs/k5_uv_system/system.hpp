@@ -68,7 +68,28 @@ namespace System
       void(*SomeAmStuff)(unsigned int u32Param);
       void (*IRQ_RESET)(void);
       void (*IRQ_SYSTICK)(void);
-
+      // API available in the SRAM overlay installed by FW
+      void ConfigureTrimValuesFromNVR(void);
+      unsigned int FLASH_ReadNvrWord(unsigned int u32Offset);
+      void SystemReset(void);
+      void FLASH_SetProgramTime(void);
+      void FLASH_SetMode(unsigned int u32Mode);
+      void FLASH_WakeFromDeepSleep(void);
+      void FLASH_SetEraseTime(void);
+      void FLASH_SetReadMode(unsigned int u32Mode);
+      void FLASH_Set_NVR_SEL(unsigned int u32Sel);
+      unsigned int FLASH_ReadByAPB(unsigned int u32Offset);
+      unsigned int FLASH_ReadByAHB(unsigned int u32Offset);
+      void FLASH_Unlock(void);
+      void FLASH_Lock(void);
+      void FLASH_MaskUnlock(void);
+      void FLASH_SetMaskSel(unsigned int u32Mask);
+      void FLASH_MaskLock(void);
+      void FLASH_Init(unsigned int u32ReadMode);
+      void FLASH_Start(void);
+      int FLASH_IsInitBusy(void);
+      int FLASH_IsBusy(void);
+      int FLASH_RebootToBootloader(void);
    };
 
    struct TOrgData
@@ -108,7 +129,28 @@ namespace System
       .AdcReadout = (decltype(TOrgFunctions::AdcReadout) (0x9d7c + 1)),
       .SomeAmStuff = (decltype(TOrgFunctions::SomeAmStuff) (0xc158 + 1)),
       .IRQ_RESET = (decltype(TOrgFunctions::IRQ_RESET) (0xd4 + 1)),
-      .IRQ_SYSTICK = (decltype(TOrgFunctions::IRQ_SYSTICK) (0xc398 + 1))
+      .IRQ_SYSTICK = (decltype(TOrgFunctions::IRQ_SYSTICK) (0xc398 + 1)),
+      .ConfigureTrimValuesFromNVR = (decltype(TOrgFunctions::ConfigureTrimValuesFromNVR)) (0x20000230 + 1),
+      .FLASH_ReadNvrWord = (decltype(TOrgFunctions::FLASH_ReadNvrWord)) (0x20000214 + 1),
+      .SystemReset = (decltype(TOrgFunctions::SystemReset)) (0x200001f8 + 1),
+      .FLASH_SetProgramTime = (decltype(TOrgFunctions::FLASH_SetProgramTime)) (0x200001d4 + 1),
+      .FLASH_SetMode = (decltype(TOrgFunctions::FLASH_SetMode)) (0x200001b4 + 1),
+      .FLASH_WakeFromDeepSleep = (decltype(TOrgFunctions::FLASH_WakeFromDeepSleep)) (0x20000194 + 1),
+      .FLASH_SetEraseTime = (decltype(TOrgFunctions::FLASH_SetEraseTime)) (0x20000170 + 1),
+      .FLASH_SetReadMode = (decltype(TOrgFunctions::FLASH_SetReadMode)) (0x20000148 + 1),
+      .FLASH_Set_NVR_SEL = (decltype(TOrgFunctions::FLASH_Set_NVR_SEL)) (0x20000128 + 1),
+      .FLASH_ReadByAPB = (decltype(TOrgFunctions::FLASH_ReadByAPB)) (0x200000e8 + 1),
+      .FLASH_ReadByAHB = (decltype(TOrgFunctions::FLASH_ReadByAHB)) (0x200000dc + 1),
+      .FLASH_Unlock = (decltype(TOrgFunctions::FLASH_Unlock)) (0x200000d0 + 1),
+      .FLASH_Lock = (decltype(TOrgFunctions::FLASH_Lock)) (0x200000c4 + 1),
+      .FLASH_MaskUnlock = (decltype(TOrgFunctions::FLASH_MaskUnlock)) (0x200000b0 + 1),
+      .FLASH_SetMaskSel = (decltype(TOrgFunctions::FLASH_SetMaskSel)) (0x20000094 + 1),
+      .FLASH_MaskLock = (decltype(TOrgFunctions::FLASH_MaskLock)) (0x20000080 + 1),
+      .FLASH_Init = (decltype(TOrgFunctions::FLASH_Init)) (0x2000005c + 1),
+      .FLASH_Start = (decltype(TOrgFunctions::FLASH_Start)) (0x20000044 + 1),
+      .FLASH_IsInitBusy = (decltype(TOrgFunctions::FLASH_IsInitBusy)) (0x2000002c + 1),
+      .FLASH_IsBusy = (decltype(TOrgFunctions::FLASH_IsBusy)) (0x20000014 + 1),
+      .FLASH_RebootToBootloader = (decltype(TOrgFunctions::FLASH_RebootToBootloader)) (0x20000000 + 1),
    };
 
    inline const TOrgData OrgData_01_26 =
