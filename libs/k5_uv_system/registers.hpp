@@ -60,6 +60,24 @@ struct TSysCon
    unsigned int PLL_ST;
 };
 
+struct TAdc
+{
+   unsigned int ADC_CFG;
+   unsigned int ADC_START;
+   unsigned int ADC_IE;
+   unsigned int ADC_IF;
+   struct
+   {
+      unsigned int STAT;
+      unsigned int DATA;
+   }CHANNEL[16];
+   unsigned int ADC_FIFO_STAT;
+   unsigned int ADC_FIFO_DATA;
+   unsigned int EXTTRIG_SEL;
+   unsigned int ADC_CALIB_OFFSET;
+   unsigned int ADC_CALIB_KD;
+};
+
 #define GPIO_BASE 0x400B0000
 #define GPIO ((TPort*)GPIO_BASE)
 #define __BKPT(value)                       __asm volatile ("bkpt "#value)
@@ -93,5 +111,8 @@ struct TSysCon
 
 #define SYSCON_BASE 0x40000000
 #define SYSCON ((TSysCon*)SYSCON_BASE)
+
+#define ADC_BASE 0x400BA000
+#define ADC ((TAdc*)ADC_BASE)
 
 

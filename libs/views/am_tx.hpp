@@ -1,6 +1,7 @@
 #pragma once
 #include "manager.hpp"
 #include "registers.hpp"
+#include "hardware/adc.hpp"
 
 template <
     const System::TOrgFunctions &Fw,
@@ -16,8 +17,10 @@ class CAmTx : public IView
    bool bAmMode = false;
    bool bEnabled = false;
    unsigned short u16OldAmp = 0;
+   unsigned short u16ActualAmp = 0;
    int s32DeltaAmp = 0;
    unsigned int u32StartFreq = 0;
+   bool bInit = false;
    // unsigned short U16OldAgcTable[5];
    // unsigned short U16NewAgcTable[5] = {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF};
 
@@ -29,37 +32,22 @@ public:
          return eScreenRefreshFlag::NoRefresh;
       }
 
-      if constexpr (bAmpTests)
+      if(bInit)
       {
-         // Fw.BK4819Write(0x29, 0);
-         // Fw.BK4819Write(0x2B, 0);
-         // Fw.BK4819Write(0x19, 0);
-         // RadioDriver.SetDeviationPresent(0);
-         HandleTests();
-         if (!CheckForPtt())
-         {
-            RadioDriver.SetDeviationPresent(1);
-            Context.ViewStack.Pop();
-         }
-
-         return eScreenRefreshFlag::MainScreen;
+         bInit = false;
+         RadioDriver.SetDeviationPresent(0);
+         u32StartFreq = RadioDriver.GetFrequency();
       }
 
-      RadioDriver.SetDeviationPresent(0);
-      auto InitialBias = Fw.BK4819Read(0x36);
+      HandleTests();
 
-      u32StartFreq = RadioDriver.GetFrequency();
-
-      while (CheckForPtt())
+      if (CheckForPtt())
       {
-         HandleMicInput();
-         HandleTxAm();
-         //HandleTxWfm();
+         return eScreenRefreshFlag::MainScreen;
       }
 
       RadioDriver.SetFrequency(u32StartFreq);
       RadioDriver.SetDeviationPresent(1);
-      Fw.BK4819Write(0x36, InitialBias);
 
       Context.ViewStack.Pop();
       return eScreenRefreshFlag::NoRefresh;
@@ -67,25 +55,55 @@ public:
 
    void HandleTests()
    {
-      HandleMicInput();
-      char S8DebugStr[20];
-      // int MicAmp = s32DeltaAmp / 8; // RadioDriver.GetAFAmplitude();
-      // MicAmp = 4 + MicAmp;
-      // if (MicAmp > 0b111)
-      //    MicAmp = 0b111;
-      // if (MicAmp < 0)
-      //    MicAmp = 0;
-      unsigned short U16AdcData[2];
-      Fw.AdcReadout(U16AdcData, U16AdcData+1);
-      Fw.FormatString(S8DebugStr, "in 1: %05i   ", U16AdcData[0]);
+      if constexpr(!bAmpTests)
+      {
+         return;
+      }
+
+      // HandleMicInput();
+      char S8DebugStr[6 * 40 + 1];
+      // static constexpr auto reg = 0x6F;
+      DisplayBuff.ClearAll();
+      
+      Fw.FormatString(S8DebugStr, "%05i  %05i  ", RadioDriver.GetVoiceAmplitude(), RadioDriver.GetAFAmplitude());
       Fw.PrintTextOnScreen(S8DebugStr, 0, 127, 0, 8, 0);
-      Fw.FormatString(S8DebugStr, "in 2: %05i   ", U16AdcData[1]);
-      Fw.PrintTextOnScreen(S8DebugStr, 0, 127, 2, 8, 0);
+      DrawMicInChart();
+   }
+
+   void DrawMicInChart()
+   {
+      static constexpr auto chartBottomY = 55;
+      static constexpr auto chartTopY = 16;
+      unsigned char u8LastYpoint;
+      for(unsigned short x = 0; x < 128; x++)
+      {
+         auto ypoint = RadioDriver.GetVoiceAmplitude();
+         ypoint >>= 6;
+         if(ypoint >= chartBottomY - chartTopY)
+         {
+            ypoint = chartTopY;
+         }
+         else
+         {
+            ypoint = chartBottomY - ypoint;
+         }
+
+         if(!x) u8LastYpoint = ypoint;
+         DisplayBuff.SetPixel(x, ypoint);
+         while (ypoint != u8LastYpoint)
+         {
+            u8LastYpoint += u8LastYpoint < ypoint ? 1 : -1;
+            DisplayBuff.SetPixel(x, u8LastYpoint);
+         }
+
+         u8LastYpoint = ypoint;
+      }
    }
 
    void HandleMicInput()
    {
-      unsigned short u16ActualAmp = Fw.BK4819Read(0x64);
+      u16ActualAmp = Fw.BK4819Read(0x64);
+      // u16ActualAmp = Fw.BK4819Read(0x6F) & 0b1111111;
       s32DeltaAmp = u16OldAmp - u16ActualAmp;
       u16OldAmp = u16ActualAmp;
    }
@@ -131,6 +149,7 @@ public:
          return eScreenRefreshFlag::StatusBar;
       }
 
+      bInit = true;
       Context.ViewStack.Push(*this);
       return eScreenRefreshFlag::StatusBar;
    }
