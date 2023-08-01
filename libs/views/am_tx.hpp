@@ -3,13 +3,11 @@
 #include "registers.hpp"
 
 template <
-    const System::TOrgFunctions &Fw,
-    const System::TOrgData &FwData,
     TUV_K5Display &DisplayBuff,
     CDisplay<TUV_K5Display> &Display,
     CDisplay<TUV_K5Display> &DisplayStatusBar,
     const TUV_K5SmallNumbers &FontSmallNr,
-    Radio::CBK4819<Fw> &RadioDriver>
+    Radio::CBK4819 &RadioDriver>
 class CAmTx : public IView
 {
    static constexpr bool bAmpTests = true;
@@ -31,9 +29,9 @@ public:
 
       if constexpr (bAmpTests)
       {
-         // Fw.BK4819Write(0x29, 0);
-         // Fw.BK4819Write(0x2B, 0);
-         // Fw.BK4819Write(0x19, 0);
+         // BK4819Write(0x29, 0);
+         // BK4819Write(0x2B, 0);
+         // BK4819Write(0x19, 0);
          // RadioDriver.SetDeviationPresent(0);
          HandleTests();
          if (!CheckForPtt())
@@ -46,7 +44,7 @@ public:
       }
 
       RadioDriver.SetDeviationPresent(0);
-      auto InitialBias = Fw.BK4819Read(0x36);
+      auto InitialBias = BK4819Read(0x36);
 
       u32StartFreq = RadioDriver.GetFrequency();
 
@@ -59,7 +57,7 @@ public:
 
       RadioDriver.SetFrequency(u32StartFreq);
       RadioDriver.SetDeviationPresent(1);
-      Fw.BK4819Write(0x36, InitialBias);
+      BK4819Write(0x36, InitialBias);
 
       Context.ViewStack.Pop();
       return eScreenRefreshFlag::NoRefresh;
@@ -76,16 +74,16 @@ public:
       // if (MicAmp < 0)
       //    MicAmp = 0;
       unsigned short U16AdcData[2];
-      Fw.AdcReadout(U16AdcData, U16AdcData+1);
-      Fw.FormatString(S8DebugStr, "in 1: %05i   ", U16AdcData[0]);
-      Fw.PrintTextOnScreen(S8DebugStr, 0, 127, 0, 8, 0);
-      Fw.FormatString(S8DebugStr, "in 2: %05i   ", U16AdcData[1]);
-      Fw.PrintTextOnScreen(S8DebugStr, 0, 127, 2, 8, 0);
+      AdcReadout(U16AdcData, U16AdcData+1);
+      FormatString(S8DebugStr, "in 1: %05i   ", U16AdcData[0]);
+      PrintTextOnScreen(S8DebugStr, 0, 127, 0, 8, 0);
+      FormatString(S8DebugStr, "in 2: %05i   ", U16AdcData[1]);
+      PrintTextOnScreen(S8DebugStr, 0, 127, 2, 8, 0);
    }
 
    void HandleMicInput()
    {
-      unsigned short u16ActualAmp = Fw.BK4819Read(0x64);
+      unsigned short u16ActualAmp = BK4819Read(0x64);
       s32DeltaAmp = u16OldAmp - u16ActualAmp;
       u16OldAmp = u16ActualAmp;
    }
@@ -98,7 +96,7 @@ public:
          MicAmp = 0b111;
       if (MicAmp < 0)
          MicAmp = 0;
-      Fw.BK4819Write(0x36, ((MicAmp & 0b111) << 3) | (MicAmp & 0b111));
+      BK4819Write(0x36, ((MicAmp & 0b111) << 3) | (MicAmp & 0b111));
    }
 
    void HandleTxWfm()
@@ -145,7 +143,7 @@ public:
       if (GPIOC->DATA & GPIO_PIN_3)
       {
          GPIOC->DATA &= ~GPIO_PIN_3;
-         *FwData.p8FlashLightStatus = 3;
+         gFlashLightStatus = 3;
          return true;
       }
 
@@ -154,14 +152,14 @@ public:
 
    void DrawAmIcon(bool bDraw)
    {
-      memset(FwData.pStatusBarData, 0, 14);
+      memset(gStatusBarData, 0, 14);
       if (!bDraw)
       {
          return;
       }
 
-      memcpy(FwData.pStatusBarData, FwData.pSmallLeters + 223, 12);
-      unsigned char *pNegative = FwData.pStatusBarData;
+      memcpy(gStatusBarData, gSmallLeters + 223, 12);
+      unsigned char *pNegative = gStatusBarData;
       for (unsigned char i = 0; i < 14; i++)
       {
          *pNegative++ ^= 0xFF;

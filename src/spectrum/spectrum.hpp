@@ -19,7 +19,6 @@ static constexpr auto operator""_MHz(unsigned long long KiloHertz)
    return KiloHertz * 1000_KHz;
 }
 
-template <const System::TOrgFunctions &Fw, const System::TOrgData &FwData>
 class CSpectrum
 {
 public:
@@ -33,8 +32,8 @@ public:
    static constexpr auto PressDuration = 30;
    static constexpr auto BWStep = 200_KHz;
    CSpectrum()
-       : DisplayBuff(FwData.pDisplayBuffer),
-         FontSmallNr(FwData.pSmallDigs),
+       : DisplayBuff(gDisplayBuffer),
+         FontSmallNr(gSmallDigs),
          Display(DisplayBuff),
          bDisplayCleared(true),
          u32ScanRange(1_MHz),
@@ -58,9 +57,9 @@ public:
          {
             bDisplayCleared = true;
             ClearDrawings();
-            Fw.FlushFramebufferToScreen();
+            FlushFramebufferToScreen();
             SetFrequency(u32OldFreq);
-            Fw.BK4819Write(0x47, u16OldAfSettings); // set previous AF settings
+            BK4819Write(0x47, u16OldAfSettings); // set previous AF settings
          }
 
          return;
@@ -69,8 +68,8 @@ public:
       if (bDisplayCleared)
       {
          u32OldFreq = GetFrequency();
-         u16OldAfSettings = Fw.BK4819Read(0x47);
-         Fw.BK4819Write(0x47, 0); // mute AF during scan
+         u16OldAfSettings = BK4819Read(0x47);
+         BK4819Write(0x47, 0); // mute AF during scan
       }
 
       bDisplayCleared = false;
@@ -118,7 +117,7 @@ public:
       {
          if (!(u8Pos % (DisplayBuff.SizeX / LabelsCnt)) || u8Pos == DisplayBuff.SizeX - 1)
          {
-            *(FwData.pDisplayBuffer + 2 * DisplayBuff.SizeX + u8Pos) = 0xFF;
+            gDisplayBuffer[2 * DisplayBuff.SizeX + u8Pos] = 0xFF;
          }
 
          auto const FreqOffset = (u8Pos * u32ScanRange) >> 7;
@@ -140,7 +139,7 @@ public:
          }
       }
       // Display.DrawRectangle(0,0, 7, 7, 0);
-      memcpy(FwData.pDisplayBuffer + 8 * 2 + 10 * 6 + 2, FwData.pSmallLeters + 18 + 5, 7);
+      memcpy(gDisplayBuffer + 8 * 2 + 10 * 6 + 2, gSmallLeters + 18 + 5, 7);
       Display.SetCoursor(0, 0);
       Display.PrintFixedDigitsNumber2(u32OldFreq);
       Display.SetCoursor(1, 0);
@@ -152,31 +151,31 @@ public:
       Display.SetCoursor(0, 8 * 2 + 10 * 7);
       Display.PrintFixedDigitsNumber2(u32Peak);
 
-      memcpy(FwData.pDisplayBuffer + 128 * 2 + u8PeakPos - 3, FwData.pSmallLeters + 18 + 5, 7);
-      Fw.FlushFramebufferToScreen();
+      memcpy(gDisplayBuffer + 128 * 2 + u8PeakPos - 3, gSmallLeters + 18 + 5, 7);
+      FlushFramebufferToScreen();
    }
 
 private:
    void SetFrequency(unsigned int u32Freq)
    {
-      Fw.BK4819Write(0x39, ((u32Freq >> 16) & 0xFFFF));
-      Fw.BK4819Write(0x38, (u32Freq & 0xFFFF));
-      // Fw.BK4819Write(0x37,7951);
-      Fw.BK4819Write(0x30, 0);
-      Fw.BK4819Write(0x30, 0xbff1);
+      BK4819Write(0x39, ((u32Freq >> 16) & 0xFFFF));
+      BK4819Write(0x38, (u32Freq & 0xFFFF));
+      // BK4819Write(0x37,7951);
+      BK4819Write(0x30, 0);
+      BK4819Write(0x30, 0xbff1);
    }
 
    unsigned char GetRssi(unsigned int u32Freq)
    {
       SetFrequency(u32Freq);
-      Fw.DelayUs(800);
-      return ((Fw.BK4819Read(0x67) >> 1) & 0xFF);
+      DelayUs(800);
+      return ((BK4819Read(0x67) >> 1) & 0xFF);
    }
 
    unsigned int GetFrequency()
    {
-      unsigned short u16f1 = Fw.BK4819Read(0x39);
-      unsigned short u16f2 = Fw.BK4819Read(0x38);
+      unsigned short u16f1 = BK4819Read(0x39);
+      unsigned short u16f2 = BK4819Read(0x38);
       return ((u16f1 << 16) | u16f2);
    }
 
@@ -187,12 +186,12 @@ private:
       {
          bEnabled = true;
          GPIOC->DATA &= ~GPIO_PIN_3;
-         *FwData.p8FlashLightStatus = 3;
+         gFlashLightStatus = 3;
       }
 
       if (bEnabled)
       {
-         u8LastBtnPressed = Fw.PollKeyboard();
+         u8LastBtnPressed = PollKeyboard();
       }
 
       bool bPtt = !(GPIOC->DATA & GPIO_PIN_5);
@@ -206,7 +205,7 @@ private:
 
    void ClearDrawings()
    {
-      memset(FwData.pDisplayBuffer, 0, (DisplayBuff.SizeX / 8) * DisplayBuff.SizeY);
+      memset(gDisplayBuffer, 0, (DisplayBuff.SizeX / 8) * DisplayBuff.SizeY);
    }
 
    TUV_K5Display DisplayBuff;

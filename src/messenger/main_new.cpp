@@ -5,25 +5,18 @@
 #include "rssi_sbar.hpp"
 #include "manager.hpp"
 
-const System::TOrgFunctions &Fw = System::OrgFunc_01_26;
-const System::TOrgData &FwData = System::OrgData_01_26;
-
-TUV_K5Display DisplayBuff(FwData.pDisplayBuffer);
-const TUV_K5SmallNumbers FontSmallNr(FwData.pSmallDigs);
+TUV_K5Display DisplayBuff(gDisplayBuffer);
+const TUV_K5SmallNumbers FontSmallNr(gSmallDigs);
 CDisplay Display(DisplayBuff);
 
-Radio::CBK4819<System::OrgFunc_01_26> RadioDriver;
+Radio::CBK4819 RadioDriver;
 CMessenger<
     DisplayBuff,
     Display,
-    System::OrgFunc_01_26,
-    System::OrgData_01_26,
     RadioDriver>
     Messenger;
 
 CRssiSbar<
-    System::OrgFunc_01_26,
-    System::OrgData_01_26,
     DisplayBuff,
     Display,
     FontSmallNr>
@@ -31,8 +24,6 @@ CRssiSbar<
 
 static IView * const Views[] = {&Messenger, &RssiSbar};
 CViewManager<
-    System::OrgFunc_01_26,
-    System::OrgData_01_26,
     16, 2, sizeof(Views) / sizeof(*Views)>
     Manager(Views);
 

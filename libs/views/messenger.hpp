@@ -8,9 +8,7 @@
 template <
     TUV_K5Display &DisplayBuff,
     CDisplay<TUV_K5Display> &Display,
-    const System::TOrgFunctions &Fw,
-    const System::TOrgData &FwData,
-    Radio::CBK4819<Fw> &RadioDriver>
+    Radio::CBK4819 &RadioDriver>
 class CMessenger : public IView
 {
 public:
@@ -66,7 +64,7 @@ public:
       if (u8RxDoneLabelCnt < 100)
       {
          u8RxDoneLabelCnt++;
-         Fw.PrintTextOnScreen("> RX <", 0, 128, 2, 8, 1);
+         PrintTextOnScreen("> RX <", 0, 128, 2, 8, 1);
       }
 
       switch (State)
@@ -100,8 +98,8 @@ public:
    void PrintTxData()
    {
       char C8PrintBuff[30];
-      Fw.FormatString(C8PrintBuff, ">%s", T9.C8WorkingBuff);
-      Fw.PrintTextOnScreen(C8PrintBuff, 0, 128, 0, 8, 0);
+      FormatString(C8PrintBuff, ">%s", T9.C8WorkingBuff);
+      PrintTextOnScreen(C8PrintBuff, 0, 128, 0, 8, 0);
    }
 
    void PrintRxData()
@@ -109,9 +107,9 @@ public:
       // char *tempRxBuff = S8RxBuff + MaxCharsInLine;
       // char C8Temp = tempRxBuff[MaxCharsInLine];
       // S8RxBuff[MaxCharsInLine] = '\0';
-      Fw.PrintTextOnScreen(S8RxBuff, 1, 128, 3, 8, 0);
+      PrintTextOnScreen(S8RxBuff, 1, 128, 3, 8, 0);
       // S8RxBuff[MaxCharsInLine] = C8Temp;
-      // Fw.PrintTextOnScreen(tempRxBuff, 1, 128, 5, 8, 0);
+      // PrintTextOnScreen(tempRxBuff, 1, 128, 5, 8, 0);
    }
 
    void HandleInitTx()
@@ -124,7 +122,7 @@ public:
          State = eState::InitRx;
       }
 
-      Fw.PrintTextOnScreen("> TX <", 0, 128, 2, 8, 1);
+      PrintTextOnScreen("> TX <", 0, 128, 2, 8, 1);
    }
    void RxDoneHandler(unsigned char u8DataLen, bool bCrcOk)
    {
@@ -142,12 +140,12 @@ private:
       {
          bEnabled = true;
          GPIOC->DATA &= ~GPIO_PIN_3;
-         *FwData.p8FlashLightStatus = 3;
+         gFlashLightStatus = 3;
       }
 
       if (bEnabled)
       {
-         // Keyboard.Handle(Fw.PollKeyboard());
+         // Keyboard.Handle(PollKeyboard());
       }
 
       return bEnabled;
@@ -161,7 +159,7 @@ private:
 
    void ClearDrawings()
    {
-      memset(FwData.pDisplayBuffer, 0, (DisplayBuff.SizeX / 8) * DisplayBuff.SizeY);
+      memset(gDisplayBuffer, 0, (DisplayBuff.SizeX / 8) * DisplayBuff.SizeY);
    }
 
    void HandlePressedButton(unsigned char u8Button) override

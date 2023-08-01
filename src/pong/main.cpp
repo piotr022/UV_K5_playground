@@ -7,18 +7,17 @@
 
 extern "C" void __libc_init_array();
 
-const System::TOrgFunctions& Fw = System::OrgFunc_01_26;
-CSPong<System::OrgFunc_01_26, System::OrgData_01_26> Pong;
+CSPong Pong;
 
 int main()
 {
-    Fw.IRQ_RESET();
+    IRQ_RESET();
    return 0;
 }
 
 extern "C" void Reset_Handler()
 {
-    Fw.IRQ_RESET();
+    IRQ_RESET();
 }
 
 extern "C" void SysTick_Handler()
@@ -36,5 +35,5 @@ extern "C" void SysTick_Handler()
    {
       Pong.Handle();
    }
-    Fw.IRQ_SYSTICK();
+    IRQ_SYSTICK();
 }

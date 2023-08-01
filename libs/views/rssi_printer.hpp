@@ -4,8 +4,6 @@
 #include "manager.hpp"
 
 template <
-    System::TOrgFunctions &Fw,
-    System::TOrgData &FwData,
     TUV_K5Display &DisplayBuff,
     CDisplay<TUV_K5Display> &Display,
     TUV_K5SmallNumbers &FontSmallNr>
@@ -25,7 +23,7 @@ public:
          return eScreenRefreshFlag::NoRefresh;
       }
 
-      if (Fw.BK4819Read(0x0C) & 0b10)
+      if (BK4819Read(0x0C) & 0b10)
       {
          u8SqlDelayCnt = 0;
       }
@@ -55,7 +53,7 @@ public:
       Display.SetFont(&FontSmallNr);
 
       char C8RssiString[] = "g000";
-      unsigned char u8Rssi = ((Fw.BK4819Read(0x67) >> 1) & 0xFF);
+      unsigned char u8Rssi = ((BK4819Read(0x67) >> 1) & 0xFF);
       if (!u8Rssi)
       {
          return eScreenRefreshFlag::NoRefresh;

@@ -7,18 +7,16 @@
 #include <string.h>
 
 Hardware::THardware Hw;
-const System::TOrgFunctions &Fw = System::OrgFunc_01_26;
-const System::TOrgData &FwData = System::OrgData_01_26;
 
-Radio::CBK4819<System::OrgFunc_01_26> RadioDriver;
-CSpectrum<System::OrgFunc_01_26, System::OrgData_01_26, RadioDriver> Spectrum;
+Radio::CBK4819 RadioDriver;
+CSpectrum<RadioDriver> Spectrum;
 
 int main() {
-  Fw.IRQ_RESET();
+  IRQ_RESET();
   return 0;
 }
 
-extern "C" void Reset_Handler() { Fw.IRQ_RESET(); }
+extern "C" void Reset_Handler() { IRQ_RESET(); }
 
 extern "C" void SysTick_Handler() {
   static bool bFirstInit = false;
@@ -30,5 +28,5 @@ extern "C" void SysTick_Handler() {
 
   Spectrum.Handle();
 
-  Fw.IRQ_SYSTICK();
+  IRQ_SYSTICK();
 }

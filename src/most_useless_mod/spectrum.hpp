@@ -3,9 +3,7 @@
 #include "uv_k5_display.hpp"
 #include "radio.hpp"
 
-template <const System::TOrgFunctions &Fw,
-          const System::TOrgData &FwData,
-          Radio::CBK4819<Fw> &RadioDriver>
+template <Radio::CBK4819 &RadioDriver>
 class CSpectrum
 {
 public:
@@ -23,7 +21,7 @@ public:
    };
 
    CSpectrum()
-       : DisplayBuff(FwData.pDisplayBuffer), FontSmallNr(FwData.pSmallDigs), Display(DisplayBuff), State(eState::Init), u8RxCnt(0){};
+       : DisplayBuff(gDisplayBuffer), FontSmallNr(gSmallDigs), Display(DisplayBuff), State(eState::Init), u8RxCnt(0){};
 
    void Handle()
    {
@@ -38,14 +36,14 @@ public:
       {
          
 
-         Fw.DelayMs(600);
+         DelayMs(600);
          //memset(U8Buff, 0, sizeof(U8Buff));
          RadioDriver.RecieveAsyncAirCopyMode(U8Buff, sizeof(U8Buff), Radio::CallbackRxDoneType(this, &CSpectrum::RxDoneHandler));
          State = eState::RxPending;
          // while(State == eState::RxPending)
          // {
          //    RadioDriver.InterruptHandler();
-         //    // if(Fw.PollKeyboard() != 0xFF)
+         //    // if(PollKeyboard() != 0xFF)
          //    // {
          //    //    break;
          //    // }
@@ -59,13 +57,13 @@ public:
          char kupa[20];
          U8Buff[10] = 0;
          DisplayBuff.ClearAll();
-         Fw.FormatString(kupa, "RX DONE %u", u8RxCnt);
-         Fw.PrintTextOnScreen(kupa, 0, 127, 0, 8, 0);
-         Fw.FormatString(kupa, "LEN: %i", RadioDriver.u16RxDataLen);
-         Fw.PrintTextOnScreen(kupa, 0, 127, 2, 8, 0);
-         Fw.FormatString(kupa, "S: %s", U8Buff);
-         Fw.PrintTextOnScreen(kupa, 0, 127, 4, 8, 0);
-         Fw.FlushFramebufferToScreen();
+         FormatString(kupa, "RX DONE %u", u8RxCnt);
+         PrintTextOnScreen(kupa, 0, 127, 0, 8, 0);
+         FormatString(kupa, "LEN: %i", RadioDriver.u16RxDataLen);
+         PrintTextOnScreen(kupa, 0, 127, 2, 8, 0);
+         FormatString(kupa, "S: %s", U8Buff);
+         PrintTextOnScreen(kupa, 0, 127, 4, 8, 0);
+         FlushFramebufferToScreen();
 
          static unsigned int u32Cnt = 1;
          if(!(u32Cnt++%8))
@@ -74,29 +72,29 @@ public:
             State = eState::Init;
          }
 
-         // Fw.WriteSerialData((unsigned char *)"RX packet, hex: ", 17);
+         // WriteSerialData((unsigned char *)"RX packet, hex: ", 17);
          // for (unsigned int i = 0; i < sizeof(U8Buff); i++)
          // {
-         //    Fw.FormatString(kupa, "%02X", U8Buff[i]);
-         //    Fw.WriteSerialData((unsigned char *)kupa, 1);
+         //    FormatString(kupa, "%02X", U8Buff[i]);
+         //    WriteSerialData((unsigned char *)kupa, 1);
          // }
-         // Fw.WriteSerialData((unsigned char *)"\n", 1);
+         // WriteSerialData((unsigned char *)"\n", 1);
          break;
       }
 
       case eState::RxPending:
       {
 
-         //Fw.AirCopyFskSetup();
+         //AirCopyFskSetup();
          char kupa[20];
          DisplayBuff.ClearAll();
-         Fw.FormatString(kupa, "Rx: %u kHz", Fw.IntDivide(RadioDriver.GetFrequency(), 100));
-         Fw.PrintTextOnScreen(kupa, 0, 127, 0, 8, 0);
-         Fw.FormatString(kupa, "0x3F: 0x%04X", Fw.BK4819Read(0x3F));
-         Fw.PrintTextOnScreen(kupa, 0, 127, 2, 8, 0);
-         Fw.FormatString(kupa, "len: %i", Fw.BK4819Read(0x5D) >> 8);
-         Fw.PrintTextOnScreen(kupa, 0, 127, 4, 8, 0);
-         Fw.FlushFramebufferToScreen();
+         FormatString(kupa, "Rx: %u kHz", IntDivide(RadioDriver.GetFrequency(), 100));
+         PrintTextOnScreen(kupa, 0, 127, 0, 8, 0);
+         FormatString(kupa, "0x3F: 0x%04X", BK4819Read(0x3F));
+         PrintTextOnScreen(kupa, 0, 127, 2, 8, 0);
+         FormatString(kupa, "len: %i", BK4819Read(0x5D) >> 8);
+         PrintTextOnScreen(kupa, 0, 127, 4, 8, 0);
+         FlushFramebufferToScreen();
          return;
       }
 
@@ -110,18 +108,18 @@ public:
          if(!(u32Cnt++%8))
          {
             u8TxCnt++;
-            Fw.FormatString((char *)C8TxStr, "packet %i", u8TxCnt);
+            FormatString((char *)C8TxStr, "packet %i", u8TxCnt);
             RadioDriver.SendSyncAirCopyMode72((unsigned char *)C8TxStr);
          }
 
          DisplayBuff.ClearAll();
-         Fw.FormatString(kupa, "TX: %u kHz", Fw.IntDivide(RadioDriver.GetFrequency(), 100));
-         Fw.PrintTextOnScreen(kupa, 0, 127, 0, 8, 0);
-         Fw.FormatString(kupa, "Irq: 0x%04X", RadioDriver.GetIrqReg());
-         Fw.PrintTextOnScreen(kupa, 0, 127, 2, 8, 0);
-         Fw.FormatString(kupa, "S: %s", C8TxStr);
-         Fw.PrintTextOnScreen(kupa, 0, 127, 4, 8, 0);
-         Fw.FlushFramebufferToScreen();
+         FormatString(kupa, "TX: %u kHz", IntDivide(RadioDriver.GetFrequency(), 100));
+         PrintTextOnScreen(kupa, 0, 127, 0, 8, 0);
+         FormatString(kupa, "Irq: 0x%04X", RadioDriver.GetIrqReg());
+         PrintTextOnScreen(kupa, 0, 127, 2, 8, 0);
+         FormatString(kupa, "S: %s", C8TxStr);
+         PrintTextOnScreen(kupa, 0, 127, 4, 8, 0);
+         FlushFramebufferToScreen();
 
 
          return;

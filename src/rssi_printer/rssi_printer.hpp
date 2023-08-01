@@ -6,14 +6,14 @@ class CRssiPrinter
 {
    public:
    static constexpr auto ChartStartX = 4*7 + 4;
-   static void Handle(const System::TOrgFunctions& Fw, const System::TOrgData& FwData)
+   static void Handle(void)
    {
       static bool bIsCleared = true;
       static unsigned char u8ChartPosition = 0;
       static unsigned char u8SqlDelayCnt = 0xFF;
       static unsigned char U8ScreenHistory[128 - ChartStartX] = {0};
-      TUV_K5Display DisplayBuff(FwData.pDisplayBuffer);
-      const TUV_K5SmallNumbers FontSmallNr(FwData.pSmallDigs);
+      TUV_K5Display DisplayBuff(gDisplayBuffer);
+      const TUV_K5SmallNumbers FontSmallNr(gSmallDigs);
       CDisplay Display(DisplayBuff);
 
       if(!(GPIOC->DATA & 0b1))
@@ -22,7 +22,7 @@ class CRssiPrinter
       }
 
       auto* pMenuCheckData = (unsigned char*)DisplayBuff.GetCoursorData(DisplayBuff.GetCoursorPosition(2, 6*8 + 1));
-      if(Fw.BK4819Read(0x0C) & 0b10)
+      if(BK4819Read(0x0C) & 0b10)
       {
          u8SqlDelayCnt = 0;
       }
@@ -38,7 +38,7 @@ class CRssiPrinter
             u8ChartPosition = 0;
             if(*pMenuCheckData != 0xFF)
             {
-               Fw.FlushFramebufferToScreen();
+               FlushFramebufferToScreen();
             }
          }
 
@@ -52,7 +52,7 @@ class CRssiPrinter
       Display.SetFont(&FontSmallNr);
 
       char C8RssiString[] = "g000";
-      unsigned char u8Rssi = ((Fw.BK4819Read(0x67) >> 1) & 0xFF);
+      unsigned char u8Rssi = ((BK4819Read(0x67) >> 1) & 0xFF);
       if(!u8Rssi)
       {
          return;
@@ -96,6 +96,6 @@ class CRssiPrinter
       memcpy(pDData, U8ScreenHistory, sizeof(U8ScreenHistory));
 
       u8ChartPosition++;
-      Fw.FlushFramebufferToScreen();
+      FlushFramebufferToScreen();
    }
 };

@@ -3,26 +3,19 @@
 #include "messenger.hpp"
 #include "radio.hpp"
 
-const System::TOrgFunctions &Fw = System::OrgFunc_01_26;
-const System::TOrgData &FwData = System::OrgData_01_26;
+Radio::CBK4819 RadioDriver;
 
-Radio::CBK4819<System::OrgFunc_01_26> RadioDriver;
-
-CMessenger<
-    System::OrgFunc_01_26,
-    System::OrgData_01_26,
-    RadioDriver>
-    Messenger;
+CMessenger<RadioDriver> Messenger;
 
 int main()
 {
-   Fw.IRQ_RESET();
+   IRQ_RESET();
    return 0;
 }
 
 extern "C" void Reset_Handler()
 {
-   Fw.IRQ_RESET();
+   IRQ_RESET();
 }
 
 extern "C" void SysTick_Handler()
@@ -37,5 +30,5 @@ extern "C" void SysTick_Handler()
 
    RadioDriver.InterruptHandler();
    Messenger.Handle();
-   Fw.IRQ_SYSTICK();
+   IRQ_SYSTICK();
 }
