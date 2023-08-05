@@ -3,12 +3,11 @@
 #include "uv_k5_display.hpp"
 #include "keyboard.hpp"
 
-template <const System::TOrgFunctions &Fw, const System::TOrgData &FwData>
 class CT9Texting
 {
 public:
    CT9Texting()
-       : DisplayBuff(FwData.pDisplayBuffer),
+       : DisplayBuff(gDisplayBuffer),
          Display(DisplayBuff),
          Keyboard(*this),
          bDisplayCleared(true),
@@ -67,7 +66,7 @@ public:
             // Clear cMessage
             memset(cMessage, 0, 30);
             c_index = 0;
-            Fw.FlushFramebufferToScreen();
+            FlushFramebufferToScreen();
          }
 
          return;
@@ -123,8 +122,8 @@ public:
       prev_key = key;
       // Display.DrawRectangle(0,0, 7, 7, 0);
       ClearDrawings();
-      Fw.PrintTextOnScreen(cMessage, 0, 128, 0, 8, 0);
-      Fw.FlushFramebufferToScreen();
+      PrintTextOnScreen(cMessage, 0, 128, 0, 8, 0);
+      FlushFramebufferToScreen();
    }
 
 private:
@@ -136,15 +135,15 @@ private:
       {
          bEnabled = true;
          GPIOC->DATA &= ~GPIO_PIN_3;
-         *FwData.p8FlashLightStatus = 3;
+         gFlashLightStatus = 3;
       }
 
       if (bEnabled)
       {
-         u8LastBtnPressed = Fw.PollKeyboard();
+         u8LastBtnPressed = PollKeyboard();
       }
 
-      // u8LastBtnPressed = Fw.PollKeyboard();
+      // u8LastBtnPressed = PollKeyboard();
       // if (u8LastBtnPressed == EnableKey)
       // {
       //    u8PressCnt++;
@@ -161,7 +160,7 @@ private:
 
    void ClearDrawings()
    {
-      memset(FwData.pDisplayBuffer, 0, (DisplayBuff.SizeX / 8) * DisplayBuff.SizeY);
+      memset(gDisplayBuffer, 0, (DisplayBuff.SizeX / 8) * DisplayBuff.SizeY);
    }
 
    TUV_K5Display DisplayBuff;

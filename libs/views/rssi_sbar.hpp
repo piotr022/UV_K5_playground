@@ -49,13 +49,11 @@ namespace Rssi
 }
 
 template <
-    const System::TOrgFunctions &Fw,
-    const System::TOrgData &FwData,
     TUV_K5Display &DisplayBuff,
     CDisplay<TUV_K5Display> &Display,
     CDisplay<TUV_K5Display> &DisplayStatusBar,
     const TUV_K5SmallNumbers &FontSmallNr,
-    Radio::CBK4819<Fw> &RadioDriver>
+    Radio::CBK4819 &RadioDriver>
 class CRssiSbar : public IView, public IMenuElement
 {
 public:
@@ -67,7 +65,7 @@ public:
    static constexpr auto LinearBlocksCnt = 9;
    static constexpr auto VoltageOffset = 77;
    static constexpr auto MaxBarPoints = 13;
-   static inline unsigned char *const pDData = FwData.pDisplayBuffer + 128 * 3;
+   static inline unsigned char *const pDData = gDisplayBuffer + 128 * 3;
 
    unsigned int u32DrawVoltagePsc = 0;
    Rssi::TRssi RssiData;
@@ -188,7 +186,7 @@ public:
    {
       if (bPtt) // print TX
       {
-         memcpy(pDData + 5 * 7, FwData.pSmallLeters + 128 * 2 + 8 * 3 + 2, 15);
+         memcpy(pDData + 5 * 7, gSmallLeters + 128 * 2 + 8 * 3 + 2, 15);
          unsigned char *pNegative = pDData + 5 * 7 - 2;
          for (unsigned char i = 0; i < 19; i++)
          {
@@ -205,13 +203,13 @@ public:
       }
       else if (u8SValue > 9)
       {
-         memcpy(pDData + 5 * 7, FwData.pSmallLeters + 109 - 3 * 8, 8);
+         memcpy(pDData + 5 * 7, gSmallLeters + 109 - 3 * 8, 8);
          C8SignalString[1] = '0';
          C8SignalString[0] = '0' + u8SValue - 9;
       }
       else
       {
-         memcpy(pDData + 5 * 7, FwData.pSmallLeters + 109, 8);
+         memcpy(pDData + 5 * 7, gSmallLeters + 109, 8);
          C8SignalString[0] = '0' + u8SValue;
          C8SignalString[1] = ' ';
       }
@@ -234,20 +232,20 @@ public:
 
    void PrintBatteryVoltage()
    {
-      if(*(FwData.pStatusBarData + VoltageOffset + 4 * 6 + 1) ||
-          *(FwData.pStatusBarData + VoltageOffset + 4 * 6 - 6))
+      if(gStatusBarData[VoltageOffset + 4 * 6 + 1] ||
+          gStatusBarData[VoltageOffset + 4 * 6 - 6])
       {  // disable printing when function or charging icon are printed
          return;
       }
 
-      unsigned short u16Voltage = *FwData.p16Voltage > 1000 ? 999 : *FwData.p16Voltage;
+      unsigned short u16Voltage = gVoltage > 1000 ? 999 : gVoltage;
 
-      memset(FwData.pStatusBarData + VoltageOffset, 0, 4 * 5);
+      memset(gStatusBarData + VoltageOffset, 0, 4 * 5);
       DisplayStatusBar.SetCoursor(0, VoltageOffset);
       DisplayStatusBar.PrintFixedDigitsNumber2(u16Voltage, 2, 1);
-      memset(FwData.pStatusBarData + VoltageOffset + 7 + 1, 0b1100000, 2); // dot
+      memset(gStatusBarData + VoltageOffset + 7 + 1, 0b1100000, 2); // dot
       DisplayStatusBar.SetCoursor(0, VoltageOffset + 7 + 4);
       DisplayStatusBar.PrintFixedDigitsNumber2(u16Voltage, 0, 2);
-      memcpy(FwData.pStatusBarData + VoltageOffset + 4 * 6 + 2, FwData.pSmallLeters + 128 * 2 + 102, 5); // V character
+      memcpy(gStatusBarData + VoltageOffset + 4 * 6 + 2, gSmallLeters + 128 * 2 + 102, 5); // V character
    }
 };

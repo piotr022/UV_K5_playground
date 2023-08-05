@@ -4,7 +4,6 @@
 #include "keyboard.hpp"
  
 inline char S8Label[20];
-template <const System::TOrgFunctions &Fw>
 class CHeater : public IMenuElement
 {
    bool bEnabled = false;
@@ -28,23 +27,22 @@ class CHeater : public IMenuElement
       bEnabled = !bEnabled;
       if(bEnabled)
       {
-         Fw.BK4819SetGpio(1, true);
+         BK4819SetGpio(1, true);
       }
       else
       {
-         Fw.BK4819SetGpio(1, false);
+         BK4819SetGpio(1, false);
       }
    }
 };
 
-template <const System::TOrgFunctions &Fw>
 class CAmRx : public IMenuElement
 {
    unsigned char u8Mode = 0;
    public:
    const char *GetLabel() override
    {
-      Fw.FormatString(S8Label, "AM RX     %u", u8Mode);
+      FormatString(S8Label, "AM RX     %u", u8Mode);
       return S8Label;
    }
 
@@ -59,11 +57,11 @@ class CAmRx : public IMenuElement
       if(u8Mode > 2)
          u8Mode = 0;
       
-      // Fw.SomeAmStuff(u8Mode);
+      // SomeAmStuff(u8Mode);
    }
 };
 
-template <const System::TOrgFunctions &Fw, Radio::CBK4819<Fw> &RadioDriver>
+template <Radio::CBK4819 &RadioDriver>
 class CMicVal : public IMenuElement
 {
    unsigned char u8Mode = 0;
@@ -71,7 +69,7 @@ class CMicVal : public IMenuElement
    public:
    const char *GetLabel() override
    {
-      Fw.FormatString(S8Label, "MIC in    %u", Fw.BK4819Read(0x64));
+      FormatString(S8Label, "MIC in    %u", BK4819Read(0x64));
       return S8Label;
    }
 
@@ -80,7 +78,7 @@ class CMicVal : public IMenuElement
    }
 };
 
-template <const System::TOrgFunctions &Fw, Radio::CBK4819<Fw> &RadioDriver>
+template <Radio::CBK4819 &RadioDriver>
 class CRssiVal : public IMenuElement
 {
    unsigned char u8Mode = 0;
@@ -89,7 +87,7 @@ class CRssiVal : public IMenuElement
    public:
    const char *GetLabel() override
    {                         
-      Fw.FormatString(S8Label, "RSSI     %i", RadioDriver.GetRssi());
+      FormatString(S8Label, "RSSI     %i", RadioDriver.GetRssi());
       return S8Label;
    }
 

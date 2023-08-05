@@ -11,8 +11,7 @@ typedef unsigned int u32;
 typedef signed long long i64;
 typedef unsigned long long u64;
 
-template <const System::TOrgFunctions &Fw, const System::TOrgData &FwData,
-          Radio::CBK4819<Fw> &RadioDriver>
+template <Radio::CBK4819 &RadioDriver>
 class CSpectrum {
 public:
   static constexpr auto ExitKey = 13;
@@ -29,7 +28,7 @@ public:
   u32 FStart, fMeasure;
 
   CSpectrum()
-      : DisplayBuff(FwData.pDisplayBuffer), FontSmallNr(FwData.pSmallDigs),
+      : DisplayBuff(gDisplayBuffer), FontSmallNr(gSmallDigs),
         Display(DisplayBuff), scanDelay(800), sampleZoom(2), scanStep(25_KHz),
         frequencyChangeStep(100_KHz), rssiTriggerLevel(65), stickyPeakTrigger(false) {
     Display.SetFont(&FontSmallNr);
@@ -43,7 +42,7 @@ public:
     if (fMeasure != highestPeakF) {
       fMeasure = highestPeakF;
       RadioDriver.SetFrequency(fMeasure);
-      Fw.BK4819Write(0x47, u16OldAfSettings);
+      BK4819Write(0x47, u16OldAfSettings);
       RadioDriver.ToggleAFDAC(true);
     }
 
@@ -64,7 +63,7 @@ public:
     fMeasure = FStart;
 
     RadioDriver.ToggleAFDAC(false);
-    Fw.BK4819Write(0x47, 0);
+    BK4819Write(0x47, 0);
 
     for (u8 i = 0; i < measurementsCount; ++i, fMeasure += scanStep) {
       rssi = rssiHistory[i] = GetRssi(fMeasure);
@@ -134,15 +133,15 @@ public:
       modulo(f, 500_KHz) < step && (barValue |= 0b00100000);
       modulo(f, 1_MHz) < step && (barValue |= 0b11000000);
 
-      *(FwData.pDisplayBuffer + BarPos + i) |= barValue;
+      gDisplayBuffer[BarPos + i] |= barValue;
     }
 
     // center
-    *(FwData.pDisplayBuffer + BarPos + 64) |= 0b10101010;
+    gDisplayBuffer[BarPos + 64] |= 0b10101010;
   }
 
   inline void DrawArrow(u8 x) {
-    u8 *peakPos = FwData.pDisplayBuffer + BarPos + x;
+    u8 *peakPos = gDisplayBuffer + BarPos + x;
     x > 1 && (*(peakPos - 2) |= 0b01000000);
     x > 0 && (*(peakPos - 1) |= 0b01100000);
     (*(peakPos) |= 0b01110000);
@@ -205,15 +204,15 @@ public:
     DrawSpectrum();
     DrawRssiTriggerLevel();
     DrawNums();
-    Fw.FlushFramebufferToScreen();
+    FlushFramebufferToScreen();
   }
 
   void Update() {
     if (bDisplayCleared) {
       currentFreq = RadioDriver.GetFrequency();
       OnUserInput();
-      u16OldAfSettings = Fw.BK4819Read(0x47);
-      Fw.BK4819Write(0x47, 0); // mute AF during scan
+      u16OldAfSettings = BK4819Read(0x47);
+      BK4819Write(0x47, 0); // mute AF during scan
     }
     bDisplayCleared = false;
 
@@ -269,7 +268,7 @@ public:
     highestPeakX = 64;
     highestPeakF = currentFreq;
 
-    Fw.DelayUs(90000);
+    DelayUs(90000);
   }
 
   void Handle() {
@@ -285,7 +284,7 @@ public:
       return;
     }
 
-    lastButtonPressed = Fw.PollKeyboard();
+    lastButtonPressed = PollKeyboard();
     if (lastButtonPressed == ExitKey) {
       working = false;
       RestoreParams();
@@ -300,16 +299,16 @@ private:
     if (!bDisplayCleared) {
       bDisplayCleared = true;
       DisplayBuff.ClearAll();
-      Fw.FlushFramebufferToScreen();
+      FlushFramebufferToScreen();
       RadioDriver.SetFrequency(currentFreq);
-      Fw.BK4819Write(0x47, u16OldAfSettings); // set previous AF settings
+      BK4819Write(0x47, u16OldAfSettings); // set previous AF settings
     }
   }
 
   inline void Listen(u32 duration) {
     for (u8 i = 0; i < 16 && lastButtonPressed == 255; ++i) {
-      lastButtonPressed = Fw.PollKeyboard();
-      Fw.DelayUs(duration >> 4);
+      lastButtonPressed = PollKeyboard();
+      DelayUs(duration >> 4);
     }
   }
 
@@ -320,8 +319,8 @@ private:
       RadioDriver.ToggleRXDSP(true);
     }
 
-    Fw.DelayUs(scanDelay);
-    return Fw.BK4819Read(0x67);
+    DelayUs(scanDelay);
+    return BK4819Read(0x67);
   }
 
   u8 GetRssi(u32 f) {
@@ -332,7 +331,7 @@ private:
   inline bool IsFlashLightOn() { return GPIOC->DATA & GPIO_PIN_3; }
   inline void TurnOffFlashLight() {
     GPIOC->DATA &= ~GPIO_PIN_3;
-    *FwData.p8FlashLightStatus = 3;
+    gFlashLightStatus = 3;
   }
 
   inline void ToggleBacklight() { GPIOB->DATA ^= GPIO_PIN_6; }

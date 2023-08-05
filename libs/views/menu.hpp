@@ -8,8 +8,6 @@ struct IMenuElement
    virtual void HandleUserAction(unsigned char u8Button) = 0;
 };
 
-template <const System::TOrgFunctions &Fw,
-          const System::TOrgData &FwData>
 class CMenu : public IView
 {
    static constexpr auto MenuLines = 3;
@@ -73,18 +71,18 @@ public:
 
    void DrawMenu()
    {
-      memset(FwData.pDisplayBuffer, 0, 128*6);
+      memset(gDisplayBuffer, 0, 128*6);
       for(unsigned char u8Line = 0; u8Line < MenuLines; u8Line++)
       {
          auto* Element = GetElement(u8Selected - 1 + u8Line);
          if(!Element)
             continue;
 
-         Fw.PrintTextOnScreen(Element->GetLabel(), 0, 127, u8Line << 1, 8, 0);
+         PrintTextOnScreen(Element->GetLabel(), 0, 127, u8Line << 1, 8, 0);
       }
 
       for(auto i = 0; i < 256; i++)
-         FwData.pDisplayBuffer[i + 2*128] ^= 0xFF; 
+         gDisplayBuffer[i + 2*128] ^= 0xFF; 
    }
 
    IMenuElement* GetElement(signed char s8Idx)
@@ -102,7 +100,7 @@ public:
       if (GPIOC->DATA & GPIO_PIN_3)
       {
          GPIOC->DATA &= ~GPIO_PIN_3;
-         *FwData.p8FlashLightStatus = 3;
+         gFlashLightStatus = 3;
          return true;
       }
 

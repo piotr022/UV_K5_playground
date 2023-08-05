@@ -6,17 +6,14 @@
 #include "rssi_sbar.hpp"
 #include "manager.hpp"
 
-const System::TOrgFunctions &Fw = System::OrgFunc_01_26;
-const System::TOrgData &FwData = System::OrgData_01_26;
-
-TUV_K5Display DisplayBuff(FwData.pDisplayBuffer);
-const TUV_K5SmallNumbers FontSmallNr(FwData.pSmallDigs);
+TUV_K5Display DisplayBuff(gDisplayBuffer);
+const TUV_K5SmallNumbers FontSmallNr(gSmallDigs);
 CDisplay Display(DisplayBuff);
 
-TUV_K5Display StatusBarBuff(FwData.pStatusBarData);
+TUV_K5Display StatusBarBuff(gStatusBarData);
 CDisplay DisplayStatusBar(StatusBarBuff);
 
-Radio::CBK4819<System::OrgFunc_01_26> RadioDriver;
+Radio::CBK4819 RadioDriver;
 
 // CRssiSbar<
 //     System::OrgFunc_01_26,
@@ -29,8 +26,6 @@ Radio::CBK4819<System::OrgFunc_01_26> RadioDriver;
 //     RssiSbar;
     
 CAmTx<
-    System::OrgFunc_01_26,
-    System::OrgData_01_26,
     DisplayBuff,
     Display,
     DisplayStatusBar,
@@ -40,20 +35,18 @@ CAmTx<
 
 static IView * const Views[] = {&AmTx};
 CViewManager<
-    System::OrgFunc_01_26,
-    System::OrgData_01_26,
     8, 1, sizeof(Views) / sizeof(*Views)>
     Manager(Views);
 
 int main()
 {
-   Fw.IRQ_RESET();
+   IRQ_RESET();
    return 0;
 }
 
 extern "C" void Reset_Handler()
 {
-   Fw.IRQ_RESET();
+   IRQ_RESET();
 }
 
 extern "C" void SysTick_Handler()
@@ -67,5 +60,5 @@ extern "C" void SysTick_Handler()
    }
 
    Manager.Handle();
-   Fw.IRQ_SYSTICK();
+   IRQ_SYSTICK();
 }

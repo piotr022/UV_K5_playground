@@ -4,13 +4,11 @@
 #include "hardware/adc.hpp"
 
 template <
-    const System::TOrgFunctions &Fw,
-    const System::TOrgData &FwData,
     TUV_K5Display &DisplayBuff,
     CDisplay<TUV_K5Display> &Display,
     CDisplay<TUV_K5Display> &DisplayStatusBar,
     const TUV_K5SmallNumbers &FontSmallNr,
-    Radio::CBK4819<Fw> &RadioDriver>
+    Radio::CBK4819 &RadioDriver>
 class CAmTx : public IView
 {
    static constexpr bool bAmpTests = true;
@@ -41,7 +39,7 @@ public:
 
       HandleTests();
 
-      if (CheckForPtt())
+      if(CheckForPtt())
       {
          return eScreenRefreshFlag::MainScreen;
       }
@@ -55,55 +53,26 @@ public:
 
    void HandleTests()
    {
-      if constexpr(!bAmpTests)
-      {
-         return;
-      }
-
-      // HandleMicInput();
-      char S8DebugStr[6 * 40 + 1];
-      // static constexpr auto reg = 0x6F;
-      DisplayBuff.ClearAll();
-      
-      Fw.FormatString(S8DebugStr, "%05i  %05i  ", RadioDriver.GetVoiceAmplitude(), RadioDriver.GetAFAmplitude());
-      Fw.PrintTextOnScreen(S8DebugStr, 0, 127, 0, 8, 0);
-      DrawMicInChart();
-   }
-
-   void DrawMicInChart()
-   {
-      static constexpr auto chartBottomY = 55;
-      static constexpr auto chartTopY = 16;
-      unsigned char u8LastYpoint;
-      for(unsigned short x = 0; x < 128; x++)
-      {
-         auto ypoint = RadioDriver.GetVoiceAmplitude();
-         ypoint >>= 6;
-         if(ypoint >= chartBottomY - chartTopY)
-         {
-            ypoint = chartTopY;
-         }
-         else
-         {
-            ypoint = chartBottomY - ypoint;
-         }
-
-         if(!x) u8LastYpoint = ypoint;
-         DisplayBuff.SetPixel(x, ypoint);
-         while (ypoint != u8LastYpoint)
-         {
-            u8LastYpoint += u8LastYpoint < ypoint ? 1 : -1;
-            DisplayBuff.SetPixel(x, u8LastYpoint);
-         }
-
-         u8LastYpoint = ypoint;
-      }
+      HandleMicInput();
+      char S8DebugStr[20];
+      // int MicAmp = s32DeltaAmp / 8; // RadioDriver.GetAFAmplitude();
+      // MicAmp = 4 + MicAmp;
+      // if (MicAmp > 0b111)
+      //    MicAmp = 0b111;
+      // if (MicAmp < 0)
+      //    MicAmp = 0;
+      unsigned short U16AdcData[2];
+      AdcReadout(U16AdcData, U16AdcData+1);
+      FormatString(S8DebugStr, "in 1: %05i   ", U16AdcData[0]);
+      PrintTextOnScreen(S8DebugStr, 0, 127, 0, 8, 0);
+      FormatString(S8DebugStr, "in 2: %05i   ", U16AdcData[1]);
+      PrintTextOnScreen(S8DebugStr, 0, 127, 2, 8, 0);
    }
 
    void HandleMicInput()
    {
-      u16ActualAmp = Fw.BK4819Read(0x64);
-      // u16ActualAmp = Fw.BK4819Read(0x6F) & 0b1111111;
+      u16ActualAmp = BK4819Read(0x64);
+      // u16ActualAmp = BK4819Read(0x6F) & 0b1111111;
       s32DeltaAmp = u16OldAmp - u16ActualAmp;
       u16OldAmp = u16ActualAmp;
    }
@@ -116,7 +85,7 @@ public:
          MicAmp = 0b111;
       if (MicAmp < 0)
          MicAmp = 0;
-      Fw.BK4819Write(0x36, ((MicAmp & 0b111) << 3) | (MicAmp & 0b111));
+      BK4819Write(0x36, ((MicAmp & 0b111) << 3) | (MicAmp & 0b111));
    }
 
    void HandleTxWfm()
@@ -164,7 +133,7 @@ public:
       if (GPIOC->DATA & GPIO_PIN_3)
       {
          GPIOC->DATA &= ~GPIO_PIN_3;
-         *FwData.p8FlashLightStatus = 3;
+         gFlashLightStatus = 3;
          return true;
       }
 
@@ -173,14 +142,14 @@ public:
 
    void DrawAmIcon(bool bDraw)
    {
-      memset(FwData.pStatusBarData, 0, 14);
+      memset(gStatusBarData, 0, 14);
       if (!bDraw)
       {
          return;
       }
 
-      memcpy(FwData.pStatusBarData, FwData.pSmallLeters + 223, 12);
-      unsigned char *pNegative = FwData.pStatusBarData;
+      memcpy(gStatusBarData, gSmallLeters + 223, 12);
+      unsigned char *pNegative = gStatusBarData;
       for (unsigned char i = 0; i < 14; i++)
       {
          *pNegative++ ^= 0xFF;

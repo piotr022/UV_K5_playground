@@ -4,8 +4,7 @@
 #include "keyboard.hpp"
 #include "registers.hpp"
 
-template <const System::TOrgFunctions &Fw, 
-   const System::TOrgData &FwData, 
+template <
    unsigned char BackgroundViewPrescaler,
    unsigned char MainViewPrescaler,
    unsigned char RegisteredViews>
@@ -48,7 +47,7 @@ class CViewManager
                               % MainViewPrescaler))
       {
          if(!MainViewContext.OriginalFwStatus.b1RadioSpiCommInUse)
-            Keyboard.Handle(Fw.PollKeyboard());
+            Keyboard.Handle(PollKeyboard());
 
          u8ScreenRefreshFlag |= 
             pViewStackTop->HandleMainView(MainViewContext);
@@ -56,12 +55,12 @@ class CViewManager
 
       if(u8ScreenRefreshFlag & eScreenRefreshFlag::MainScreen)
       {
-         Fw.FlushFramebufferToScreen();
+         FlushFramebufferToScreen();
       }
 
       if(u8ScreenRefreshFlag & eScreenRefreshFlag::StatusBar)
       {
-         Fw.FlushStatusbarBufferToScreen();
+         FlushStatusbarBufferToScreen();
       }
    }
 
@@ -84,8 +83,8 @@ class CViewManager
 
    inline void CheckOriginalFwStatus()
    {
-      const auto *pMenuCheckData = (unsigned char *)(FwData.pDisplayBuffer + 2*128 + 6 * 8 + 1);
-      const auto *pFrequencyScanCheckData = (unsigned char *)(FwData.pDisplayBuffer + 6*128 + 3 * 8 + 2);
+      const auto *pMenuCheckData = (unsigned char *)(gDisplayBuffer + 2*128 + 6 * 8 + 1);
+      const auto *pFrequencyScanCheckData = (unsigned char *)(gDisplayBuffer + 6*128 + 3 * 8 + 2);
       MainViewContext.OriginalFwStatus.b1MenuDrawed = *pMenuCheckData == 0xFF;
       MainViewContext.OriginalFwStatus.b1FrequencyScan = *pFrequencyScanCheckData;
       MainViewContext.OriginalFwStatus.b1RadioSpiCommInUse = !(GPIOC->DATA & 0b1);

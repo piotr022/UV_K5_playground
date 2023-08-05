@@ -8,22 +8,18 @@
 
 extern "C" void __libc_init_array();
 
-const System::TOrgFunctions& Fw = System::OrgFunc_01_26;
-
-Radio::CBK4819<System::OrgFunc_01_26> RadioDriver;
-CSpectrum<System::OrgFunc_01_26,
-          System::OrgData_01_26, RadioDriver>
-    Spectrum;
+Radio::CBK4819 RadioDriver;
+CSpectrum<RadioDriver> Spectrum;
 
 int main()
 {
-    Fw.IRQ_RESET();
+    IRQ_RESET();
     return 0;
 }
 
 extern "C" void Reset_Handler()
 {
-    Fw.IRQ_RESET();
+    IRQ_RESET();
 }
 
 extern "C" void SysTick_Handler()
@@ -41,5 +37,5 @@ extern "C" void SysTick_Handler()
    {
       Spectrum.Handle();
    }
-    Fw.IRQ_SYSTICK();
+    IRQ_SYSTICK();
 }

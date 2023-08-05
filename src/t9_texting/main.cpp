@@ -6,20 +6,18 @@
 #include <string.h>
 
 Hardware::THardware Hw;
-const System::TOrgFunctions& Fw = System::OrgFunc_01_26;
-const System::TOrgData& FwData = System::OrgData_01_26;
 
-CT9Texting<System::OrgFunc_01_26, System::OrgData_01_26> T9Texting;
+CT9Texting T9Texting;
 
 int main()
 {
-    Fw.IRQ_RESET();
+    IRQ_RESET();
     return 0;
 }
 
 extern "C" void Reset_Handler()
 {
-    Fw.IRQ_RESET();
+    IRQ_RESET();
 }
 
 extern "C" void SysTick_Handler()
@@ -36,13 +34,13 @@ extern "C" void SysTick_Handler()
       bFirstInit = true;
    }
 
-   bool bPreventWhileKeypadPolling = pStackedRegs->LR > (unsigned int)Fw.PollKeyboard && 
-      pStackedRegs->PC < (unsigned int)Fw.PollKeyboard + 0x100; // i made a mistake and compared PC and LR, but this works fine xD
+   bool bPreventWhileKeypadPolling = pStackedRegs->LR > (unsigned int)PollKeyboard &&
+      pStackedRegs->PC < (unsigned int)PollKeyboard + 0x100; // i made a mistake and compared PC and LR, but this works fine xD
 
    static unsigned int u32StupidCounter = 1;
    if(u32StupidCounter++ > 200 && !bPreventWhileKeypadPolling)
    {
       T9Texting.Handle();
    }
-    Fw.IRQ_SYSTICK();
+    IRQ_SYSTICK();
 }

@@ -3,14 +3,13 @@
 #include "uv_k5_display.hpp"
 #include "gpt_pong.hpp"
 
-template <const System::TOrgFunctions &Fw, const System::TOrgData &FwData>
 class CSPong
 {
 public:
    static constexpr auto StepSize = 0xFFFF / TUV_K5Display::SizeX;
    static constexpr auto StepSizeFreq = 10'000;
    CSPong()
-       : DisplayBuff(FwData.pDisplayBuffer), FontSmallNr(FwData.pSmallDigs), Display(DisplayBuff), x(DisplayBuff.SizeX / 2), y(DisplayBuff.SizeY / 2)
+       : DisplayBuff(gDisplayBuffer), FontSmallNr(gSmallDigs), Display(DisplayBuff), x(DisplayBuff.SizeX / 2), y(DisplayBuff.SizeY / 2)
          ,bEnabled(true){};
 
    void Handle()
@@ -23,7 +22,7 @@ public:
       DisplayBuff.ClearAll();
       char C8RssiString[] = "000";
 
-      unsigned int u32Key = Fw.PollKeyboard();
+      unsigned int u32Key = PollKeyboard();
       if(u32Key == 13) // exit key
       {
          bEnabled = false;
@@ -47,7 +46,7 @@ public:
       u32Cnt++;
       if((u32Cnt >> 8) % 2)
       {
-         unsigned int* p32Buff = (unsigned int*)FwData.pDisplayBuffer;
+         unsigned int* p32Buff = (unsigned int*)gDisplayBuffer;
          for(int i = 0; i < (DisplayBuff.SizeX * DisplayBuff.SizeY) / (8*4); i++)
          {
             *p32Buff = ~(*p32Buff);
@@ -56,7 +55,7 @@ public:
       }
 
 
-      Fw.FlushFramebufferToScreen();
+      FlushFramebufferToScreen();
    }
 
 private:
