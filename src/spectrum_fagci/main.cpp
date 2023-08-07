@@ -1,13 +1,12 @@
 #include "hardware/hardware.hpp"
+#include "radio.hpp"
 #include "registers.hpp"
 #include "spectrum.hpp"
 #include "system.hpp"
-#include "radio.hpp"
 #include "uv_k5_display.hpp"
 #include <string.h>
 
 Hardware::THardware Hw;
-
 Radio::CBK4819 RadioDriver;
 CSpectrum<RadioDriver> Spectrum;
 
