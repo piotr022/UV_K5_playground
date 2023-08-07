@@ -82,22 +82,25 @@ public:
 
   void DrawNums() {
     Display.SetCoursorXY(0, 0);
-    Display.PrintFixedDigitsNumber2(scanDelay, 0);
+    Display.PrintFixedDigitsNumber3(scanDelay, 2, 2, 1);
 
-    Display.SetCoursorXY(51, 0);
-    Display.PrintFixedDigitsNumber2(GetBW());
+    Display.SetCoursorXY(112, 0);
+    Display.PrintFixedDigitsNumber3(GetBW(), 4, 2, 1);
 
     /* Display.SetCoursorXY(0, 0);
     Display.PrintFixedDigitsNumber2(rssiMinV, 0); */
 
-    Display.SetCoursorXY(86, 0);
-    Display.PrintFixedDigitsNumber2(peakF);
+    Display.SetCoursorXY(44, 0);
+    Display.PrintFixedDigitsNumber3(peakF, 2, 6, 3);
 
-    Display.SetCoursorXY(44, 48);
-    Display.PrintFixedDigitsNumber2(currentFreq);
+    Display.SetCoursorXY(0, 48);
+    Display.PrintFixedDigitsNumber3(GetFStart(), 4, 4, 1);
 
-    Display.SetCoursorXY(100, 48);
-    Display.PrintFixedDigitsNumber2(frequencyChangeStep);
+    Display.SetCoursorXY(98, 48);
+    Display.PrintFixedDigitsNumber3(GetFEnd(), 4, 4, 1);
+
+    Display.SetCoursorXY(57, 48);
+    Display.PrintFixedDigitsNumber3(frequencyChangeStep, 4, 2, 1);
 
     /* Display.SetCoursorXY(0, 8);
     Display.PrintFixedDigitsNumber2(rssiMaxV, 0); */
@@ -112,7 +115,7 @@ public:
 
   void DrawTicks() {
     // center
-    gDisplayBuffer[BarPos + 64] = 0b10101000;
+    gDisplayBuffer[BarPos + 64] = 0b00111000;
   }
 
   void DrawArrow(u8 x) {
@@ -126,11 +129,11 @@ public:
 
   void OnKey(u8 key) {
     switch (key) {
-    case 3:
+    case 14:
       UpdateRssiTriggerLevel(1);
       DelayMs(90);
       break;
-    case 9:
+    case 15:
       UpdateRssiTriggerLevel(-1);
       DelayMs(90);
       break;
@@ -151,18 +154,18 @@ public:
         rssiMin = 255;
       }
       break;
-    case 2:
+    case 3:
       UpdateBWMul(1);
       resetBlacklist = true;
       break;
-    case 8:
+    case 9:
       UpdateBWMul(-1);
       resetBlacklist = true;
       break;
-    case 14:
+    case 2:
       UpdateFreqChangeStep(100_KHz);
       break;
-    case 15:
+    case 8:
       UpdateFreqChangeStep(-100_KHz);
       break;
     case 11: // up
@@ -307,6 +310,7 @@ private:
   u16 GetScanStep() { return 25_KHz >> (2 >> bwMul); }
   u32 GetBW() { return 200_KHz << bwMul; }
   u32 GetFStart() { return currentFreq - (100_KHz << bwMul); }
+  u32 GetFEnd() { return currentFreq + (100_KHz << bwMul); }
 
   u8 BWMul2XDiv() { return clamp(4 - bwMul, 0, 2); }
   u8 GetMeasurementsCount() {
