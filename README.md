@@ -12,6 +12,41 @@ AFSK messenger with T9 typing support
 * if message is cleared use **EXIT** to exit messenger view  
 * There is no timeout for the button. If you want to type letters located on the same button in a row, use an asterisk (*) to confirm the selected character  
 
+## src/spectrum_fagci ![auto release build](https://github.com/piotr022/UV_K5_playground/actions/workflows/c-cpp.yml/badge.svg)
+
+Spectrum scanner by [@fagci](https://github.com/fagci)
+
+![spectrum_fagci](./docs/spectrum_fagci.gif)
+
+[more videos](https://youtube.com/playlist?list=PL67vBSofOrHMyXOEhonOzQz5gJzsZFiDq)
+
+[download mod](https://github.com/piotr022/UV_K5_playground/releases/latest)
+
+Features:
+
+* no scan sound
+* squelch by user input level
+* 0.2 .. 3.2MHz frequency ranges
+* ticks by frequency (100,500,1000KHz)
+* catch signal peak frequency
+* automatic frequency change step
+* automatic scan step
+* frequency blacklist to remove unwanted signals
+* backlight control
+
+How to start:
+
+* set squelch level to 0 or go into monitor mode before enabling mod
+* to enable spectum view press **flash light button**
+
+How to operate:
+
+* press **8** / **2** for zoom in / zoom out
+* press and hold **3** / **9** to set squelch level
+* press **5** to toggle backlight
+* press **0** to remove frequency from sspectrum to scan
+* press **EXIT** to disable spectrum view
+
 ## src/spectrum ![auto release build](https://github.com/piotr022/UV_K5_playground/actions/workflows/c-cpp.yml/badge.svg)
 ![spectrum](./docs/spectrum.gif)  
 **update**  
