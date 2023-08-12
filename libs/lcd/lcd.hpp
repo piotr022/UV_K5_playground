@@ -270,10 +270,9 @@ public:
     const char dot[1] = {64};
     for (unsigned char i = 0; i < len; i++) {
       if (pointAt == len - i) {
-        u16CoursorPosition++;
-        auto *pCoursorPosition = Bitmap.GetCoursorData(u16CoursorPosition);
+        auto *pCoursorPosition = Bitmap.GetCoursorData(u16CoursorPosition + 1);
         memcpy(pCoursorPosition, dot, 1);
-        u16CoursorPosition++;
+        u16CoursorPosition += 2;
       }
       PrintCharacter(str[i]);
     }

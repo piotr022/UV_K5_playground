@@ -26,7 +26,7 @@ Features:
 
 * no scan sound
 * squelch by user input level
-* 0.2 .. 3.2MHz frequency ranges
+* 0.1 .. 3.2MHz frequency ranges
 * ticks by frequency (100,500,1000KHz)
 * catch signal peak frequency
 * automatic frequency change step
@@ -41,8 +41,11 @@ How to start:
 
 How to operate:
 
-* press **8** / **2** for zoom in / zoom out
-* press and hold **3** / **9** to set squelch level
+* press **UP** / **DOWN** key to change frequency
+* press **1** / **7** to control measurement time (increasing "sensitivity")
+* press **2** / **8** to to set frequency change step
+* press **9** / **3** for zoom in / zoom out
+* press and hold **\*** / **F** to set squelch level
 * press **5** to toggle backlight
 * press **0** to remove frequency from sspectrum to scan
 * press **EXIT** to disable spectrum view
