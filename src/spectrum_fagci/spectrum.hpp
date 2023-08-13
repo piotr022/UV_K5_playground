@@ -10,11 +10,11 @@ public:
   static constexpr auto DrawingEndY = 42;
   static constexpr auto BarPos = 5 * 128;
 
-  static constexpr u32 modeHalfSpectrumBW[6] = {50_KHz,  100_KHz, 200_KHz,
+  static constexpr u32 modeHalfSpectrumBW[6] = {16_KHz,  100_KHz, 200_KHz,
                                                 400_KHz, 800_KHz, 1600_KHz};
-  static constexpr u16 modeScanStep[6] = {1562_Hz, 6250_Hz, 12500_Hz,
-                                          25_KHz,  25_KHz,  25_KHz};
-  static constexpr u8 modeXdiv[6] = {1, 2, 2, 2, 1, 0};
+  static constexpr u16 modeScanStep[6] = {1_KHz,  6250_Hz, 12500_Hz,
+                                          25_KHz, 25_KHz,  25_KHz};
+  static constexpr u8 modeXdiv[6] = {2, 2, 2, 2, 1, 0};
 
   u8 rssiHistory[128] = {};
   u32 fMeasure;
@@ -289,11 +289,12 @@ private:
   void ResetPeak() { peakRssi = 0; }
 
   void SetBW() {
-    auto Reg = BK4819Read(0x43);
+    /* auto Reg = BK4819Read(0x43);
     Reg &= ~(0b11 << 4);
     if (mode >= 3)
-      Reg |= 0b11 << 4;
-    BK4819Write(0x43, Reg);
+      Reg |= 0b10 << 4;
+    BK4819Write(0x43, Reg); */
+    BK4819SetChannelBandwidth(mode < 3);
   }
   void MuteAF() { BK4819Write(0x47, 0); }
   void RestoreOldAFSettings() { BK4819Write(0x47, oldAFSettings); }
