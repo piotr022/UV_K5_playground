@@ -11,6 +11,7 @@ public:
   static constexpr auto BarPos = 5 * 128;
 
   static constexpr auto ModesCount = 7;
+  static constexpr auto LastLowBWModeIndex = 3;
 
   static constexpr u32 modeHalfSpectrumBW[ModesCount] = {
       16_KHz, 50_KHz, 100_KHz, 200_KHz, 400_KHz, 800_KHz, 1600_KHz};
@@ -28,8 +29,6 @@ public:
   u8 rssiMin = 255;
   u8 btnCounter = 0;
 
-  bool resetBlacklist = false;
-
   CSpectrum()
       : DisplayBuff(gDisplayBuffer), Display(DisplayBuff),
         FontSmallNr(gSmallDigs), scanDelay(800), mode(5), rssiTriggerLevel(50) {
@@ -44,7 +43,7 @@ public:
 
     fMeasure = GetFStart();
 
-    RadioDriver.ToggleAFDAC(false);
+    // RadioDriver.ToggleAFDAC(false);
     MuteAF();
 
     u16 scanStep = GetScanStep();
@@ -217,10 +216,12 @@ public:
   void Update() {
     if (peakRssi >= rssiTriggerLevel) {
       ToggleGreen(true);
+      GPIOC->DATA |= GPIO_PIN_4;
       Listen();
     }
     if (peakRssi < rssiTriggerLevel) {
       ToggleGreen(false);
+      GPIOC->DATA &= ~GPIO_PIN_4;
       Scan();
     }
   }
@@ -290,7 +291,7 @@ private:
 
   void ResetPeak() { peakRssi = 0; }
 
-  void SetBW() { BK4819SetChannelBandwidth(mode < 4); }
+  void SetBW() { BK4819SetChannelBandwidth(mode <= LastLowBWModeIndex); }
   void MuteAF() { BK4819Write(0x47, 0); }
   void RestoreOldAFSettings() { BK4819Write(0x47, oldAFSettings); }
 
@@ -299,7 +300,7 @@ private:
       fMeasure = peakF;
       RadioDriver.SetFrequency(fMeasure);
       RestoreOldAFSettings();
-      RadioDriver.ToggleAFDAC(true);
+      // RadioDriver.ToggleAFDAC(true);
     }
     for (u8 i = 0; i < 16 && PollKeyboard() == 255; ++i) {
       DelayMs(64);
@@ -322,7 +323,7 @@ private:
   u8 GetRssi() {
     ResetRSSI();
 
-    DelayUs(scanDelay << (mode < 4));
+    DelayUs(scanDelay << (mode <= LastLowBWModeIndex));
     auto v = BK4819Read(0x67) & 0x1FF;
     return v < 255 ? v : 255;
   }
@@ -362,4 +363,5 @@ private:
   u32 frequencyChangeStep;
 
   bool isInitialized;
+  bool resetBlacklist;
 };
