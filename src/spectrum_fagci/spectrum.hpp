@@ -214,9 +214,11 @@ public:
 
   void Update() {
     if (peakRssi >= rssiTriggerLevel) {
+      // ToggleGreen(true);
       Listen();
     }
     if (peakRssi < rssiTriggerLevel) {
+      // ToggleGreen(false);
       Scan();
     }
   }
@@ -270,6 +272,7 @@ private:
     SetBW();
     ResetPeak();
     resetBlacklist = true;
+    ToggleGreen(false);
     isInitialized = true;
   }
 
@@ -279,6 +282,7 @@ private:
     RadioDriver.SetFrequency(currentFreq);
     RestoreOldAFSettings();
     BK4819Write(0x43, oldBWSettings);
+    ToggleGreen(true);
     isInitialized = false;
   }
 
@@ -335,16 +339,15 @@ private:
 
   void ToggleBacklight() { GPIOB->DATA ^= GPIO_PIN_6; }
 
+  void ToggleRed(bool flag) { BK4819SetGpio(5, flag); }
+  void ToggleGreen(bool flag) { BK4819SetGpio(6, flag); }
+
   u8 Rssi2Y(u8 rssi) {
     return DrawingEndY - clamp(rssi - rssiMin, 0, DrawingEndY);
   }
 
   i32 clamp(i32 v, i32 min, i32 max) {
-    if (v <= min)
-      return min;
-    if (v >= max)
-      return max;
-    return v;
+    return v <= min ? min : (v >= max ? max : v);
   }
 
   TUV_K5Display DisplayBuff;
