@@ -1,6 +1,7 @@
 #pragma once
 #include <string.h>
 #include <type_traits>
+#include "system.hpp"
 
 struct ILcd {
   virtual void UpdateScreen() = 0;
@@ -161,7 +162,7 @@ public:
   }
 
   void Print(const char *C8String) const {
-    for (unsigned char i = 0; i < strlen(C8String); i++) {
+    for (unsigned char i = 0; i < Strlen(C8String); i++) {
       PrintCharacter(C8String[i]);
     }
   }
@@ -260,7 +261,7 @@ public:
     startIdx = 9 - u8DigsToCut - u8FixedDigtsCnt;
 
     const char *str = U8NumBuff + startIdx;
-    const char len = strlen(str);
+    const char len = Strlen(str);
     const char dot[1] = {64};
     for (unsigned char i = 0; i < len; i++) {
       if (pointAt == len - i) {

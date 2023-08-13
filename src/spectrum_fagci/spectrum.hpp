@@ -214,11 +214,11 @@ public:
 
   void Update() {
     if (peakRssi >= rssiTriggerLevel) {
-      // ToggleGreen(true);
+      ToggleGreen(true);
       Listen();
     }
     if (peakRssi < rssiTriggerLevel) {
-      // ToggleGreen(false);
+      ToggleGreen(false);
       Scan();
     }
   }
@@ -288,14 +288,7 @@ private:
 
   void ResetPeak() { peakRssi = 0; }
 
-  void SetBW() {
-    /* auto Reg = BK4819Read(0x43);
-    Reg &= ~(0b11 << 4);
-    if (mode >= 3)
-      Reg |= 0b10 << 4;
-    BK4819Write(0x43, Reg); */
-    BK4819SetChannelBandwidth(mode < 3);
-  }
+  void SetBW() { BK4819SetChannelBandwidth(mode < 3); }
   void MuteAF() { BK4819Write(0x47, 0); }
   void RestoreOldAFSettings() { BK4819Write(0x47, oldAFSettings); }
 
