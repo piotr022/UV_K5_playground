@@ -10,11 +10,13 @@ public:
   static constexpr auto DrawingEndY = 42;
   static constexpr auto BarPos = 5 * 128;
 
-  static constexpr u32 modeHalfSpectrumBW[6] = {16_KHz,  100_KHz, 200_KHz,
-                                                400_KHz, 800_KHz, 1600_KHz};
-  static constexpr u16 modeScanStep[6] = {1_KHz,  6250_Hz, 12500_Hz,
-                                          25_KHz, 25_KHz,  25_KHz};
-  static constexpr u8 modeXdiv[6] = {2, 2, 2, 2, 1, 0};
+  static constexpr auto ModesCount = 7;
+
+  static constexpr u32 modeHalfSpectrumBW[ModesCount] = {
+      16_KHz, 50_KHz, 100_KHz, 200_KHz, 400_KHz, 800_KHz, 1600_KHz};
+  static constexpr u16 modeScanStep[ModesCount] = {
+      1_KHz, 3125_Hz, 6250_Hz, 12500_Hz, 25_KHz, 25_KHz, 25_KHz};
+  static constexpr u8 modeXdiv[ModesCount] = {2, 2, 2, 2, 2, 1, 0};
 
   u8 rssiHistory[128] = {};
   u32 fMeasure;
@@ -30,7 +32,7 @@ public:
 
   CSpectrum()
       : DisplayBuff(gDisplayBuffer), Display(DisplayBuff),
-        FontSmallNr(gSmallDigs), scanDelay(800), mode(4), rssiTriggerLevel(60) {
+        FontSmallNr(gSmallDigs), scanDelay(800), mode(5), rssiTriggerLevel(50) {
     Display.SetFont(&FontSmallNr);
     frequencyChangeStep = modeHalfSpectrumBW[mode];
   };
@@ -89,10 +91,10 @@ public:
     Display.SetCoursorXY(0, 0);
     Display.PrintFixedDigitsNumber3(scanDelay, 2, 2, 1);
 
-    Display.SetCoursorXY(112, 0);
-    Display.PrintFixedDigitsNumber3(GetBW(), 4, 2, 1);
+    Display.SetCoursorXY(105, 0);
+    Display.PrintFixedDigitsNumber3(GetBW(), 3, 3, 2);
 
-    Display.SetCoursorXY(44, 0);
+    Display.SetCoursorXY(42, 0);
     Display.PrintFixedDigitsNumber3(peakF, 2, 6, 3);
 
     Display.SetCoursorXY(0, 48);
@@ -101,8 +103,8 @@ public:
     Display.SetCoursorXY(98, 48);
     Display.PrintFixedDigitsNumber3(GetFEnd(), 4, 4, 1);
 
-    Display.SetCoursorXY(57, 48);
-    Display.PrintFixedDigitsNumber3(frequencyChangeStep, 4, 2, 1);
+    Display.SetCoursorXY(52, 48);
+    Display.PrintFixedDigitsNumber3(frequencyChangeStep, 3, 3, 2);
   }
 
   void DrawRssiTriggerLevel() {
@@ -130,13 +132,13 @@ public:
     switch (key) {
     case Keys::NUM1:
       if (scanDelay < 8000) {
-        scanDelay += 200;
+        scanDelay += 100;
         rssiMin = 255;
       }
       break;
     case Keys::NUM7:
-      if (scanDelay > 800) {
-        scanDelay -= 200;
+      if (scanDelay > 400) {
+        scanDelay -= 100;
         rssiMin = 255;
       }
       break;
@@ -226,7 +228,7 @@ public:
   void UpdateRssiTriggerLevel(i32 diff) { rssiTriggerLevel += diff; }
 
   void UpdateBWMul(i32 diff) {
-    if ((diff > 0 && mode < 5) || (diff < 0 && mode > 0)) {
+    if ((diff > 0 && mode < (ModesCount - 1)) || (diff < 0 && mode > 0)) {
       mode += diff;
       SetBW();
       rssiMin = 255;
@@ -288,7 +290,7 @@ private:
 
   void ResetPeak() { peakRssi = 0; }
 
-  void SetBW() { BK4819SetChannelBandwidth(mode < 3); }
+  void SetBW() { BK4819SetChannelBandwidth(mode < 4); }
   void MuteAF() { BK4819Write(0x47, 0); }
   void RestoreOldAFSettings() { BK4819Write(0x47, oldAFSettings); }
 
@@ -320,7 +322,7 @@ private:
   u8 GetRssi() {
     ResetRSSI();
 
-    DelayUs(scanDelay << (mode < 3));
+    DelayUs(scanDelay << (mode < 4));
     auto v = BK4819Read(0x67) & 0x1FF;
     return v < 255 ? v : 255;
   }
