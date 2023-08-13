@@ -30,8 +30,7 @@ public:
 
   CSpectrum()
       : DisplayBuff(gDisplayBuffer), Display(DisplayBuff),
-        FontSmallNr(gSmallDigs), scanDelay(1600), mode(4),
-        rssiTriggerLevel(60) {
+        FontSmallNr(gSmallDigs), scanDelay(800), mode(4), rssiTriggerLevel(60) {
     Display.SetFont(&FontSmallNr);
     frequencyChangeStep = modeHalfSpectrumBW[mode];
   };
@@ -188,14 +187,18 @@ public:
       DeInit();
       return false;
     }
-    if (btn != 255 && btn == btnPrev) {
-      btnCounter = clamp(btnCounter + 1, 0, 255);
-    } else {
-      btnCounter = 0;
+
+    if (btn != 255) {
+      if (btn == btnPrev && btnCounter < 255) {
+        btnCounter++;
+      }
+      if (btnPrev == 255 || btnCounter > 16) {
+        OnKeyDown(btn);
+      }
+      return true;
     }
-    if ((btn != 255 && btnPrev == 255) || btnCounter > 16) {
-      OnKeyDown(btn);
-    }
+
+    btnCounter = 0;
     return true;
   }
 
@@ -279,11 +282,7 @@ private:
     isInitialized = false;
   }
 
-  void ResetPeak() {
-    peakRssi = 0;
-    // peakF = currentFreq;
-    peakT = 0;
-  }
+  void ResetPeak() { peakRssi = 0; }
 
   void SetBW() {
     auto Reg = BK4819Read(0x43);
@@ -324,7 +323,8 @@ private:
     ResetRSSI();
 
     DelayUs(scanDelay << (mode < 3));
-    return (BK4819Read(0x67) & 0x1FF) >> 1;
+    auto v = BK4819Read(0x67) & 0x1FF;
+    return v < 255 ? v : 255;
   }
 
   bool IsFlashLightOn() { return GPIOC->DATA & GPIO_PIN_3; }
@@ -362,5 +362,5 @@ private:
   u16 oldBWSettings;
   u32 frequencyChangeStep;
 
-  bool isInitialized = false;
+  bool isInitialized;
 };

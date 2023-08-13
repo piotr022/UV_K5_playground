@@ -256,14 +256,8 @@ public:
         startIdx = 8 - i;
     }
 
-    // If the number was 0, we write a single 0.
-    /* if (startIdx == 0)
-      U8NumBuff[0] = '0'; */
-
     // Print the string from the start index
-    if (u8FixedDigtsCnt) {
-      startIdx = 9 - u8DigsToCut - u8FixedDigtsCnt;
-    }
+    startIdx = 9 - u8DigsToCut - u8FixedDigtsCnt;
 
     const char *str = U8NumBuff + startIdx;
     const char len = strlen(str);
