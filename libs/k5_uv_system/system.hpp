@@ -23,6 +23,8 @@ extern "C" {
       void AirCopyFskSetup();
       void BK4819Reset();
       int IntDivide(int s32Divident, int s32Divisor);
+      int Strlen(const char *string);
+      void BK4819SetChannelBandwidth(bool narrow);
       void BK4819WriteFrequency(unsigned int u32Frequency);
       void BK4819SetPaGain(unsigned short u16PaBias, unsigned int u32Frequency);
       void BK4819ConfigureAndStartTxFsk();

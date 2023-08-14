@@ -43,6 +43,12 @@ BK4819Reset = 0xa7cc + 1;
 .globl IntDivide
 IntDivide = 0x128 + 1;
 
+.globl Strlen
+Strlen = 0x1c0 + 1;
+
+.globl BK4819SetChannelBandwidth
+BK4819SetChannelBandwidth = 0xaa48 + 1;
+
 .globl BK4819WriteFrequency
 BK4819WriteFrequency = 0xaabc + 1;
 
