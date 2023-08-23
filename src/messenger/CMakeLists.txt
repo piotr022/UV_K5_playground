@@ -69,11 +69,21 @@ add_custom_command(TARGET ${NAME}
 )
 
 add_custom_target(${NAME}_flash
-	COMMAND openocd -f interface/cmsis-dap.cfg -f ${PROJECT_SOURCE_DIR}/openocd_scripts/dp32g030.cfg -c "write_image ${PROJECT_SOURCE_DIR}/build/src/rssi_printer/rssi_printer.bin 0x1000" -c "halt" -c "shutdown"
+	COMMAND openocd -f interface/cmsis-dap.cfg -f ${PROJECT_SOURCE_DIR}/openocd_scripts/dp32g030:.cfg -c "write_image ${PROJECT_SOURCE_DIR}/build/src/rssi_printer/rssi_printer.bin 0x1000" -c "halt" -c "shutdown"
 	DEPENDS ${NAME}
 )
 
 add_custom_target(${NAME}_encoded
 	COMMAND python ${PROJECT_SOURCE_DIR}/tools/fw_tools/python-utils/fw_pack.py ${CMAKE_CURRENT_BINARY_DIR}/${NAME}.bin ${CMAKE_CURRENT_SOURCE_DIR}/../orginal_fw/k5_26_encrypted_18to1300MHz.ver.bin ${CMAKE_CURRENT_BINARY_DIR}/${NAME}_encoded.bin
 	DEPENDS ${NAME}
+)
+
+if(NOT DEFINED ${SERIAL_PORT})
+	set(SERIAL_PORT /dev/ttyUSB0)
+endif()
+
+add_custom_target(${NAME}_flash_uart
+	COMMAND ${CMAKE_BINARY_DIR}/tools/k5prog -F -p ${SERIAL_PORT} -b ${CMAKE_CURRENT_BINARY_DIR}/${NAME}.bin -Y -Y -Y
+	DEPENDS ${NAME}_encoded
+	DEPENDS k5prog
 )

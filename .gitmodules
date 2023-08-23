@@ -1,3 +1,6 @@
 [submodule "tools/fw_tools"]
 	path = tools/fw_tools
 	url = https://github.com/amnemonic/Quansheng_UV-K5_Firmware.git
+[submodule "tools/k5prog"]
+	path = tools/k5prog
+	url = git@github.com:sq5bpf/k5prog.git

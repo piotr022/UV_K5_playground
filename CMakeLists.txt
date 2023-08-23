@@ -31,6 +31,7 @@ set(COMPILER_OPTIONS -mthumb -mcpu=cortex-m0 -mfpu=auto -mfloat-abi=soft -fno-ex
 -O${OPTI_FLAG} -Wl,--gc-sections $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti> 
 )
 
+add_subdirectory(tools)
 add_subdirectory(libs)
 add_subdirectory(src)
 
